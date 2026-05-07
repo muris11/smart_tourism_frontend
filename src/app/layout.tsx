@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import '@/styles/globals.css'
 
@@ -7,11 +7,18 @@ const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin']
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Smart Tourism Ciayumajakuning',
-    default: 'Smart Tourism Ciayumajakuning',
+    template: '%s | CITRA',
+    default: 'CITRA',
   },
-  description:
-    'Temukan wisata, kuliner, dan tempat nongkrong terbaik di Cirebon, Indramayu, Majalengka, dan Kuningan.',
+  description: 'CITRA (Ciayumajakuning Intelligent Tourism & Recommendation Assistant)',
+  icons: {
+    icon: '/favicon.ico',
+  },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

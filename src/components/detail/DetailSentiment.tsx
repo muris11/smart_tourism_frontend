@@ -9,11 +9,11 @@ interface Props {
 
 export default function DetailSentiment({ kode, tipe, sentimen, pct }: Props) {
   return (
-    <section className="card rounded-2xl p-6">
-      <h2 className="text-xl font-semibold">Sentiment</h2>
-      <p className="mt-3 text-sm text-gray-600">{tipe} · {kode}</p>
-      <p className="mt-1 text-sm text-gray-600">Status: {sentimen}</p>
-      <p className="mt-1 font-medium text-[var(--color-brand)]">{formatSentimen(pct)}</p>
+    <section className="card p-6">
+      <h2 className="text-2xl text-brand-navy">Sentiment</h2>
+      <p className="mt-3 text-sm text-slate-600">{tipe} · {kode}</p>
+      <p className="mt-1 text-sm text-slate-600">Status: {sentimen}</p>
+      <p className="mt-2 text-lg font-medium text-brand-green">{formatSentimen(pct)}</p>
     </section>
   )
 }

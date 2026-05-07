@@ -10,18 +10,18 @@ interface Props {
 
 export default function NongkrongCard({ nongkrong }: Props) {
   return (
-    <Link href={ROUTES.NONGKRONG_DETAIL(nongkrong.kode)} className="card block rounded-2xl p-4 transition-shadow hover:shadow-md">
-      <div className="mb-3 flex items-start justify-between gap-3">
+    <Link href={ROUTES.NONGKRONG_DETAIL(nongkrong.kode)} className="group block rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+      <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs text-gray-400">{nongkrong.wilayah} · {nongkrong.tipe}</p>
-          <h3 className="font-semibold">{nongkrong.nama}</h3>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{nongkrong.wilayah} · {nongkrong.tipe}</p>
+          <h3 className="mt-2 text-2xl leading-tight text-brand-navy transition-colors group-hover:text-[var(--color-brand-dark)]">{nongkrong.nama}</h3>
         </div>
         <Badge label={nongkrong.sentimen} variant={nongkrong.sentimen === 'positif' ? 'success' : nongkrong.sentimen === 'negatif' ? 'danger' : 'default'} />
       </div>
-      <p className="text-sm text-gray-500">{nongkrong.alamat ?? 'Alamat belum tersedia'}</p>
-      <div className="mt-3 flex items-center justify-between text-sm">
-        <span className="font-medium text-[var(--color-brand)]">⭐ {formatRating(nongkrong.rating)}</span>
-        <span className="text-gray-400">{nongkrong.ada_wifi ? 'WiFi' : 'No WiFi'} · {nongkrong.ada_colokan ? 'Colokan' : 'Tanpa Colokan'}</span>
+      <p className="text-sm leading-7 font-light text-slate-600">{nongkrong.alamat ?? 'Alamat belum tersedia'}</p>
+      <div className="mt-5 flex items-center justify-between text-sm">
+        <span className="font-medium text-brand-navy">Rating {formatRating(nongkrong.rating)}</span>
+        <span className="text-slate-400">{nongkrong.ada_wifi ? 'WiFi' : 'No WiFi'} · {nongkrong.ada_colokan ? 'Colokan' : 'Tanpa Colokan'}</span>
       </div>
     </Link>
   )

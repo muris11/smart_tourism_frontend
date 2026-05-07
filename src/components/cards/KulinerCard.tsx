@@ -10,18 +10,18 @@ interface Props {
 
 export default function KulinerCard({ kuliner }: Props) {
   return (
-    <Link href={ROUTES.KULINER_DETAIL(kuliner.kode)} className="card block rounded-2xl p-4 transition-shadow hover:shadow-md">
-      <div className="mb-3 flex items-start justify-between gap-3">
+    <Link href={ROUTES.KULINER_DETAIL(kuliner.kode)} className="group block rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+      <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs text-gray-400">{kuliner.wilayah} · {kuliner.jenis}</p>
-          <h3 className="font-semibold">{kuliner.nama}</h3>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{kuliner.wilayah} · {kuliner.jenis}</p>
+          <h3 className="mt-2 text-2xl leading-tight text-brand-navy transition-colors group-hover:text-[var(--color-brand-dark)]">{kuliner.nama}</h3>
         </div>
         <Badge label={kuliner.sentimen} variant={kuliner.sentimen === 'positif' ? 'success' : kuliner.sentimen === 'negatif' ? 'danger' : 'default'} />
       </div>
-      <p className="text-sm text-gray-500">{kuliner.alamat ?? 'Alamat belum tersedia'}</p>
-      <div className="mt-3 flex items-center justify-between text-sm">
-        <span className="font-medium text-[var(--color-brand)]">⭐ {formatRating(kuliner.rating)}</span>
-        <span className="text-gray-400">{kuliner.range_harga ?? '-'}</span>
+      <p className="text-sm leading-7 font-light text-slate-600">{kuliner.alamat ?? 'Alamat belum tersedia'}</p>
+      <div className="mt-5 flex items-center justify-between text-sm">
+        <span className="font-medium text-brand-navy">Rating {formatRating(kuliner.rating)}</span>
+        <span className="text-slate-400">{kuliner.range_harga ?? '-'}</span>
       </div>
     </Link>
   )

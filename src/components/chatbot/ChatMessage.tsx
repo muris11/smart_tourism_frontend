@@ -10,7 +10,14 @@ export default function ChatMessage({ message }: Props) {
 
   return (
     <div className={cn('flex', isUser ? 'justify-end' : 'justify-start')}>
-      <div className={cn('max-w-[85%] rounded-2xl px-3 py-2 text-sm', isUser ? 'rounded-br-sm bg-[var(--color-brand)] text-white' : 'rounded-bl-sm bg-gray-100 text-gray-800')}>
+      <div
+        className={cn(
+          'max-w-[85%] rounded-[1.35rem] px-4 py-3 text-sm leading-7 shadow-sm',
+          isUser
+            ? 'rounded-br-md bg-brand-navy text-white'
+            : 'rounded-bl-md border border-slate-200 bg-white text-slate-700'
+        )}
+      >
         {message.content}
       </div>
     </div>

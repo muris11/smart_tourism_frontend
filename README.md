@@ -1,6 +1,6 @@
 # Frontend_CITRA
 
-Frontend Next.js untuk template Smart Tourism Ciayumajakuning.
+Frontend Next.js untuk CITRA (Ciayumajakuning Intelligent Tourism & Recommendation Assistant).
 
 Stack utama:
 - Next.js 16 App Router

@@ -18,14 +18,32 @@ export default function ChatInput({ onSend, disabled }: Props) {
   }
 
   return (
-    <div className="flex items-center gap-2 border-t border-gray-100 px-3 py-3">
-      <input value={value} onChange={(e) => setValue(e.target.value)} onKeyDown={(e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault()
-          handleSend()
-        }
-      }} disabled={disabled} placeholder="Ketik pertanyaan kamu..." className="flex-1 rounded-xl bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] disabled:opacity-50" />
-      <button onClick={handleSend} disabled={disabled || !value.trim()} className="rounded-xl bg-[var(--color-brand)] px-3 py-2 text-sm font-medium text-white transition hover:bg-[var(--color-brand-dark)] disabled:opacity-50">Kirim</button>
+    <div className="border-t border-slate-200 bg-white px-4 py-4">
+      <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-2 transition-all focus-within:border-brand-navy focus-within:bg-white focus-within:ring-1 focus-within:ring-brand-navy">
+        <div className="flex items-end gap-2">
+          <textarea
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                handleSend()
+              }
+            }}
+            disabled={disabled}
+            rows={1}
+            placeholder="Tulis tujuan, suasana, atau jenis tempat yang ingin kamu cari..."
+            className="max-h-32 min-h-[48px] flex-1 resize-none bg-transparent px-3 py-2.5 text-sm leading-6 outline-none placeholder:text-slate-400 disabled:opacity-50"
+          />
+          <button
+            onClick={handleSend}
+            disabled={disabled || !value.trim()}
+            className="rounded-[1.1rem] bg-brand-navy px-4 py-3 text-sm font-medium text-white transition hover:bg-[var(--color-brand)] disabled:opacity-50"
+          >
+            Kirim
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

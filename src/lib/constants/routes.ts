@@ -12,4 +12,7 @@ export const ROUTES = {
   REKOMENDASI: '/rekomendasi',
   PLANNING: '/planning',
   CARI: '/cari',
+  TENTANG: '/tentang',
+  FAQ: '/faq',
+  KONTAK: '/kontak',
 } as const

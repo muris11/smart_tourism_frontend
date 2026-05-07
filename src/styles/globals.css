@@ -1,14 +1,19 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #ffffff;
-  --color-foreground: #111827;
-  --color-brand: #16a34a;
-  --color-brand-dark: #14532d;
-  --color-brand-light: #dcfce7;
+  --color-background: #fcfcfb;
+  --color-foreground: #18181b;
+  --color-brand: #8a5a44;
+  --color-brand-dark: #261814;
+  --color-brand-light: #f6efe7;
+  --color-brand-blue: #6f5d53;
+  --color-brand-navy: #261814;
+  --color-brand-pale: #f6efe7;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --shadow-card: 0 2px 16px 0 rgba(0, 0, 0, 0.07);
+  --font-display: Georgia, "Times New Roman", serif;
+  --shadow-card: 0 10px 40px rgba(38, 24, 20, 0.08);
+  --shadow-soft: 0 20px 80px rgba(38, 24, 20, 0.1);
 }
 
 @layer base {
@@ -25,7 +30,20 @@
   }
 
   body {
-    @apply antialiased bg-white text-gray-900;
+    @apply antialiased text-gray-900;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.03em;
   }
 
   ::-webkit-scrollbar {
@@ -48,10 +66,114 @@
   }
 
   .btn-primary {
-    @apply rounded-xl bg-[var(--color-brand)] px-5 py-2.5 font-semibold text-white transition-colors hover:bg-[var(--color-brand-dark)] disabled:opacity-60;
+    @apply rounded-full bg-[var(--color-brand-navy)] px-6 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-slate-800 hover:shadow-lg disabled:opacity-60;
   }
 
   .card {
-    @apply overflow-hidden rounded-2xl bg-white shadow-[var(--shadow-card)];
+    @apply overflow-hidden rounded-[2rem] bg-white shadow-[var(--shadow-card)];
+  }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  }
+
+  .glass-panel-dark {
+    background: rgba(11, 18, 33, 0.55);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.22em];
+    color: var(--color-brand);
+  }
+
+  .section-title {
+    @apply text-4xl leading-tight md:text-5xl;
+    color: var(--color-brand-navy);
+  }
+
+  .section-copy {
+    @apply text-lg font-light leading-8 text-slate-500;
+  }
+}
+
+@layer utilities {
+  .text-brand-navy {
+    color: var(--color-brand-navy);
+  }
+
+  .text-brand-green {
+    color: var(--color-brand);
+  }
+
+  .hover-brand-soft {
+    transition: color 300ms ease;
+  }
+
+  .hover-brand-soft:hover {
+    color: var(--color-brand-dark);
+  }
+
+  .text-brand-blue {
+    color: var(--color-brand-blue);
+  }
+
+  .bg-brand-navy {
+    background-color: var(--color-brand-navy);
+  }
+
+  .bg-brand-pale {
+    background-color: var(--color-brand-pale);
+  }
+
+  .bg-brand-green {
+    background-color: var(--color-brand);
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-slide-up-delay-1 {
+    animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+    opacity: 0;
+  }
+
+  .animate-slide-up-delay-2 {
+    animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+    opacity: 0;
+  }
+
+  .img-reveal {
+    opacity: 0;
+    animation: fadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

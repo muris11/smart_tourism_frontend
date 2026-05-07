@@ -12,9 +12,10 @@ export default function DetailInfo({ wisata, item }: Props) {
   if (!data) return null
 
   return (
-    <section className="card rounded-2xl p-6">
-      <h2 className="text-xl font-semibold">Informasi Detail</h2>
-      <p className="mt-3 text-sm leading-6 text-gray-600">{data.deskripsi ?? 'Deskripsi belum tersedia.'}</p>
+    <section className="card p-8">
+      <p className="eyebrow mb-4">Ulasan Destinasi</p>
+      <h2 className="mb-5 text-3xl text-brand-navy">Informasi Detail</h2>
+      <p className="text-base leading-8 font-light text-slate-600">{data.deskripsi ?? 'Deskripsi belum tersedia.'}</p>
     </section>
   )
 }
