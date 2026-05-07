@@ -1,0 +1,15 @@
+export const ROUTES = {
+  HOME: '/',
+  LOGIN: '/login',
+  REGISTER: '/register',
+  PROFIL: '/profil',
+  WISATA: '/wisata',
+  WISATA_DETAIL: (kode: string) => `/wisata/${kode}`,
+  KULINER: '/kuliner',
+  KULINER_DETAIL: (kode: string) => `/kuliner/${kode}`,
+  NONGKRONG: '/nongkrong',
+  NONGKRONG_DETAIL: (kode: string) => `/nongkrong/${kode}`,
+  REKOMENDASI: '/rekomendasi',
+  PLANNING: '/planning',
+  CARI: '/cari',
+} as const
