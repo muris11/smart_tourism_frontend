@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Link from 'next/link'
-import { User as UserIcon, Mail, LogOut, Edit3, Save, Loader2, Shield } from 'lucide-react'
+import { User as UserIcon, Mail, LogOut, Edit3, Save, Loader2, Shield, Heart, MapPin, Wallet } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { authApi } from '@/lib/api/auth'
+import { authApi, UserPreferences, PreferencesPayload } from '@/lib/api/auth'
 import { useAuthStore } from '@/stores/authStore'
 
 const profileSchema = z.object({
@@ -15,6 +15,9 @@ const profileSchema = z.object({
 })
 
 type ProfileFormData = z.infer<typeof profileSchema>
+
+const WILAYAH_OPTIONS = ['Cirebon', 'Indramayu', 'Majalengka', 'Kuningan']
+const KATEGORI_OPTIONS = ['Alam', 'Buatan', 'Budaya', 'Religi', 'Petualangan', 'Edukasi', 'Kuliner', 'Nongkrong']
 
 function GuestView() {
   return (
@@ -38,6 +41,227 @@ function GuestView() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function PreferencesSection() {
+  const [prefs, setPrefs] = useState<UserPreferences | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [successMsg, setSuccessMsg] = useState<string | null>(null)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+
+  const [kategoriFavorit, setKategoriFavorit] = useState<string[]>([])
+  const [wilayahFavorit, setWilayahFavorit] = useState<string[]>([])
+  const [budgetMin, setBudgetMin] = useState('')
+  const [budgetMax, setBudgetMax] = useState('')
+
+  useEffect(() => {
+    const fetchPrefs = async () => {
+      try {
+        const data = await authApi.getPreferences()
+        setPrefs(data)
+        if (data) {
+          setKategoriFavorit(data.kategori_favorit ?? [])
+          setWilayahFavorit(data.wilayah_favorit ?? [])
+          setBudgetMin(data.budget_min ? String(data.budget_min) : '')
+          setBudgetMax(data.budget_max ? String(data.budget_max) : '')
+        }
+      } catch {
+        // preferences belum ada, biarkan kosong
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchPrefs()
+  }, [])
+
+  const handleSave = async () => {
+    setIsSaving(true)
+    setSuccessMsg(null)
+    setErrorMsg(null)
+
+    const payload: PreferencesPayload = {
+      kategori_favorit: kategoriFavorit.length > 0 ? kategoriFavorit : undefined,
+      wilayah_favorit: wilayahFavorit.length > 0 ? wilayahFavorit : undefined,
+      budget_min: budgetMin ? Number(budgetMin) : undefined,
+      budget_max: budgetMax ? Number(budgetMax) : undefined,
+    }
+
+    try {
+      await authApi.updatePreferences(payload)
+      setSuccessMsg('Preferensi berhasil disimpan.')
+      setIsEditing(false)
+    } catch {
+      setErrorMsg('Gagal menyimpan preferensi.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const toggleKategori = (k: string) => {
+    setKategoriFavorit((prev) => prev.includes(k) ? prev.filter((x) => x !== k) : [...prev, k])
+  }
+
+  const toggleWilayah = (w: string) => {
+    setWilayahFavorit((prev) => prev.includes(w) ? prev.filter((x) => x !== w) : [...prev, w])
+  }
+
+  if (isLoading) {
+    return (
+      <div className="mt-8 border-t border-slate-100 pt-8">
+        <div className="h-6 w-40 animate-pulse rounded bg-slate-100" />
+        <div className="mt-4 space-y-3">
+          <div className="h-12 animate-pulse rounded-xl bg-slate-100" />
+          <div className="h-12 animate-pulse rounded-xl bg-slate-100" />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mt-8 border-t border-slate-100 pt-8">
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-500">Preferensi Wisata</h2>
+        {!isEditing && (
+          <button
+            onClick={() => setIsEditing(true)}
+            className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
+          >
+            <Edit3 className="h-3 w-3" />
+            Edit Preferensi
+          </button>
+        )}
+      </div>
+
+      {isEditing ? (
+        <div className="mt-4 space-y-5">
+          <div>
+            <label className="mb-2 flex items-center gap-2 text-xs font-medium text-slate-600">
+              <Heart className="h-3.5 w-3.5" />
+              Kategori Favorit
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {KATEGORI_OPTIONS.map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => toggleKategori(k)}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
+                    kategoriFavorit.includes(k)
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                  }`}
+                >
+                  {k}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 flex items-center gap-2 text-xs font-medium text-slate-600">
+              <MapPin className="h-3.5 w-3.5" />
+              Wilayah Favorit
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {WILAYAH_OPTIONS.map((w) => (
+                <button
+                  key={w}
+                  type="button"
+                  onClick={() => toggleWilayah(w)}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
+                    wilayahFavorit.includes(w)
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                  }`}
+                >
+                  {w}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1 flex items-center gap-2 text-xs font-medium text-slate-600">
+                <Wallet className="h-3.5 w-3.5" />
+                Budget Min (Rp)
+              </label>
+              <input
+                type="number"
+                value={budgetMin}
+                onChange={(e) => setBudgetMin(e.target.value)}
+                placeholder="0"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-all focus:border-blue-500 focus:bg-white"
+              />
+            </div>
+            <div>
+              <label className="mb-1 flex items-center gap-2 text-xs font-medium text-slate-600">
+                <Wallet className="h-3.5 w-3.5" />
+                Budget Max (Rp)
+              </label>
+              <input
+                type="number"
+                value={budgetMax}
+                onChange={(e) => setBudgetMax(e.target.value)}
+                placeholder="0"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-all focus:border-blue-500 focus:bg-white"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-800 disabled:opacity-50"
+            >
+              {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              Simpan Preferensi
+            </button>
+            <button
+              onClick={() => setIsEditing(false)}
+              className="rounded-full border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50"
+            >
+              Batal
+            </button>
+          </div>
+
+          {successMsg && <div className="rounded-xl border border-green-100 bg-green-50 p-3 text-sm text-green-700">{successMsg}</div>}
+          {errorMsg && <div className="rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-600">{errorMsg}</div>}
+        </div>
+      ) : (
+        <div className="mt-4 space-y-3">
+          <div className="flex items-start justify-between rounded-xl bg-slate-50 px-4 py-3">
+            <span className="text-xs text-slate-500">Kategori Favorit</span>
+            <div className="flex flex-wrap justify-end gap-1">
+              {kategoriFavorit.length > 0 ? kategoriFavorit.map((k) => (
+                <span key={k} className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700">{k}</span>
+              )) : <span className="text-xs text-slate-400">Belum diatur</span>}
+            </div>
+          </div>
+          <div className="flex items-start justify-between rounded-xl bg-slate-50 px-4 py-3">
+            <span className="text-xs text-slate-500">Wilayah Favorit</span>
+            <div className="flex flex-wrap justify-end gap-1">
+              {wilayahFavorit.length > 0 ? wilayahFavorit.map((w) => (
+                <span key={w} className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700">{w}</span>
+              )) : <span className="text-xs text-slate-400">Belum diatur</span>}
+            </div>
+          </div>
+          <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
+            <span className="text-xs text-slate-500">Budget</span>
+            <span className="text-sm font-medium text-slate-800">
+              {budgetMin || budgetMax
+                ? `Rp ${budgetMin || '0'} - Rp ${budgetMax || '∞'}`
+                : <span className="text-xs text-slate-400">Belum diatur</span>
+              }
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -162,6 +386,8 @@ function ProfileView() {
               <div className="mt-4 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-600">{errorMsg}</div>
             )}
           </div>
+
+          <PreferencesSection />
 
           <div className="mt-8 border-t border-slate-100 pt-8">
             <button
