@@ -29,6 +29,13 @@ export function useAuth() {
     router.push('/login')
   }
 
+  const updateProfile = async (payload: { nama?: string; avatar_url?: string }) => {
+    await authApi.updateProfile(payload)
+    if (user && payload.nama) {
+      setUser({ ...user, name: payload.nama })
+    }
+  }
+
   return {
     user,
     isLoggedIn: !!user,
@@ -36,5 +43,6 @@ export function useAuth() {
     login,
     register,
     logout,
+    updateProfile,
   }
 }

@@ -10,8 +10,8 @@ export type RekoItem = (WisataItem | KulinerItem | NongkrongItem) & {
 
 export interface RecommendationPayload {
   mode?: 'personal' | 'nearby' | 'popular'
-  wilayah?: string
-  tipe?: 'wisata' | 'kuliner' | 'nongkrong'
+  wilayah?: string[]
+  tipe?: 'wisata' | 'kuliner' | 'nongkrong' | 'all' | string
   kategori?: string
   latitude?: number
   longitude?: number
@@ -22,7 +22,7 @@ export interface PlanningPayload {
   jumlah_hari: number
   wilayah: string[]
   preferensi?: string[]
-  budget?: 'murah' | 'sedang' | 'mahal'
+  budget?: 'murah' | 'sedang' | 'mahal' | string
   latitude?: number
   longitude?: number
 }

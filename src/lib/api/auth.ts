@@ -1,7 +1,26 @@
 import Cookies from 'js-cookie'
 import { ApiResponse } from '@/types/api'
-import { AuthResponse, LoginPayload, RegisterPayload } from '@/types/auth'
+import { AuthResponse, LoginPayload, RegisterPayload, User } from '@/types/auth'
 import { apiClient, TOKEN_KEY } from './client'
+
+export interface PreferencesPayload {
+  kategori_favorit?: string[]
+  wilayah_favorit?: string[]
+  budget_min?: number
+  budget_max?: number
+  tipe_wisata?: string[]
+}
+
+export interface UserPreferences {
+  id: number
+  user_id: string
+  kategori_favorit: string[] | null
+  wilayah_favorit: string[] | null
+  budget_min: number
+  budget_max: number
+  tipe_wisata: string[] | null
+  updated_at: string
+}
 
 export const authApi = {
   login: async (payload: LoginPayload): Promise<AuthResponse> => {
@@ -22,8 +41,18 @@ export const authApi = {
     await apiClient.post('/auth/logout')
     Cookies.remove(TOKEN_KEY)
   },
-  me: async () => {
-    const { data } = await apiClient.get<ApiResponse<AuthResponse['user']>>('/auth/me')
-    return data.data
+  me: async (): Promise<User | null> => {
+    const { data } = await apiClient.get<ApiResponse<User>>('/auth/me')
+    return data.data ?? null
+  },
+  updateProfile: async (payload: { nama?: string; avatar_url?: string }): Promise<void> => {
+    await apiClient.put('/auth/profile', payload)
+  },
+  getPreferences: async (): Promise<UserPreferences | null> => {
+    const { data } = await apiClient.get<ApiResponse<UserPreferences>>('/preferences')
+    return data.data ?? null
+  },
+  updatePreferences: async (payload: PreferencesPayload): Promise<void> => {
+    await apiClient.put('/preferences', payload)
   },
 }
