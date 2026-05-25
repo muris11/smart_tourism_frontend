@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import ItineraryResult from '@/components/sections/ItineraryResult'
-import PlanningForm from '@/components/sections/PlanningForm'
+import ItineraryResult from '@/components/sections/planning/ItineraryResult'
+import PlanningForm from '@/components/sections/planning/PlanningForm'
 import { PlanningResult } from '@/types/recommendation'
 
 export default function PlanningPage() {
