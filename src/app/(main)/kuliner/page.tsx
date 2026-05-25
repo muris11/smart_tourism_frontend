@@ -2,7 +2,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Search, SlidersHorizontal, X, Sparkles } from 'lucide-react'
 import { useKuliner, useFeaturedKuliner } from '@/hooks/useKuliner'
@@ -153,7 +153,7 @@ function FilterContent({
   )
 }
 
-export default function KulinerPage() {
+function KulinerPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -406,5 +406,21 @@ export default function KulinerPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function KulinerPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-linear-to-b from-slate-50 to-white">
+        <div className="container mx-auto px-4 pb-8 pt-32 md:px-6 md:pt-36 lg:px-8 lg:pt-32">
+          <div className="flex justify-center py-20">
+            <div className="h-10 w-48 animate-pulse rounded bg-slate-200" />
+          </div>
+        </div>
+      </div>
+    }>
+      <KulinerPageContent />
+    </Suspense>
   )
 }
