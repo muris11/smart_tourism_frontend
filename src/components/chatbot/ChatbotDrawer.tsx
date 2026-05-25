@@ -6,7 +6,7 @@ import { useChatbot } from '@/hooks/useChatbot'
 import { useChatbotStore } from '@/stores/chatbotStore'
 import ChatMessage from './ChatMessage'
 import ChatInput from './ChatInput'
-import { X, MapPin, Bot, Trash2, ChevronDown, Sparkles } from 'lucide-react'
+import { X, MapPin, Bot, Trash2, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
 interface ChatbotDrawerProps {
@@ -65,7 +65,7 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
           className
         )}
       >
-        <div className="flex items-center justify-between bg-gradient-to-r from-[#1a1f2e] to-[#1a1f2e] px-4 py-3 rounded-t-2xl">
+        <div className="flex items-center justify-between bg-gradient-to-r from-[#0d7a6a] to-[#0a6458] px-4 py-3 rounded-t-2xl">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15">
               <Bot className="h-4 w-4 text-white" />
@@ -146,8 +146,8 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
             <div className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
               {safeMessages.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center text-center px-4">
-                  <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1a1f2e] to-[#1a1f2e] shadow-md">
-                    <Sparkles className="h-7 w-7 text-white" />
+                  <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0d7a6a] to-[#0a6458] shadow-md">
+                    <Bot className="h-7 w-7 text-white" />
                   </div>
                   <h4 className="mb-2 text-base font-semibold text-brand-deep font-display">
                     Halo! Ada yang bisa dibantu?

@@ -9,15 +9,19 @@
  * 
  */
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google'
 import '@/styles/globals.css'
 import AuthProvider from '@/providers/AuthProvider'
 
-/** Konfigurasi font Geist Sans untuk tampilan teks utama */
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 
-/** Konfigurasi font Geist Mono untuk tampilan teks monospace (kode, dll) */
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
+
+const playfair = Playfair_Display({
+  variable: '--font-playfair',
+  subsets: ['latin'],
+  display: 'swap',
+})
 
 /**
  * Metadata untuk SEO aplikasi
@@ -56,7 +60,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="id" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased bg-[#f6f1eb] text-[#1c1917]`}
       >
         <AuthProvider>
           {children}

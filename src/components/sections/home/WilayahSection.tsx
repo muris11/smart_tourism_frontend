@@ -18,7 +18,7 @@ const wilayah: WilayahItem[] = [
     total: '45+ Destinasi',
     icon: <Landmark className="h-5 w-5" />,
     color: 'text-amber-600',
-    bgGradient: 'from-amber-50 to-amber-100/50',
+    bgGradient: 'from-amber-50 to-amber-100/60',
   },
   {
     name: 'Indramayu',
@@ -26,8 +26,8 @@ const wilayah: WilayahItem[] = [
       'Pesona pantai utara dengan suasana laut, mangrove, dan wisata alam yang menenangkan.',
     total: '30+ Destinasi',
     icon: <Waves className="h-5 w-5" />,
-    color: 'text-sky-600',
-    bgGradient: 'from-sky-50 to-sky-100/50',
+    color: 'text-cyan-600',
+    bgGradient: 'from-cyan-50 to-cyan-100/60',
   },
   {
     name: 'Majalengka',
@@ -36,7 +36,7 @@ const wilayah: WilayahItem[] = [
     total: '50+ Destinasi',
     icon: <Mountain className="h-5 w-5" />,
     color: 'text-emerald-600',
-    bgGradient: 'from-emerald-50 to-emerald-100/50',
+    bgGradient: 'from-emerald-50 to-emerald-100/60',
   },
   {
     name: 'Kuningan',
@@ -45,7 +45,7 @@ const wilayah: WilayahItem[] = [
     total: '40+ Destinasi',
     icon: <TreePine className="h-5 w-5" />,
     color: 'text-violet-600',
-    bgGradient: 'from-violet-50 to-violet-100/50',
+    bgGradient: 'from-violet-50 to-violet-100/60',
   },
 ]
 
@@ -74,7 +74,7 @@ export default function WilayahSection() {
             <Link
               key={item.name}
               href={`/wisata?wilayah=${item.name}`}
-              className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-elevated md:p-8"
+              className="group relative overflow-hidden rounded-2xl border border-stone-200/60 bg-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-elevated md:p-8"
             >
               <div className={`absolute inset-0 bg-linear-to-br ${item.bgGradient} opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
 
@@ -97,7 +97,7 @@ export default function WilayahSection() {
                   <span className="text-xs font-medium text-slate-400">
                     {item.total}
                   </span>
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition-all duration-300 group-hover:bg-brand group-hover:text-white">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-pale text-muted transition-all duration-300 group-hover:bg-brand group-hover:text-white">
                     <ArrowUpRight className="h-4 w-4" />
                   </div>
                 </div>

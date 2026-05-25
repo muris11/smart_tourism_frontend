@@ -11,7 +11,7 @@ import { FaInstagram, FaYoutube, FaTiktok } from 'react-icons/fa'
 
 export default function Footer() {
   return (
-    <footer className="mt-auto border-t border-slate-100 bg-white">
+    <footer className="mt-auto border-t border-stone-200/60 bg-white">
       <div className="container mx-auto px-4 py-12 md:px-6 lg:py-16">
 
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">

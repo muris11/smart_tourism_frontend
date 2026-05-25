@@ -110,7 +110,7 @@ const StarRating = ({ rating }: { rating: number }) => {
         <Star
           key={i}
           className={`w-4 h-4 ${i < rating
-            ? 'fill-brand-green text-brand-green'
+            ? 'fill-brand text-brand'
             : 'fill-gray-200 text-gray-200'
             }`}
         />
@@ -128,10 +128,10 @@ const StarRating = ({ rating }: { rating: number }) => {
  */
 const TestimonialCard = ({ testimonial }: { testimonial: typeof testimonials[0] }) => {
   return (
-    <div className="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-brand-green/20">
+    <div className="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-stone-200/60 hover:border-brand/20">
       {/* Quote Icon */}
       <div className="absolute -top-3 -right-3 opacity-10 group-hover:opacity-20 transition-opacity">
-        <Quote className="w-12 h-12 text-brand-navy" />
+        <Quote className="w-12 h-12 text-brand-deep" />
       </div>
 
       {/* Header */}
@@ -142,16 +142,16 @@ const TestimonialCard = ({ testimonial }: { testimonial: typeof testimonials[0] 
             alt={testimonial.name}
             width={56}
             height={56}
-            className="w-14 h-14 rounded-full object-cover ring-2 ring-brand-green/20 group-hover:ring-brand-green/40 transition-all"
+            className="w-14 h-14 rounded-full object-cover ring-2 ring-brand/20 group-hover:ring-brand/40 transition-all"
           />
-          <div className="absolute -bottom-1 -right-1 bg-brand-green rounded-full p-1">
+          <div className="absolute -bottom-1 -right-1 bg-brand rounded-full p-1">
             <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" />
             </svg>
           </div>
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-900 group-hover:text-brand-navy transition-colors">
+          <h3 className="font-semibold text-gray-900 group-hover:text-brand-deep transition-colors">
             {testimonial.name}
           </h3>
           <p className="text-sm text-gray-500">{testimonial.role}</p>
@@ -170,7 +170,7 @@ const TestimonialCard = ({ testimonial }: { testimonial: typeof testimonials[0] 
         <span className="text-xs text-gray-400">{testimonial.date}</span>
         <div className="flex gap-1">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="w-1 h-1 rounded-full bg-brand-green/30" />
+            <div key={i} className="w-1 h-1 rounded-full bg-brand/30" />
           ))}
         </div>
       </div>
@@ -223,12 +223,12 @@ export default function HomeTestimonials() {
         {/* Header Section */}
         <div className="text-center max-w-3xl mx-auto mb-12">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-brand-green/10 rounded-full px-4 py-1.5 mb-4">
+          <div className="inline-flex items-center gap-2 bg-brand/10 rounded-full px-4 py-1.5 mb-4">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-green opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-green"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand"></span>
             </span>
-            <span className="text-xs font-semibold text-brand-green uppercase tracking-wide">
+            <span className="text-xs font-semibold text-brand uppercase tracking-wide">
               Testimonial
             </span>
           </div>
@@ -267,7 +267,7 @@ export default function HomeTestimonials() {
           <div className="hidden lg:flex absolute -left-4 top-1/2 -translate-y-1/2 gap-2">
             <button
               onClick={prevPage}
-              className="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg border border-gray-200 flex items-center justify-center text-gray-600 hover:text-brand-green hover:border-brand-green/30 transition-all"
+              className="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg border border-stone-200 flex items-center justify-center text-gray-600 hover:text-brand hover:border-brand/30 transition-all"
               aria-label="Previous testimonial"
             >
               <ChevronLeft className="w-5 h-5" />
@@ -276,7 +276,7 @@ export default function HomeTestimonials() {
           <div className="hidden lg:flex absolute -right-4 top-1/2 -translate-y-1/2 gap-2">
             <button
               onClick={nextPage}
-              className="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg border border-gray-200 flex items-center justify-center text-gray-600 hover:text-brand-green hover:border-brand-green/30 transition-all"
+              className="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg border border-stone-200 flex items-center justify-center text-gray-600 hover:text-brand hover:border-brand/30 transition-all"
               aria-label="Next testimonial"
             >
               <ChevronRight className="w-5 h-5" />
@@ -291,7 +291,7 @@ export default function HomeTestimonials() {
               key={i}
               onClick={() => goToPage(i)}
               className={`transition-all duration-300 rounded-full ${currentPage === i
-                ? 'w-8 h-2 bg-brand-green'
+                 ? 'w-8 h-2 bg-brand'
                 : 'w-2 h-2 bg-gray-300 hover:bg-gray-400'
                 }`}
               aria-label={`Go to testimonial page ${i + 1}`}

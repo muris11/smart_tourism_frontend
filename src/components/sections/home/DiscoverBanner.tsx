@@ -2,10 +2,10 @@
 
 export default function DiscoverBanner() {
   return (
-    <section className="relative overflow-hidden bg-[#1a1f2e] py-20 md:py-24 lg:py-28">
+    <section className="relative overflow-hidden bg-[#0d3d35] py-20 md:py-24 lg:py-28">
 
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(15,118,110,0.15)_0%,_transparent_60%)]" />
-      <div className="absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0f766e]/10 blur-3xl md:h-96 md:w-96 lg:h-[500px] lg:w-[500px]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(212,129,58,0.12)_0%,_transparent_60%)]" />
+      <div className="absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#d4813a]/8 blur-3xl md:h-96 md:w-96 lg:h-[500px] lg:w-[500px]" />
 
       <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
 

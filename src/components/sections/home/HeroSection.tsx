@@ -68,7 +68,7 @@ export default function HeroSection() {
               Explore Ciayumajakuning
             </span>
 
-            <h1 className="mb-5 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl drop-shadow-lg">
+            <h1 className="mb-5 text-4xl leading-tight font-bold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl drop-shadow-lg">
               Temukan Keindahan
               <br />
               <span className="bg-linear-to-r from-amber-200 to-white bg-clip-text text-transparent">

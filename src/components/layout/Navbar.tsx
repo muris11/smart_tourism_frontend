@@ -52,7 +52,7 @@ export default function Navbar() {
         className={cn(
           'fixed top-0 z-50 w-full transition-all duration-500',
           isScrolledOrMobile
-            ? 'bg-white/90 backdrop-blur-lg border-b border-slate-200/80 py-3 shadow-sm md:py-4'
+            ? 'bg-white/90 backdrop-blur-lg border-b border-stone-200/80 py-3 shadow-sm md:py-4'
             : 'bg-transparent py-5 md:py-8'
         )}
       >
@@ -178,7 +178,7 @@ export default function Navbar() {
 
       <div
         className={cn(
-          'fixed inset-y-0 right-0 z-40 flex w-full max-w-xs flex-col bg-white px-5 pb-6 pt-20 shadow-xl transition-transform duration-500 sm:max-w-sm sm:px-6 sm:pb-8 sm:pt-24 lg:hidden',
+          'fixed inset-y-0 right-0 z-40 flex w-full max-w-xs flex-col bg-[#faf5ef] px-5 pb-6 pt-20 shadow-xl transition-transform duration-500 sm:max-w-sm sm:px-6 sm:pb-8 sm:pt-24 lg:hidden',
           mobileOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >

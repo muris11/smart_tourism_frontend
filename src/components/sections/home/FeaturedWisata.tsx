@@ -17,18 +17,18 @@ function getImageUrl(item: WisataItem): string | null {
 
 function getGradientByWilayah(wilayah: string): string {
   const gradients: Record<string, string> = {
-    Cirebon: 'from-amber-900/70 to-amber-800/40',
-    Indramayu: 'from-sky-900/70 to-sky-800/40',
-    Majalengka: 'from-emerald-900/70 to-emerald-800/40',
-    Kuningan: 'from-violet-900/70 to-violet-800/40',
+    Cirebon: 'from-amber-900/80 to-amber-800/30',
+    Indramayu: 'from-cyan-900/80 to-cyan-800/30',
+    Majalengka: 'from-emerald-900/80 to-emerald-800/30',
+    Kuningan: 'from-violet-900/80 to-violet-800/30',
   }
-  return gradients[wilayah] || 'from-slate-900/70 to-slate-800/40'
+  return gradients[wilayah] || 'from-stone-900/70 to-stone-800/40'
 }
 
 function getAccentByWilayah(wilayah: string): string {
   const accents: Record<string, string> = {
     Cirebon: 'text-amber-500',
-    Indramayu: 'text-sky-500',
+    Indramayu: 'text-cyan-500',
     Majalengka: 'text-emerald-500',
     Kuningan: 'text-violet-500',
   }
@@ -185,7 +185,7 @@ export default function FeaturedWisata() {
                     <span className={`text-xs font-semibold uppercase tracking-wider ${accent}`}>
                       Jelajahi
                     </span>
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-all duration-300 group-hover:bg-brand group-hover:text-white">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-pale text-muted transition-all duration-300 group-hover:bg-brand group-hover:text-white">
                       <ArrowUpRight className="h-4 w-4" />
                     </div>
                   </div>
