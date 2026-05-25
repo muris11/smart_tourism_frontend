@@ -1,143 +1,105 @@
-/**
- * WilayahSection - Komponen untuk menampilkan wilayah Ciayumajakuning
- * 
- * Fitur:
- * - Menampilkan 4 wilayah utama (Cirebon, Indramayu, Majalengka, Kuningan)
- * - Setiap wilayah memiliki deskripsi dan jumlah destinasi
- * - Hover effect pada card wilayah (background, warna, animasi icon)
- * - Link ke halaman wisata dengan filter wilayah otomatis
- * - Layout grid dengan border antar item
- * - Responsive design (stack di mobile, row di desktop)
- * 
- * @component
- * @returns {JSX.Element} Komponen wilayah section
- * 
- * @example
- * // Penggunaan di halaman beranda
- * <WilayahSection />
- * 
- * @example
- * // Setelah hero section
- * <>
- *   <HeroSection />
- *   <WilayahSection />
- * </>
- */
 import Link from 'next/link'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, Mountain, Waves, Landmark, TreePine } from 'lucide-react'
 
-/** Interface untuk data wilayah */
 interface WilayahItem {
-  /** Nama wilayah (Cirebon, Indramayu, Majalengka, Kuningan) */
   name: string
-  /** Deskripsi singkat tentang wilayah */
   description: string
-  /** Jumlah destinasi di wilayah tersebut */
   total: string
+  icon: React.ReactNode
+  color: string
+  bgGradient: string
 }
 
-/** Data wilayah Ciayumajakuning */
 const wilayah: WilayahItem[] = [
   {
     name: 'Cirebon',
     description:
       'Kota budaya dengan kekayaan sejarah keraton, wisata religi, dan kuliner legendaris.',
     total: '45+ Destinasi',
+    icon: <Landmark className="h-5 w-5" />,
+    color: 'text-amber-600',
+    bgGradient: 'from-amber-50 to-amber-100/50',
   },
   {
     name: 'Indramayu',
     description:
       'Pesona pantai utara dengan suasana laut, mangrove, dan wisata alam yang menenangkan.',
     total: '30+ Destinasi',
+    icon: <Waves className="h-5 w-5" />,
+    color: 'text-sky-600',
+    bgGradient: 'from-sky-50 to-sky-100/50',
   },
   {
     name: 'Majalengka',
     description:
       'Hamparan pegunungan, air terjun, dan panorama alam terbaik di Jawa Barat.',
     total: '50+ Destinasi',
+    icon: <Mountain className="h-5 w-5" />,
+    color: 'text-emerald-600',
+    bgGradient: 'from-emerald-50 to-emerald-100/50',
   },
   {
     name: 'Kuningan',
     description:
       'Udara sejuk kaki Gunung Ciremai dengan destinasi alam dan healing terbaik.',
     total: '40+ Destinasi',
+    icon: <TreePine className="h-5 w-5" />,
+    color: 'text-violet-600',
+    bgGradient: 'from-violet-50 to-violet-100/50',
   },
 ]
 
-/**
- * Komponen WilayahSection untuk menampilkan daftar wilayah
- * 
- * @returns {JSX.Element} Wilayah section dengan 4 wilayah
- */
 export default function WilayahSection() {
   return (
     <section className="bg-white py-16 md:py-20 lg:py-28">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
 
-        {/* ========== HEADER SECTION ========== */}
-        <div className="mb-12 flex flex-col justify-between gap-6 md:mb-16 md:flex-row md:items-end lg:mb-20">
-
-          {/* Left Side - Title */}
+        <div className="mb-12 md:mb-16 lg:mb-20">
           <div className="max-w-2xl">
-            {/* Badge Label */}
-            <span className="mb-3 block text-xs font-semibold uppercase tracking-[0.2em] text-brand-green md:mb-4">
-              Explore Region
-            </span>
-
-            {/* Main Heading */}
-            <h2 className="text-3xl font-bold leading-tight text-brand-navy md:text-4xl lg:text-5xl">
+            <span className="eyebrow mb-4 block">Explore Region</span>
+            <h2 className="section-title mb-6">
               Jelajahi Wilayah
               <br />
               Ciayumajakuning
             </h2>
+            <p className="section-copy max-w-lg">
+              Setiap wilayah memiliki karakter, budaya, dan pengalaman
+              wisata yang berbeda untuk dijelajahi.
+            </p>
           </div>
-
-          {/* Right Side - Description */}
-          <p className="max-w-lg text-base leading-relaxed font-light text-slate-500 md:text-lg">
-            Setiap wilayah memiliki karakter, budaya, dan pengalaman
-            wisata yang berbeda untuk dijelajahi.
-          </p>
         </div>
 
-        {/* ========== WILAYAH LIST ========== */}
-        <div className="divide-y divide-slate-200 border-y border-slate-200">
-          {wilayah.map((item, index) => (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6">
+          {wilayah.map((item) => (
             <Link
               key={item.name}
               href={`/wisata?wilayah=${item.name}`}
-              className="group flex flex-col gap-6 px-0 py-6 transition-all duration-300 hover:px-2 md:gap-8 md:py-8 lg:gap-10 lg:py-10"
+              className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-elevated md:p-8"
             >
-              {/* Left Section - Number & Info */}
-              <div className="flex items-start gap-4 md:gap-5 lg:gap-6">
-                {/* Nomor Urut */}
-                <span className="mt-0.5 text-xs font-medium text-slate-400 sm:text-sm">
-                  {(index + 1).toString().padStart(2, '0')}
-                </span>
+              <div className={`absolute inset-0 bg-linear-to-br ${item.bgGradient} opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
 
-                {/* Wilayah Info */}
-                <div>
-                  {/* Wilayah Name */}
-                  <h3 className="mb-2 text-2xl font-bold text-brand-navy transition-colors duration-300 group-hover:text-brand-green md:mb-3 md:text-3xl">
-                    {item.name}
-                  </h3>
-
-                  {/* Wilayah Description */}
-                  <p className="max-w-xl text-sm leading-relaxed font-light text-slate-500 md:text-base">
-                    {item.description}
-                  </p>
+              <div className="relative z-10 flex items-start justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-slate-200/50 ${item.color}`}>
+                    {item.icon}
+                  </div>
+                  <div>
+                    <h3 className={`text-xl font-bold font-display tracking-tight text-brand-deep transition-colors duration-300 md:text-2xl`}>
+                      {item.name}
+                    </h3>
+                    <p className="mt-1.5 max-w-md text-sm leading-relaxed text-slate-500">
+                      {item.description}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              {/* Right Section - Total & Arrow Icon */}
-              <div className="flex items-center justify-between gap-4 md:justify-end md:gap-5">
-                {/* Total Destinasi */}
-                <span className="text-xs font-medium tracking-wide text-slate-400 uppercase md:text-sm">
-                  {item.total}
-                </span>
-
-                {/* Arrow Icon Circle */}
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-transparent text-brand-navy transition-all duration-300 group-hover:border-brand-green group-hover:bg-brand-pale group-hover:text-brand-green md:h-11 md:w-11 lg:h-12 lg:w-12">
-                  <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 md:h-4.5 md:w-4.5 lg:h-5 lg:w-5" />
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="text-xs font-medium text-slate-400">
+                    {item.total}
+                  </span>
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition-all duration-300 group-hover:bg-brand group-hover:text-white">
+                    <ArrowUpRight className="h-4 w-4" />
+                  </div>
                 </div>
               </div>
             </Link>
