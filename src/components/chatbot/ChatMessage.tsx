@@ -65,7 +65,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         {!isUser && (
           <div className="flex items-center gap-1.5 mb-1.5 pb-1 border-b border-slate-100">
             <Bot className="h-3.5 w-3.5 text-brand-green" />
-            <span className="text-xs font-semibold text-brand-green">SITA</span>
+            <span className="text-xs font-semibold text-brand-green">CITRA</span>
           </div>
         )}
 

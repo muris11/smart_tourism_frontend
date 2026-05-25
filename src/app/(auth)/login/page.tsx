@@ -16,11 +16,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Mail, LockKeyhole, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
+import { useSearchParams } from 'next/navigation'
 import ToastContainer from '@/components/ui/ToastContainer'
 
 /**
@@ -36,7 +37,10 @@ const schema = z.object({
 /** Type untuk data form berdasarkan schema Zod */
 type FormData = z.infer<typeof schema>
 
-export default function LoginPage() {
+function LoginForm() {
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get('callback') || undefined
+
   /** Hook autentikasi dari context (login function) */
   const { login } = useAuth()
 
@@ -77,7 +81,7 @@ export default function LoginPage() {
    */
   const onSubmit = async (data: FormData) => {
     try {
-      await login(data)
+      await login(data, callbackUrl)
       // Success: tampilkan toast dan redirect handled by useAuth
       toastSuccess('Login berhasil! Selamat datang kembali.')
       reset()
@@ -241,5 +245,17 @@ export default function LoginPage() {
         </p>
       </div>
     </>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-10 w-48 animate-pulse rounded bg-slate-200" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }

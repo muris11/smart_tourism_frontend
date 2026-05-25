@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect } from 'react'
 import { authApi } from '@/lib/api/auth'
 import { useAuthStore } from '@/stores/authStore'
 import type { LoginPayload, RegisterPayload } from '@/types'
@@ -9,43 +8,21 @@ import type { LoginPayload, RegisterPayload } from '@/types'
 /** Hook untuk autentikasi user (login, register, logout) */
 export function useAuth() {
   const router = useRouter()
-  const { user, token, setAuth, setUser, logout: clearUser } = useAuthStore()
+  const { user, token, isLoading, setAuth, setUser, logout: clearUser } = useAuthStore()
 
-  /**
-   * Validasi token saat mount, ambil data user jika token ada
-   * Dipanggil saat komponen pertama kali di-render
-   */
-  const validateToken = useCallback(async () => {
-    if (token && !user) {
-      try {
-        const me = await authApi.me()
-        if (me) {
-          setUser(me)
-        } else {
-          clearUser()
-        }
-      } catch {
-        clearUser()
-      }
-    }
-  }, [token, user, setUser, clearUser])
-
-  useEffect(() => {
-    validateToken()
-  }, [validateToken])
-
-  /** Login user dengan email dan password */
-  const login = async (payload: LoginPayload) => {
+  /** Login user dengan email dan password, opsional redirect setelah login */
+  const login = async (payload: LoginPayload, callbackUrl?: string) => {
     const result = await authApi.login(payload)
     setAuth(result.user, result.token)
-    router.push('/')
+    router.push(callbackUrl || '/')
   }
 
   /**
    * Register user baru (langsung login setelah sukses)
    * @param payload - Data registrasi (nama, email, password)
+   * @param callbackUrl - Opsional redirect setelah register
    */
-  const register = async (payload: RegisterPayload) => {
+  const register = async (payload: RegisterPayload, callbackUrl?: string) => {
     const registerResult = await authApi.register(payload)
 
     if (!registerResult.success) {
@@ -58,7 +35,7 @@ export function useAuth() {
     })
 
     setAuth(loginResult.user, loginResult.token)
-    router.push('/')
+    router.push(callbackUrl || '/')
   }
 
   /** Logout user, hapus token dan redirect ke halaman login */
@@ -82,6 +59,7 @@ export function useAuth() {
   return {
     user,
     token,
+    isLoading,
     isLoggedIn: !!user && !!token,
     isAdmin: user?.role === 'admin',
     login,

@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { MapPin, Compass, Star, Loader2 } from 'lucide-react'
 import { useGeolocation } from '@/hooks/useGeolocation'
+import { useAuth } from '@/hooks/useAuth'
 import { recommendationApi } from '@/lib/api/recommendation'
 import { RekoItem, RecommendationPayload } from '@/types/recommendation'
 import { Wilayah } from '@/lib/constants/wilayah'
@@ -49,10 +51,29 @@ function tipeLink(tipe: string, kode: string) {
 }
 
 export default function RekomendasiPage() {
+  const { isLoggedIn, isLoading } = useAuth()
+  const router = useRouter()
   const [results, setResults] = useState<RekoItem[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [hasSearched, setHasSearched] = useState(false)
+
+  useEffect(() => {
+    if (!isLoading && !isLoggedIn) {
+      router.push('/login?callback=/rekomendasi')
+    }
+  }, [isLoggedIn, isLoading, router])
+
+  if (isLoading || !isLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white pt-28 pb-24">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-brand-navy" />
+          <p className="text-sm text-slate-500">Memeriksa autentikasi...</p>
+        </div>
+      </div>
+    )
+  }
 
   const geo = useGeolocation()
 
