@@ -1,21 +1,26 @@
 import { create } from 'zustand'
 
+/** Opsi sorting yang tersedia */
+type SortOption = 'rating' | 'terbaru' | 'nama'
+
+/** State untuk filter pencarian */
 interface FilterState {
   wilayah: string
   sentimen: string
-  sort: string
+  sort: SortOption
   q: string
   page: number
   setWilayah: (v: string) => void
   setSentimen: (v: string) => void
-  setSort: (v: string) => void
+  setSort: (v: SortOption) => void
   setQ: (v: string) => void
   setPage: (v: number) => void
   reset: () => void
 }
 
-const defaults = { wilayah: '', sentimen: '', sort: 'rating', q: '', page: 1 }
+const defaults = { wilayah: '', sentimen: '', sort: 'rating' as SortOption, q: '', page: 1 }
 
+/** Store untuk filter pencarian wisata/kuliner/nongkrong */
 export const useFilterStore = create<FilterState>((set) => ({
   ...defaults,
   setWilayah: (v) => set({ wilayah: v, page: 1 }),

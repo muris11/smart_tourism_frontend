@@ -1,14 +1,31 @@
-import { ApiResponse, ListFilter, PaginatedResponse } from '@/types/api'
-import { NongkrongDetail, NongkrongItem } from '@/types/nongkrong'
 import { apiClient } from './client'
+import type {
+  NongkrongDetail,
+  NongkrongFilter,
+  NongkrongListResponse,
+  NongkrongDetailResponse
+} from '@/types'
 
 export const nongkrongApi = {
-  list: async (filters: ListFilter & { tipe?: string; ada_wifi?: boolean } = {}) => {
-    const { data } = await apiClient.get<PaginatedResponse<NongkrongItem>>('/nongkrong', { params: filters })
-    return data
+  /**
+   * Daftar semua tempat nongkrong (publik)
+   * GET /api/v1/nongkrong/
+   * 
+   * @param filters - Filter untuk list nongkrong (wilayah, sentimen, q, sort_by, order, page, limit)
+   */
+  list: async (filters?: NongkrongFilter): Promise<NongkrongListResponse['data']> => {
+    const { data } = await apiClient.get<NongkrongListResponse>('/nongkrong', { params: filters })
+    return data.data
   },
-  detail: async (kode: string) => {
-    const { data } = await apiClient.get<ApiResponse<NongkrongDetail>>(`/nongkrong/${kode}`)
+
+  /**
+   * Detail tempat nongkrong berdasarkan kode
+   * GET /api/v1/nongkrong/{kode}
+   * 
+   * @param kode - Kode unik tempat nongkrong (contoh: NGK-CRB-001)
+   */
+  detail: async (kode: string): Promise<NongkrongDetail> => {
+    const { data } = await apiClient.get<NongkrongDetailResponse>(`/nongkrong/${kode}`)
     return data.data
   },
 }

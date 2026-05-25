@@ -2,21 +2,66 @@
 
 import useSWR from 'swr'
 import { nongkrongApi } from '@/lib/api/nongkrong'
-import { ListFilter } from '@/types/api'
+import type { NongkrongItem, NongkrongDetail, NongkrongFilter } from '@/types'
 
-export function useNongkrongList(filters: ListFilter & { tipe?: string; ada_wifi?: boolean }) {
-  const key = ['nongkrong', JSON.stringify(filters)]
-  const { data, error, isLoading } = useSWR(key, () => nongkrongApi.list(filters), {
-    revalidateOnFocus: false,
-  })
+/** Hook untuk mendapatkan daftar tempat nongkrong dengan filter */
+export function useNongkrong(params?: NongkrongFilter) {
+  const key = params ? ['nongkrong', JSON.stringify(params)] : ['nongkrong']
 
-  return { data: data?.data ?? [], meta: data?.meta, isLoading, isError: !!error }
+  const { data, error, isLoading, mutate } = useSWR(
+    key,
+    () => nongkrongApi.list(params || {}),
+    {
+      revalidateOnFocus: false,
+      keepPreviousData: true,
+    }
+  )
+
+  return {
+    data: (data?.items as NongkrongItem[]) ?? [],
+    meta: {
+      current_page: data?.page || 1,
+      per_page: data?.limit || 10,
+      total: data?.total || 0,
+      last_page: data?.total_pages || 1,
+    },
+    isLoading,
+    isError: !!error,
+    error,
+    mutate,
+  }
 }
 
+/**
+ * Hook untuk mendapatkan detail tempat nongkrong berdasarkan kode
+ * @param kode - Kode unik tempat nongkrong (contoh: NGK-CRB-001)
+ */
 export function useNongkrongDetail(kode: string) {
   const { data, error, isLoading } = useSWR(
     kode ? `nongkrong-detail-${kode}` : null,
-    () => nongkrongApi.detail(kode)
+    () => nongkrongApi.detail(kode),
+    {
+      revalidateOnFocus: false,
+      revalidateOnMount: true,
+    }
   )
-  return { nongkrong: data, isLoading, isError: !!error }
+
+  return {
+    nongkrong: data as NongkrongDetail | null,
+    isLoading,
+    isError: !!error,
+    error,
+  }
+}
+
+/**
+ * Hook untuk mendapatkan tempat nongkrong unggulan (rating tertinggi)
+ * @param limit - Jumlah data yang diambil (default: 4)
+ */
+export function useFeaturedNongkrong(limit: number = 4) {
+  return useNongkrong({
+    limit,
+    sort_by: 'rating',
+    order: 'desc',
+  })
 }

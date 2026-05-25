@@ -1,3 +1,5 @@
+import { Wilayah } from '@/lib/constants/wilayah'
+
 export interface ApiResponse<T> {
   success: boolean
   message: string
@@ -5,25 +7,60 @@ export interface ApiResponse<T> {
   errors?: Record<string, string[]>
 }
 
+/** Paginate Response */
 export interface PaginatedResponse<T> {
   success: boolean
   message: string
-  data: T[]
-  meta: {
-    current_page: number
-    per_page: number
+  data: {
+    items: T[]
     total: number
-    last_page: number
-    from: number | null
-    to: number | null
+    page: number
+    limit: number
+    total_pages: number
   }
 }
 
-export interface ListFilter {
-  wilayah?: string
+/** Filter untuk wisata */
+export interface WisataFilter {
+  wilayah?: Wilayah
+  kategori?: string
   sentimen?: string
-  sort?: 'rating' | 'terbaru' | 'nama'
-  per_page?: number
   q?: string
+  sort_by?: 'rating' | 'sentimen'
+  order?: 'asc' | 'desc'
   page?: number
+  limit?: number
+}
+
+/** Filter untuk kuliner */
+export interface KulinerFilter {
+  wilayah?: Wilayah
+  jenis?: string
+  sentimen?: string
+  halal?: boolean
+  q?: string
+  sort_by?: 'rating' | 'sentimen'
+  order?: 'asc' | 'desc'
+  page?: number
+  limit?: number
+}
+
+/** Filter untuk nongkrong */
+export interface NongkrongFilter {
+  wilayah?: Wilayah
+  sentimen?: string
+  q?: string
+  sort_by?: 'rating' | 'sentimen'
+  order?: 'asc' | 'desc'
+  page?: number
+  limit?: number
+}
+
+/** Generic filter */
+export interface ListFilter {
+  page?: number
+  limit?: number
+  search?: string
+  sort_by?: string
+  order?: 'asc' | 'desc'
 }

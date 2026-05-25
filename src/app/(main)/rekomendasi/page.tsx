@@ -55,7 +55,7 @@ export default function RekomendasiPage() {
 
   const geo = useGeolocation()
 
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       mode: 'popular',
@@ -65,7 +65,7 @@ export default function RekomendasiPage() {
     },
   })
 
-  const currentMode = watch('mode')
+  const currentMode = ('mode')
 
   const handleGetLocation = () => {
     geo.request()

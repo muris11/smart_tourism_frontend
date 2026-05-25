@@ -1,25 +1,83 @@
-import { Koordinat } from './wisata'
+import { Wilayah } from '@/lib/constants/wilayah'
+import type { Status } from '@/lib/constants/status'
+import type { Sentimen } from '@/lib/constants/sentimen'
+import { Koordinat } from './koordinat'
 
+/** Item kuliner untuk list */
 export interface KulinerItem {
+  id: number
+  uid: string
   kode: string
   nama: string
-  wilayah: string
-  jenis: string
-  gambar: string | null
-  rating: number
-  sentimen: 'positif' | 'negatif' | 'belum_dianalisis'
-  sentimen_positif_pct: number
-  alamat: string | null
-  range_harga: string | null
+  wilayah: Wilayah
+  kecamatan: string | null
+  alamat_lengkap: string | null
+  latitude: number | null
+  longitude: number | null
+  jenis_tempat: string | null
+  kategori_menu_utama: string | null
+  menu_unggulan: string | null
+  makanan_khas_daerah: boolean
+  nama_makanan_khas: string | null
+  harga_menu_min: number
+  harga_menu_max: number
+  jam_buka: string | null
+  jam_tutup: string | null
+  kapasitas_orang: number | null
+  fasilitas: string[]
+  sertifikat_halal: boolean
+  rating_google: number | null
+  jumlah_ulasan_google: number
+  link_google_maps: string | null
+  kontak: string | null
+  gambar: string[]
+  status: Status
+  sentimen: Sentimen | null
+  skor_sentimen: number | null
+  total_ulasan_scraped: number
+  total_positif: number
+  total_negatif: number
+  created_at: string
+  updated_at: string
 }
 
-export interface KulinerDetail extends KulinerItem {
-  kategori_makanan: string | null
-  deskripsi: string | null
+/** Detail lengkap kuliner */
+export interface KulinerDetail extends Omit<KulinerItem, 'id' | 'uid' | 'status' | 'created_at' | 'updated_at'> {
+  id_wisata_terdekat: string | null
+  sumber_data: string | null
+  catatan: string | null
   koordinat: Koordinat | null
-  jam_buka: string | null
-  no_telepon: string | null
-  jumlah_ulasan: number
-  menu_unggulan: string[] | null
-  maps_url: string | null
+}
+
+/** Filter untuk list kuliner */
+export interface KulinerFilter {
+  wilayah?: Wilayah
+  jenis?: string
+  sentimen?: string
+  halal?: boolean
+  q?: string
+  sort_by?: 'rating' | 'sentimen'
+  order?: 'asc' | 'desc'
+  page?: number
+  limit?: number
+}
+
+/** Response dari endpoint list kuliner (FastAPI) */
+export interface KulinerListResponse {
+  success: boolean
+  message: string
+  data: {
+    items: KulinerItem[]
+    total: number
+    page: number
+    limit: number
+    total_pages: number
+  }
+}
+
+/** Response dari endpoint detail kuliner (FastAPI) */
+export interface KulinerDetailResponse {
+  success: boolean
+  message: string
+  data: KulinerDetail
 }

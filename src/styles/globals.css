@@ -1,5 +1,11 @@
+/* ============================================
+  Tailwind Imports
+  ============================================ */
 @import "tailwindcss";
 
+/* ============================================
+  Theme Variables
+  ============================================ */
 @theme inline {
   --color-background: #fcfcfb;
   --color-foreground: #18181b;
@@ -16,6 +22,9 @@
   --shadow-soft: 0 20px 80px rgba(38, 24, 20, 0.1);
 }
 
+/* ============================================
+  Base Styles
+  ============================================ */
 @layer base {
   :root {
     --radius: 0.75rem;
@@ -36,6 +45,7 @@
     overflow-x: hidden;
   }
 
+  /* Heading fonts */
   h1,
   h2,
   h3,
@@ -46,6 +56,7 @@
     letter-spacing: -0.03em;
   }
 
+  /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
@@ -60,19 +71,26 @@
   }
 }
 
+/* ============================================
+  Component Styles
+  ============================================ */
 @layer components {
+  /* Container */
   .container {
     @apply mx-auto max-w-7xl;
   }
 
+  /* Primary button */
   .btn-primary {
-    @apply rounded-full bg-[var(--color-brand-navy)] px-6 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-slate-800 hover:shadow-lg disabled:opacity-60;
+    @apply rounded-full bg-(--color-brand-navy) px-6 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-slate-800 hover:shadow-lg disabled:opacity-60;
   }
 
+  /* Card component */
   .card {
-    @apply overflow-hidden rounded-[2rem] bg-white shadow-[var(--shadow-card)];
+    @apply overflow-hidden rounded-4xl bg-white shadow-(--shadow-card);
   }
 
+  /* Glass panel light */
   .glass-panel {
     background: rgba(255, 255, 255, 0.72);
     backdrop-filter: blur(12px);
@@ -80,28 +98,36 @@
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
   }
 
+  /* Glass panel dark */
   .glass-panel-dark {
     background: rgba(11, 18, 33, 0.55);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
+  /* Eyebrow text */
   .eyebrow {
     @apply text-xs font-semibold uppercase tracking-[0.22em];
     color: var(--color-brand);
   }
 
+  /* Section title */
   .section-title {
     @apply text-4xl leading-tight md:text-5xl;
     color: var(--color-brand-navy);
   }
 
+  /* Section description */
   .section-copy {
     @apply text-lg font-light leading-8 text-slate-500;
   }
 }
 
+/* ============================================
+  Utility Classes
+  ============================================ */
 @layer utilities {
+  /* Text colors */
   .text-brand-navy {
     color: var(--color-brand-navy);
   }
@@ -110,18 +136,11 @@
     color: var(--color-brand);
   }
 
-  .hover-brand-soft {
-    transition: color 300ms ease;
-  }
-
-  .hover-brand-soft:hover {
-    color: var(--color-brand-dark);
-  }
-
   .text-brand-blue {
     color: var(--color-brand-blue);
   }
 
+  /* Background colors */
   .bg-brand-navy {
     background-color: var(--color-brand-navy);
   }
@@ -134,6 +153,16 @@
     background-color: var(--color-brand);
   }
 
+  /* Hover utilities */
+  .hover-brand-soft {
+    transition: color 300ms ease;
+  }
+
+  .hover-brand-soft:hover {
+    color: var(--color-brand-dark);
+  }
+
+  /* Animations */
   .animate-fade-in {
     animation: fadeIn 0.8s ease-out forwards;
   }
@@ -152,12 +181,16 @@
     opacity: 0;
   }
 
+  /* Image reveal */
   .img-reveal {
     opacity: 0;
     animation: fadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 }
 
+/* ============================================
+  Keyframes
+  ============================================ */
 @keyframes slideUpFade {
   from {
     opacity: 0;
@@ -176,4 +209,54 @@
   to {
     opacity: 1;
   }
+}
+
+/* src/styles/globals.css - tambahkan di bagian utilities */
+
+/* Chat message styling untuk markdown */
+.prose-sm {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.prose-sm strong {
+  font-weight: 600;
+  color: inherit;
+}
+
+.prose-sm p {
+  margin-bottom: 0.5rem;
+}
+
+.prose-sm p:last-child {
+  margin-bottom: 0;
+}
+
+.prose-sm ul, .prose-sm ol {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}
+
+.prose-sm li {
+  margin: 0.25rem 0;
+}
+
+.prose-sm blockquote {
+  margin: 0.5rem 0;
+  padding-left: 0.75rem;
+  border-left: 2px solid currentColor;
+  opacity: 0.8;
+}
+
+/* Rating badge */
+.rating-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: #fef3c7;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #d97706;
 }
