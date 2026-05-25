@@ -22,7 +22,7 @@ export default function ItineraryResult({ result }: Props) {
     setSaveError(null)
     try {
       await apiClient.post('/planning', {
-        judul: `Perjalanan ${result.total_hari} Hari`,
+        judul: `Perjalanan ${result.total_hari || result.itinerary.length} Hari`,
         wilayah: result.itinerary.flatMap(d => d.tempat.map(t => t.wilayah)).filter((v, i, a) => a.indexOf(v) === i),
         jumlah_orang: 1,
         items: result.itinerary.flatMap(day =>
@@ -72,7 +72,7 @@ export default function ItineraryResult({ result }: Props) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-slate-900">Itinerary {result.total_hari} Hari</h2>
+        <h2 className="text-2xl font-bold text-slate-900">Itinerary {result.total_hari || result.itinerary.length} Hari</h2>
         {isLoggedIn ? (
           <button
             onClick={handleSave}

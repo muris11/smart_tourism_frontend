@@ -8,7 +8,8 @@ import Link from 'next/link'
 import { MapPin, Compass, Star, Loader2 } from 'lucide-react'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { recommendationApi } from '@/lib/api/recommendation'
-import { RekoItem } from '@/types/recommendation'
+import { RekoItem, RecommendationPayload } from '@/types/recommendation'
+import { Wilayah } from '@/lib/constants/wilayah'
 
 const schema = z.object({
   mode: z.enum(['nearby', 'personal', 'popular']),
@@ -65,10 +66,10 @@ export default function RekomendasiPage() {
     },
   })
 
-  const currentMode = ('mode')
+  const currentMode = watch('mode')
 
   const handleGetLocation = () => {
-    geo.request()
+    geo.getLocation()
   }
 
   const onSubmit = async (data: FormData) => {
@@ -76,18 +77,26 @@ export default function RekomendasiPage() {
     setSubmitError(null)
     setHasSearched(true)
 
-    const payload = {
+    const payload: RecommendationPayload = {
       mode: data.mode,
-      wilayah: data.wilayah && data.wilayah.length > 0 ? data.wilayah : undefined,
-      tipe: data.tipe || undefined,
+      wilayah: (data.wilayah && data.wilayah.length > 0 ? data.wilayah : undefined) as Wilayah[] | undefined,
+      tipe: (data.tipe || undefined) as RecommendationPayload['tipe'],
       latitude: data.mode === 'nearby' ? (geo.lat ?? data.latitude) : undefined,
       longitude: data.mode === 'nearby' ? (geo.lon ?? data.longitude) : undefined,
-      limit: data.limit,
+      jumlah: data.limit,
     }
 
     try {
-      const result = await recommendationApi.get(payload)
-      setResults(result)
+      const res = await recommendationApi.get(payload)
+      const items: RekoItem[] = (res.recommendations || []).map(r => ({
+        kode: r.kode,
+        nama: r.nama,
+        tipe: r.tipe,
+        wilayah: r.wilayah,
+        skor_rekomendasi: r.skor_relevansi,
+        jarak_km: r.jarak_km ?? undefined,
+      }))
+      setResults(items)
     } catch {
       setSubmitError('Layanan AI sedang tidak tersedia. Silakan coba lagi.')
       setResults([])

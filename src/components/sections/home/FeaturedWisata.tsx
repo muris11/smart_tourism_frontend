@@ -40,7 +40,7 @@ import { WisataItem } from '@/types/wisata'
  */
 export default function FeaturedWisata() {
   const { data: wisataList, isLoading, error } = useWisata({
-    limit: 20
+    per_page: 20
   })
 
   if (isLoading) {

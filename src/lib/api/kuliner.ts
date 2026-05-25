@@ -11,11 +11,17 @@ export const kulinerApi = {
    * Daftar semua kuliner (publik)
    * GET /api/v1/kuliner/
    * 
-   * @param filters - Filter untuk list kuliner (wilayah, jenis, sentimen, halal, q, sort_by, order, page, limit)
+   * @param filters - Filter untuk list kuliner (wilayah, jenis, sentimen, q, sort, page, per_page)
    */
-  list: async (filters?: KulinerFilter): Promise<KulinerListResponse['data']> => {
+  list: async (filters?: KulinerFilter) => {
     const { data } = await apiClient.get<KulinerListResponse>('/kuliner', { params: filters })
-    return data.data
+    return {
+      items: data.data,
+      total: data.meta.total,
+      total_pages: data.meta.last_page,
+      page: data.meta.current_page,
+      limit: data.meta.per_page,
+    }
   },
 
   /**

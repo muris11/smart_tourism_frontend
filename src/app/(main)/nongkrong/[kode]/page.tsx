@@ -29,6 +29,7 @@ import { useRecommendation } from '@/hooks/useRecommendation'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { cn } from '@/lib/utils/cn'
+import { getFirstImage } from '@/lib/utils/format'
 
 const FALLBACK_IMAGE = '/images/fallback/fallback.jpg'
 
@@ -77,9 +78,7 @@ export default function NongkrongDetailPage() {
     ? nongkrong.rating_google
     : parseFloat(nongkrong.rating_google || '0')
 
-  const imageUrl = nongkrong.gambar && nongkrong.gambar.length > 0
-    ? nongkrong.gambar[0]
-    : FALLBACK_IMAGE
+  const imageUrl = getFirstImage(nongkrong.gambar, FALLBACK_IMAGE)
 
   const handleShare = async () => {
     await navigator.clipboard.writeText(window.location.href)

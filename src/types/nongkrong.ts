@@ -49,27 +49,28 @@ export interface NongkrongDetail extends Omit<NongkrongItem, 'id' | 'uid' | 'sta
   koordinat: Koordinat | null
 }
 
-/** Filter untuk list nongkrong */
+/** Filter untuk list nongkrong (match backend Laravel) */
 export interface NongkrongFilter {
   wilayah?: Wilayah
   sentimen?: string
   q?: string
-  sort_by?: 'rating' | 'sentimen'
-  order?: 'asc' | 'desc'
+  sort?: 'rating' | 'terbaru' | 'nama'
+  per_page?: number
   page?: number
-  limit?: number
 }
 
-/** Response dari endpoint list nongkrong (FastAPI) */
+/** Response dari endpoint list nongkrong (Laravel) */
 export interface NongkrongListResponse {
   success: boolean
   message: string
-  data: {
-    items: NongkrongItem[]
+  data: NongkrongItem[]
+  meta: {
+    current_page: number
+    per_page: number
     total: number
-    page: number
-    limit: number
-    total_pages: number
+    last_page: number
+    from: number | null
+    to: number | null
   }
 }
 

@@ -76,9 +76,9 @@ function CariContent() {
   const debouncedQuery = useDebounce(query, 400)
 
   // Ambil semua data wisata, kuliner, nongkrong
-  const { data: wisataData, isLoading: wisataLoading } = useWisata({ limit: 50 })
-  const { data: kulinerData, isLoading: kulinerLoading } = useKuliner({ limit: 50 })
-  const { data: nongkrongData, isLoading: nongkrongLoading } = useNongkrong({ limit: 50 })
+  const { data: wisataData, isLoading: wisataLoading } = useWisata({ per_page: 50 })
+  const { data: kulinerData, isLoading: kulinerLoading } = useKuliner({ per_page: 50 })
+  const { data: nongkrongData, isLoading: nongkrongLoading } = useNongkrong({ per_page: 50 })
 
   const isLoading = wisataLoading || kulinerLoading || nongkrongLoading
 

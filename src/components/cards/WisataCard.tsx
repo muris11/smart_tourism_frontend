@@ -9,6 +9,7 @@ import { useRecommendation } from '@/hooks/useRecommendation'
 import { useWishlistStore } from '@/stores/wishlistStore'
 import { useCallback, useRef } from 'react'
 import { cn } from '@/lib/utils/cn'
+import { getFirstImage } from '@/lib/utils/format'
 import type { WisataItem } from '@/types'
 
 const FALLBACK_IMAGE = '/images/fallback/fallback-1.jpg'
@@ -28,9 +29,7 @@ export default function WisataCard({ data, className }: WisataCardProps) {
         ? data.rating_google
         : parseFloat(data.rating_google || '0')
 
-    const imageUrl = data.gambar && data.gambar.length > 0
-        ? data.gambar[0]
-        : FALLBACK_IMAGE
+    const imageUrl = getFirstImage(data.gambar, FALLBACK_IMAGE)
 
     const isFree = data.harga_tiket_min === 0 && data.harga_tiket_max === 0
     const priceText = isFree ? 'Gratis' : `Rp${data.harga_tiket_min.toLocaleString()}`

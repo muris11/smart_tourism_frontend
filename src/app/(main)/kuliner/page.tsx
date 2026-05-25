@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Search, SlidersHorizontal, X, Sparkles } from 'lucide-react'
-import { useKuliner } from '@/hooks/useKuliner'
+import { useKuliner, useFeaturedKuliner } from '@/hooks/useKuliner'
 import { useJenisTempat } from '@/hooks/useJenisTempat'
 import { useDebounce } from '@/hooks/useDebounce'
 import KulinerCard from '@/components/cards/KulinerCard'
@@ -15,66 +15,6 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { cn } from '@/lib/utils/cn'
 import { WILAYAH_LIST, type Wilayah } from '@/lib/constants/wilayah'
 import type { Sentimen } from '@/lib/constants/sentimen'
-
-// DUMMY REKOMENDASI KULINER - SEMENTARA
-const DUMMY_RECOMMENDATIONS = [
-  {
-    kode: 'KUL-CRB-001',
-    nama: 'Empal Gentong Krucuk',
-    wilayah: 'Cirebon',
-    jenis_tempat: 'Restoran',
-    rating_google: 4.7,
-    gambar: [],
-    harga_min: 25000,
-    harga_max: 50000,
-    jam_buka: '10:00:00',
-    jam_tutup: '22:00:00',
-    deskripsi: 'Empal gentong legendaris dengan kuah gurih khas Cirebon.',
-    alamat_lengkap: 'Jl. Tentara Pelajar No.25, Kebonbaru, Kec. Kejaksan, Kota Cirebon',
-  },
-  {
-    kode: 'KUL-KNG-001',
-    nama: 'Sate Maranggi H. Deden',
-    wilayah: 'Kuningan',
-    jenis_tempat: 'Rumah Makan',
-    rating_google: 4.8,
-    gambar: [],
-    harga_min: 20000,
-    harga_max: 40000,
-    jam_buka: '10:00:00',
-    jam_tutup: '21:00:00',
-    deskripsi: 'Sate maranggi dengan bumbu kecap dan sambal khas yang menggugah selera.',
-    alamat_lengkap: 'Jl. Siliwangi No.105, Kuningan, Kec. Kuningan, Kabupaten Kuningan',
-  },
-  {
-    kode: 'KUL-IDM-001',
-    nama: 'Mangga Cengkir Indramayu',
-    wilayah: 'Indramayu',
-    jenis_tempat: 'Oleh-oleh',
-    rating_google: 4.6,
-    gambar: [],
-    harga_min: 15000,
-    harga_max: 75000,
-    jam_buka: '08:00:00',
-    jam_tutup: '17:00:00',
-    deskripsi: 'Mangga khas Indramayu dengan rasa manis dan aroma khas.',
-    alamat_lengkap: 'Desa Cengkir, Kec. Indramayu, Kabupaten Indramayu',
-  },
-  {
-    kode: 'KUL-MJL-001',
-    nama: 'Tahu Walik Cilimus',
-    wilayah: 'Majalengka',
-    jenis_tempat: 'Kuliner Kaki Lima',
-    rating_google: 4.7,
-    gambar: [],
-    harga_min: 5000,
-    harga_max: 15000,
-    jam_buka: '15:00:00',
-    jam_tutup: '22:00:00',
-    deskripsi: 'Tahu crispy dengan isian ayam dan udang, cocok untuk camilan.',
-    alamat_lengkap: 'Jl. Raya Cilimus, Kec. Cilimus, Kabupaten Majalengka',
-  },
-]
 
 interface FilterContentProps {
   filters: {
@@ -239,9 +179,10 @@ export default function KulinerPage() {
     sentimen: (filters.sentimen as Sentimen) || undefined,
     q: debouncedSearch || undefined,
     page: currentPage,
-    limit: 12,
+    per_page: 12,
   })
 
+  const { data: rekomendasi, isLoading: rekomendasiLoading } = useFeaturedKuliner()
   const { jenis: jenisOptions } = useJenisTempat()
 
   useEffect(() => {
@@ -297,23 +238,30 @@ export default function KulinerPage() {
           </p>
         </div>
 
-        {/* REKOMENDASI KULINER UNTUK KAMU - DUMMY */}
-        <div className="mb-12">
-          <div className="mb-4 flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-brand-green" />
-            <h2 className="text-xl font-semibold text-brand-navy">
-              Rekomendasi Kuliner untuk Kamu
-            </h2>
-            <span className="text-xs text-slate-400">
-              Berdasarkan aktivitasmu
-            </span>
+        {rekomendasi && rekomendasi.length > 0 && (
+          <div className="mb-12">
+            <div className="mb-4 flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-brand-green" />
+              <h2 className="text-xl font-semibold text-brand-navy">
+                Rekomendasi Kuliner untuk Kamu
+              </h2>
+              <span className="text-xs text-slate-400">
+                Berdasarkan aktivitasmu
+              </span>
+            </div>
+            {rekomendasiLoading ? (
+              <div className="flex justify-center py-10">
+                <LoadingSpinner size="lg" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {rekomendasi.map((item) => (
+                  <KulinerCard key={item.kode} item={item} />
+                ))}
+              </div>
+            )}
           </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {DUMMY_RECOMMENDATIONS.map((item) => (
-              <KulinerCard key={item.kode} item={item as any} />
-            ))}
-          </div>
-        </div>
+        )}
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
           <aside className="hidden lg:block lg:w-80 xl:w-96 shrink-0">

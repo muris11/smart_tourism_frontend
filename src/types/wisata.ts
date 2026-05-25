@@ -56,28 +56,29 @@ export interface WisataDetail extends WisataItem {
   koordinat?: Koordinat | null
 }
 
-/** Filter untuk list wisata (match query params FastAPI) */
+/** Filter untuk list wisata (match backend Laravel) */
 export interface WisataFilter {
-  jenis?: string
-  kategori?: string
+  kategori_utama?: string
+  wilayah?: Wilayah
   sentimen?: Sentimen
   q?: string
-  sort_by?: 'rating' | 'sentimen'
-  order?: 'asc' | 'desc'
+  sort?: 'rating' | 'terbaru' | 'nama'
+  per_page?: number
   page?: number
-  limit?: number
 }
 
-/** Response dari endpoint list wisata (FastAPI) */
+/** Response dari endpoint list wisata (Laravel) */
 export interface WisataListResponse {
   success: boolean
   message: string
-  data: {
-    items: WisataItem[]
+  data: WisataItem[]
+  meta: {
+    current_page: number
+    per_page: number
     total: number
-    page: number
-    limit: number
-    total_pages: number
+    last_page: number
+    from: number | null
+    to: number | null
   }
 }
 

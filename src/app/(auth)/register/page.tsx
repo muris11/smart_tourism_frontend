@@ -23,7 +23,16 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useState } from 'react'
 import { useToast } from '@/hooks/useToast'
+import { authApi } from '@/lib/api/auth'
 import ToastContainer from '@/components/ui/ToastContainer'
+
+/** Type untuk form data */
+type RegisterFormData = {
+  nama: string
+  email: string
+  password: string
+  password_confirmation: string
+}
 
 /**
  * Schema validasi menggunakan Zod
@@ -90,43 +99,27 @@ export default function RegisterPage() {
    * 2. Jika sukses, tampilkan toast sukses dan redirect ke halaman login
    * 3. Jika gagal, tampilkan toast error dan set error form
    */
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: RegisterFormData) => {
     try {
-      // Panggil API registrasi
-      const response = await fetch('http://localhost:8001/api/v1/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          nama: data.nama,
-          email: data.email,
-          password: data.password,
-        }),
+      const result = await authApi.register({
+        nama: data.nama,
+        email: data.email,
+        password: data.password,
+        password_confirmation: data.password_confirmation,
       })
 
-      const result = await response.json()
-
-      // Cek apakah registrasi berhasil
-      if (result.success == true) {
-        // Tampilkan toast sukses
+      if (result.success) {
         toastSuccess('Registrasi berhasil! Silakan login.')
-
-        // Reset form
         reset()
-
-        // Delay redirect agar toast sempat terbaca
         setTimeout(() => {
           router.push('/login')
         }, 1500)
       } else {
-        // Tampilkan toast error dari response server
         const errorMessage = result.message || 'Registrasi gagal. Silakan coba lagi.'
         toastError(errorMessage)
         setError('root', { message: errorMessage })
       }
     } catch {
-      // Error network atau koneksi
       const errorMessage = 'Terjadi kesalahan jaringan. Silakan periksa koneksi internet Anda.'
       toastError(errorMessage)
       setError('root', { message: errorMessage })

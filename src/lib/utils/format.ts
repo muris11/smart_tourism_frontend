@@ -28,3 +28,26 @@ export const formatSentimen = (pct: number) => `${Math.round(pct)}% positif`
  * @example formatJarak(2.3) // "2.3 km"
  */
 export const formatJarak = (km: number) => (km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`)
+
+const LOCALHOST_PATTERN = /^http:\/\/localhost(:\d+)?\//i
+
+/**
+ * Transform image URL from backend — ganti localhost ke hosted backend
+ */
+export const getImageUrl = (url: string) => {
+  if (!url) return url
+  if (LOCALHOST_PATTERN.test(url)) {
+    return url.replace(LOCALHOST_PATTERN, 'https://backend.smart-tourism-citra.web.id/')
+  }
+  return url
+}
+
+/**
+ * Helper untuk ambil gambar pertama dari array gambar
+ */
+export const getFirstImage = (gambar: string[] | undefined | null, fallback: string) => {
+  if (gambar && gambar.length > 0) {
+    return getImageUrl(gambar[0])
+  }
+  return fallback
+}

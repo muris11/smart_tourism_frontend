@@ -58,10 +58,9 @@ export function useWisataDetail(kode: string) {
  * Hook untuk mendapatkan wisata unggulan (rating tertinggi)
  * @param limit - Jumlah data yang diambil (default: 4)
  */
-export function useFeaturedWisata(limit: number = 4) {
+export function useFeaturedWisata(per_page: number = 4) {
   return useWisata({
-    limit,
-    sort_by: 'rating',
-    order: 'desc',
+    per_page,
+    sort: 'rating',
   })
 }

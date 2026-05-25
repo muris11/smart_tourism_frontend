@@ -30,6 +30,7 @@ import { useRecommendation } from '@/hooks/useRecommendation'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { cn } from '@/lib/utils/cn'
+import { getFirstImage } from '@/lib/utils/format'
 
 /** Halaman detail kuliner */
 export default function KulinerDetailPage() {
@@ -77,9 +78,7 @@ export default function KulinerDetailPage() {
     ? kuliner.rating_google
     : parseFloat(kuliner.rating_google || '0')
 
-  const imageUrl = kuliner.gambar && kuliner.gambar.length > 0
-    ? kuliner.gambar[0]
-    : '/images/fallback/fallback-2.webp'
+  const imageUrl = getFirstImage(kuliner.gambar, '/images/fallback/fallback-2.webp')
 
   const getJenisIcon = (jenis: string) => {
     const lowerJenis = jenis?.toLowerCase() || ''

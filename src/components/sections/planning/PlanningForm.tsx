@@ -44,11 +44,17 @@ export default function PlanningForm({ onResult }: Props) {
     setIsLoading(true)
     setError(null)
 
+    const budgetMap: Record<string, number> = {
+      murah: 200000,
+      sedang: 500000,
+      mahal: 1000000,
+    }
+
     const payload: PlanningPayload = {
       jumlah_hari: data.jumlah_hari,
-      wilayah: data.wilayah,
-      preferensi: data.kategori_preferensi,
-      budget: data.budget as PlanningPayload['budget'] || undefined,
+      wilayah: data.wilayah as PlanningPayload['wilayah'],
+      kategori_preferensi: data.kategori_preferensi,
+      budget: data.budget ? budgetMap[data.budget] : null,
     }
 
     try {
@@ -56,7 +62,7 @@ export default function PlanningForm({ onResult }: Props) {
       onResult(result)
     } catch {
       setError('Gagal membuat itinerary. Layanan AI mungkin sedang tidak tersedia.')
-      onResult({ total_hari: data.jumlah_hari, itinerary: [] })
+      onResult({ itinerary: [], total_budget: 0, total_durasi_jam: 0 })
     } finally {
       setIsLoading(false)
     }

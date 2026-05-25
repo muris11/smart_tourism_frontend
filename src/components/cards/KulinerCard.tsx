@@ -9,6 +9,7 @@ import { useRecommendation } from '@/hooks/useRecommendation'
 import { useWishlistStore } from '@/stores/wishlistStore'
 import { useCallback, useRef } from 'react'
 import { cn } from '@/lib/utils/cn'
+import { getFirstImage } from '@/lib/utils/format'
 import type { KulinerItem } from '@/types'
 
 const FALLBACK_IMAGE = '/images/fallback/fallback-2.webp'
@@ -28,9 +29,7 @@ export default function KulinerCard({ item, className }: KulinerCardProps) {
     ? item.rating_google
     : parseFloat(item.rating_google || '0')
 
-  const imageUrl = item.gambar && item.gambar.length > 0
-    ? item.gambar[0]
-    : FALLBACK_IMAGE
+  const imageUrl = getFirstImage(item.gambar, FALLBACK_IMAGE)
 
   const getJenisIcon = (jenis: string) => {
     const lowerJenis = jenis?.toLowerCase() || ''

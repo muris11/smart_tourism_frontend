@@ -11,11 +11,17 @@ export const nongkrongApi = {
    * Daftar semua tempat nongkrong (publik)
    * GET /api/v1/nongkrong/
    * 
-   * @param filters - Filter untuk list nongkrong (wilayah, sentimen, q, sort_by, order, page, limit)
+   * @param filters - Filter untuk list nongkrong (wilayah, sentimen, q, sort, page, per_page)
    */
-  list: async (filters?: NongkrongFilter): Promise<NongkrongListResponse['data']> => {
+  list: async (filters?: NongkrongFilter) => {
     const { data } = await apiClient.get<NongkrongListResponse>('/nongkrong', { params: filters })
-    return data.data
+    return {
+      items: data.data,
+      total: data.meta.total,
+      total_pages: data.meta.last_page,
+      page: data.meta.current_page,
+      limit: data.meta.per_page,
+    }
   },
 
   /**

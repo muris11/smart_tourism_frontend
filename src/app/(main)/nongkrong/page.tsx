@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Search, SlidersHorizontal, X, Sparkles } from 'lucide-react'
-import { useNongkrong } from '@/hooks/useNongkrong'
+import { useNongkrong, useFeaturedNongkrong } from '@/hooks/useNongkrong'
 import { useDebounce } from '@/hooks/useDebounce'
 import NongkrongCard from '@/components/cards/NongkrongCard'
 import Pagination from '@/components/ui/Pagination'
@@ -12,66 +12,6 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { cn } from '@/lib/utils/cn'
 import { WILAYAH_LIST, type Wilayah } from '@/lib/constants/wilayah'
 import type { Sentimen } from '@/lib/constants/sentimen'
-
-// DUMMY REKOMENDASI TEMPAT NONGKRONG - SEMENTARA
-const DUMMY_RECOMMENDATIONS = [
-  {
-    kode: 'NGK-CRB-001',
-    nama: 'Kopi Janji Jiwa Cirebon',
-    wilayah: 'Cirebon',
-    konsep: 'Coffee Shop',
-    rating_google: 4.6,
-    gambar: [],
-    harga_min: 15000,
-    harga_max: 35000,
-    jam_buka: '08:00:00',
-    jam_tutup: '22:00:00',
-    deskripsi: 'Coffee shop modern dengan berbagai varian kopi dan tempat instagramable.',
-    alamat_lengkap: 'Jl. Siliwangi No.45, Kebonbaru, Kec. Kejaksan, Kota Cirebon',
-  },
-  {
-    kode: 'NGK-KNG-001',
-    nama: 'Cafe Lingkung Senja',
-    wilayah: 'Kuningan',
-    konsep: 'Cafe',
-    rating_google: 4.7,
-    gambar: [],
-    harga_min: 20000,
-    harga_max: 50000,
-    jam_buka: '10:00:00',
-    jam_tutup: '23:00:00',
-    deskripsi: 'Cafe dengan pemandangan pegunungan dan suasana yang adem.',
-    alamat_lengkap: 'Desa Cipari, Kec. Cipicung, Kabupaten Kuningan',
-  },
-  {
-    kode: 'NGK-IDM-001',
-    nama: 'Angkringan Indramayu',
-    wilayah: 'Indramayu',
-    konsep: 'Angkringan',
-    rating_google: 4.5,
-    gambar: [],
-    harga_min: 5000,
-    harga_max: 20000,
-    jam_buka: '17:00:00',
-    jam_tutup: '23:00:00',
-    deskripsi: 'Angkringan legendaris dengan berbagai menu, cocok untuk nongkrong malam.',
-    alamat_lengkap: 'Jl. Veteran No.12, Pasar Baru, Kec. Indramayu, Kabupaten Indramayu',
-  },
-  {
-    kode: 'NGK-MJL-001',
-    nama: 'Roofpark Majalengka',
-    wilayah: 'Majalengka',
-    konsep: 'Rooftop Cafe',
-    rating_google: 4.8,
-    gambar: [],
-    harga_min: 25000,
-    harga_max: 60000,
-    jam_buka: '16:00:00',
-    jam_tutup: '23:00:00',
-    deskripsi: 'Cafe dengan konsep rooftop dan pemandangan kota Majalengka.',
-    alamat_lengkap: 'Jl. KH. Abdul Halim No.78, Majalengka Wetan, Kec. Majalengka, Kabupaten Majalengka',
-  },
-]
 
 interface FilterContentProps {
   filters: {
@@ -209,8 +149,10 @@ export default function NongkrongPage() {
     sentimen: (filters.sentimen as Sentimen) || undefined,
     q: debouncedSearch || undefined,
     page: currentPage,
-    limit: 12,
+    per_page: 12,
   })
+
+  const { data: rekomendasi, isLoading: rekomendasiLoading } = useFeaturedNongkrong()
 
   const handleFilterChange = (key: string, value: string | number) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
@@ -252,22 +194,30 @@ export default function NongkrongPage() {
         </div>
 
         {/* REKOMENDASI TEMPAT NONGKRONG UNTUK KAMU - DUMMY */}
-        <div className="mb-12">
-          <div className="mb-4 flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-brand-green" />
-            <h2 className="text-xl font-semibold text-brand-navy">
-              Rekomendasi Nongkrong untuk Kamu
-            </h2>
-            <span className="text-xs text-slate-400">
-              Berdasarkan aktivitasmu
-            </span>
+        {rekomendasi && rekomendasi.length > 0 && (
+          <div className="mb-12">
+            <div className="mb-4 flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-brand-green" />
+              <h2 className="text-xl font-semibold text-brand-navy">
+                Rekomendasi Nongkrong untuk Kamu
+              </h2>
+              <span className="text-xs text-slate-400">
+                Berdasarkan aktivitasmu
+              </span>
+            </div>
+            {rekomendasiLoading ? (
+              <div className="flex justify-center py-10">
+                <LoadingSpinner size="lg" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {rekomendasi.map((item) => (
+                  <NongkrongCard key={item.kode} data={item} />
+                ))}
+              </div>
+            )}
           </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {DUMMY_RECOMMENDATIONS.map((item) => (
-              <NongkrongCard key={item.kode} data={item as any} />
-            ))}
-          </div>
-        </div>
+        )}
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
           <aside className="hidden lg:block lg:w-80 xl:w-96 shrink-0">

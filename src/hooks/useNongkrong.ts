@@ -58,10 +58,9 @@ export function useNongkrongDetail(kode: string) {
  * Hook untuk mendapatkan tempat nongkrong unggulan (rating tertinggi)
  * @param limit - Jumlah data yang diambil (default: 4)
  */
-export function useFeaturedNongkrong(limit: number = 4) {
+export function useFeaturedNongkrong(per_page: number = 4) {
   return useNongkrong({
-    limit,
-    sort_by: 'rating',
-    order: 'desc',
+    per_page,
+    sort: 'rating',
   })
 }

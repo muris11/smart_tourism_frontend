@@ -27,6 +27,7 @@ import { useRecommendation } from '@/hooks/useRecommendation'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { cn } from '@/lib/utils/cn'
+import { getFirstImage } from '@/lib/utils/format'
 
 /** Halaman detail destinasi wisata */
 export default function WisataDetailPage() {
@@ -73,9 +74,7 @@ export default function WisataDetailPage() {
     ? wisata.rating_google
     : parseFloat(wisata.rating_google || '0')
 
-  const imageUrl = wisata.gambar && wisata.gambar.length > 0
-    ? wisata.gambar[0]
-    : '/images/fallback/fallback.jpg'
+  const imageUrl = getFirstImage(wisata.gambar, '/images/fallback/fallback.jpg')
 
   const isFree = wisata.harga_tiket_min === 0 && wisata.harga_tiket_max === 0
 

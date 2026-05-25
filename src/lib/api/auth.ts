@@ -13,7 +13,7 @@ import {
 /** Payload untuk update preferences user */
 export interface PreferencesPayload {
   kategori_favorit?: string[]
-  wilayah_favorit?: string[]
+  wilayah_favorit?: string | string[]
   budget_min?: number
   budget_max?: number
   tipe_wisata?: string[]

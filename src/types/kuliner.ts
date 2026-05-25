@@ -49,29 +49,29 @@ export interface KulinerDetail extends Omit<KulinerItem, 'id' | 'uid' | 'status'
   koordinat: Koordinat | null
 }
 
-/** Filter untuk list kuliner */
+/** Filter untuk list kuliner (match backend Laravel) */
 export interface KulinerFilter {
   wilayah?: Wilayah
   jenis?: string
   sentimen?: string
-  halal?: boolean
   q?: string
-  sort_by?: 'rating' | 'sentimen'
-  order?: 'asc' | 'desc'
+  sort?: 'rating' | 'terbaru' | 'nama'
+  per_page?: number
   page?: number
-  limit?: number
 }
 
-/** Response dari endpoint list kuliner (FastAPI) */
+/** Response dari endpoint list kuliner (Laravel) */
 export interface KulinerListResponse {
   success: boolean
   message: string
-  data: {
-    items: KulinerItem[]
+  data: KulinerItem[]
+  meta: {
+    current_page: number
+    per_page: number
     total: number
-    page: number
-    limit: number
-    total_pages: number
+    last_page: number
+    from: number | null
+    to: number | null
   }
 }
 

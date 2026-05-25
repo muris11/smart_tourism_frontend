@@ -2,6 +2,16 @@
 
 import { Wilayah } from '@/lib/constants/wilayah'
 
+/** Item hasil rekomendasi dari endpoint POST /recommendation */
+export interface RekoItem {
+  kode: string
+  nama: string
+  tipe: 'wisata' | 'kuliner' | 'nongkrong'
+  wilayah: string
+  skor_rekomendasi?: number
+  jarak_km?: number
+}
+
 /** Item hasil rekomendasi */
 export interface RecommendationItem {
   kode: string
@@ -46,18 +56,18 @@ export interface PlanningPayload {
   wilayah: Wilayah[]
   jumlah_hari: number
   jumlah_orang?: number
-  budget_total?: number | null
-  preferensi?: string[] | null
+  budget?: number | null
+  kategori_preferensi?: string[] | null
   tanggal_mulai?: string | null
   catatan_tambahan?: string | null
 }
 
-/** Item dalam satu hari itinerary (display) */
-export interface PlanningItemDisplay {
-  urutan: number
-  tipe_tempat: 'wisata' | 'kuliner' | 'nongkrong'
-  tempat_kode: string
+/** Tempat dalam satu hari itinerary */
+export interface PlanningItem {
+  kode: string
   nama: string
+  tipe: 'wisata' | 'kuliner' | 'nongkrong'
+  wilayah: string
   estimasi_durasi_jam: number
   harga_estimasi: number
   catatan?: string
@@ -70,7 +80,7 @@ export interface PlanningItemDisplay {
 export interface PlanningDay {
   hari: number
   tanggal: string
-  items: PlanningItemDisplay[]
+  tempat: PlanningItem[]
 }
 
 /** Response dari backend FastAPI untuk planning */
@@ -79,6 +89,7 @@ export interface PlanningResponse {
   message: string
   data: {
     itinerary: PlanningDay[]
+    total_hari?: number
     total_budget: number
     total_durasi_jam: number
   }
@@ -87,6 +98,7 @@ export interface PlanningResponse {
 /** Result untuk frontend (sama dengan data di PlanningResponse) */
 export interface PlanningResult {
   itinerary: PlanningDay[]
+  total_hari?: number
   total_budget: number
   total_durasi_jam: number
 }

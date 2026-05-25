@@ -9,6 +9,7 @@ import { useRecommendation } from '@/hooks/useRecommendation'
 import { useWishlistStore } from '@/stores/wishlistStore'
 import { useCallback, useRef } from 'react'
 import { cn } from '@/lib/utils/cn'
+import { getFirstImage } from '@/lib/utils/format'
 import type { NongkrongItem } from '@/types'
 
 const FALLBACK_IMAGE = '/images/fallback/fallback-3.jpg'
@@ -28,9 +29,7 @@ export default function NongkrongCard({ data, className }: NongkrongCardProps) {
     ? data.rating_google
     : parseFloat(data.rating_google || '0')
 
-  const imageUrl = data.gambar && data.gambar.length > 0
-    ? data.gambar[0]
-    : FALLBACK_IMAGE
+  const imageUrl = getFirstImage(data.gambar, FALLBACK_IMAGE)
 
   const getKonsepIcon = () => {
     const konsep = data.konsep_suasana?.toLowerCase() || ''

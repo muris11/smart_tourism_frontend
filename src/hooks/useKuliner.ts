@@ -58,10 +58,9 @@ export function useKulinerDetail(kode: string) {
  * Hook untuk mendapatkan kuliner unggulan (rating tertinggi)
  * @param limit - Jumlah data yang diambil (default: 4)
  */
-export function useFeaturedKuliner(limit: number = 4) {
+export function useFeaturedKuliner(per_page: number = 4) {
   return useKuliner({
-    limit,
-    sort_by: 'rating',
-    order: 'desc',
+    per_page,
+    sort: 'rating',
   })
 }

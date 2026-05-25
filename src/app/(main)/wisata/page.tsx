@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useWisata } from '@/hooks/useWisata'
+import { useWisata, useFeaturedWisata } from '@/hooks/useWisata'
 import { useKategoriWisata } from '@/hooks/useKategoriWisata'
 import { useDebounce } from '@/hooks/useDebounce'
 import WisataCard from '@/components/cards/WisataCard'
@@ -14,71 +14,11 @@ import { cn } from '@/lib/utils/cn'
 import { WILAYAH_LIST, type Wilayah } from '@/lib/constants/wilayah'
 import type { Sentimen } from '@/lib/constants/sentimen'
 
-// DUMMY REKOMENDASI - SEMENTARA
-const DUMMY_RECOMMENDATIONS = [
-  {
-    kode: 'WIS-CRB-001',
-    nama: 'Masjid Agung Sang Cipta Rasa',
-    wilayah: 'Cirebon',
-    kategori_utama: 'Religi',
-    rating_google: 4.8,
-    gambar: [],
-    harga_tiket_min: 0,
-    harga_tiket_max: 0,
-    jam_buka: '04:00:00',
-    jam_tutup: '21:00:00',
-    deskripsi: 'Masjid peninggalan Wali Songo dengan arsitektur sakral.',
-    alamat_lengkap: 'Jl. Kasepuhan, Kasepuhan, Kec. Lemahwungkuk, Kota Cirebon',
-  },
-  {
-    kode: 'WIS-KNG-001',
-    nama: 'Curug Putri',
-    wilayah: 'Kuningan',
-    kategori_utama: 'Alam',
-    rating_google: 4.9,
-    gambar: [],
-    harga_tiket_min: 15000,
-    harga_tiket_max: 15000,
-    jam_buka: '08:00:00',
-    jam_tutup: '17:00:00',
-    deskripsi: 'Air terjun cantik dengan kolam alami yang menyegarkan.',
-    alamat_lengkap: 'Desa Cikupa, Kec. Darma, Kabupaten Kuningan',
-  },
-  {
-    kode: 'WIS-IDM-001',
-    nama: 'Pantai Karangsong',
-    wilayah: 'Indramayu',
-    kategori_utama: 'Pantai',
-    rating_google: 4.6,
-    gambar: [],
-    harga_tiket_min: 10000,
-    harga_tiket_max: 10000,
-    jam_buka: '06:00:00',
-    jam_tutup: '18:00:00',
-    deskripsi: 'Pantai dengan hutan mangrove dan sunset yang indah.',
-    alamat_lengkap: 'Desa Karangsong, Kec. Indramayu, Kabupaten Indramayu',
-  },
-  {
-    kode: 'WIS-MJL-001',
-    nama: 'Paralayang Majalengka',
-    wilayah: 'Majalengka',
-    kategori_utama: 'Petualangan',
-    rating_google: 4.7,
-    gambar: [],
-    harga_tiket_min: 50000,
-    harga_tiket_max: 50000,
-    jam_buka: '09:00:00',
-    jam_tutup: '16:00:00',
-    deskripsi: 'Spot paralayang dengan pemandangan pegunungan spektakuler.',
-    alamat_lengkap: 'Desa Cipaku, Kec. Maja, Kabupaten Majalengka',
-  },
-]
-
 interface FilterContentProps {
   filters: {
     wilayah: string
     searchQuery: string
-    kategori: string
+    kategori_utama: string
     sentimen: string
   }
   kategoriOptions: string[]
@@ -136,10 +76,10 @@ function FilterContent({
         <label className="mb-2 block text-sm font-medium text-slate-700">Kategori</label>
         <div className="flex flex-wrap gap-2">
           <button
-            onClick={() => onFilterChange('kategori', '')}
+            onClick={() => onFilterChange('kategori_utama', '')}
             className={cn(
               'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
-              !filters.kategori
+              !filters.kategori_utama
                 ? 'bg-brand-navy text-white shadow-sm'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             )}
@@ -149,10 +89,10 @@ function FilterContent({
           {kategoriOptions.map((k) => (
             <button
               key={k}
-              onClick={() => onFilterChange('kategori', k)}
+              onClick={() => onFilterChange('kategori_utama', k)}
               className={cn(
                 'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
-                filters.kategori === k
+                filters.kategori_utama === k
                   ? 'bg-brand-navy text-white shadow-sm'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               )}
@@ -218,7 +158,7 @@ export default function WisataPage() {
   const [filters, setFilters] = useState({
     wilayah: searchParams.get('wilayah') || '',
     searchQuery: searchParams.get('q') || '',
-    kategori: searchParams.get('kategori') || '',
+    kategori_utama: searchParams.get('kategori_utama') || '',
     sentimen: searchParams.get('sentimen') || '',
   })
   const [currentPage, setCurrentPage] = useState(() => {
@@ -233,7 +173,7 @@ export default function WisataPage() {
   useEffect(() => {
     const params = new URLSearchParams()
     if (filters.wilayah) params.set('wilayah', filters.wilayah)
-    if (filters.kategori) params.set('kategori', filters.kategori)
+    if (filters.kategori_utama) params.set('kategori_utama', filters.kategori_utama)
     if (filters.sentimen) params.set('sentimen', filters.sentimen)
     if (debouncedSearch) params.set('q', debouncedSearch)
     if (currentPage > 1) params.set('page', currentPage.toString())
@@ -244,12 +184,14 @@ export default function WisataPage() {
 
   const { data, isLoading, error, meta } = useWisata({
     wilayah: (filters.wilayah as Wilayah) || undefined,
-    kategori: filters.kategori || undefined,
+    kategori_utama: filters.kategori_utama || undefined,
     sentimen: (filters.sentimen as Sentimen) || undefined,
     q: debouncedSearch || undefined,
     page: currentPage,
-    limit: 12,
+    per_page: 12,
   })
+
+  const { data: rekomendasi, isLoading: rekomendasiLoading } = useFeaturedWisata()
 
   const handleFilterChange = (key: string, value: string | number) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
@@ -260,7 +202,7 @@ export default function WisataPage() {
     setFilters({
       wilayah: '',
       searchQuery: '',
-      kategori: '',
+      kategori_utama: '',
       sentimen: '',
     })
     setCurrentPage(1)
@@ -274,7 +216,7 @@ export default function WisataPage() {
 
   const activeFilterCount = [
     filters.wilayah,
-    filters.kategori,
+    filters.kategori_utama,
     filters.sentimen,
     filters.searchQuery,
   ].filter(Boolean).length
@@ -291,23 +233,30 @@ export default function WisataPage() {
           </p>
         </div>
 
-        {/* REKOMENDASI  UNTUK KAMU - DUMMY */}
-        <div className="mb-12">
-          <div className="mb-4 flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-brand-green" />
-            <h2 className="text-xl font-semibold text-brand-navy">
-              Rekomendasi untuk Kamu
-            </h2>
-            <span className="text-xs text-slate-400">
-              Berdasarkan aktivitasmu
-            </span>
+        {rekomendasi && rekomendasi.length > 0 && (
+          <div className="mb-12">
+            <div className="mb-4 flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-brand-green" />
+              <h2 className="text-xl font-semibold text-brand-navy">
+                Rekomendasi untuk Kamu
+              </h2>
+              <span className="text-xs text-slate-400">
+                Berdasarkan aktivitasmu
+              </span>
+            </div>
+            {rekomendasiLoading ? (
+              <div className="flex justify-center py-10">
+                <LoadingSpinner size="lg" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {rekomendasi.map((item) => (
+                  <WisataCard key={item.kode} data={item} />
+                ))}
+              </div>
+            )}
           </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {DUMMY_RECOMMENDATIONS.map((item) => (
-              <WisataCard key={item.kode} data={item as any} />
-            ))}
-          </div>
-        </div>
+        )}
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
           <aside className="hidden lg:block lg:w-80 xl:w-96 shrink-0">

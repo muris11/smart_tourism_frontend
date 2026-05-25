@@ -21,6 +21,7 @@ export interface RegisterPayload {
   nama: string
   email: string
   password: string
+  password_confirmation: string
 }
 
 /** Response dari backend FastAPI untuk login */

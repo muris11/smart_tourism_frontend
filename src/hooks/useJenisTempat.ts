@@ -11,8 +11,8 @@ interface UseJenisTempatReturn {
 }
 
 /** Hook untuk mendapatkan daftar jenis tempat kuliner unik dari API */
-export function useJenisTempat(limit: number = 50): UseJenisTempatReturn {
-    const { data, isLoading, error } = useKuliner({ limit })
+export function useJenisTempat(per_page: number = 50): UseJenisTempatReturn {
+    const { data, isLoading, error } = useKuliner({ per_page })
 
     const jenis = useMemo(() => {
         if (!data || data.length === 0) return []
