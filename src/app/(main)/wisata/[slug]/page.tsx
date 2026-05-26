@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'next/navigation'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { getDestinations, getDestinationBySlug, type Destination } from '@/lib/api'
 import DetailHero from '@/components/sections/DetailHero'
 import DetailContent from '@/components/sections/DetailContent'
@@ -15,6 +16,7 @@ export default function WisataDetailPage() {
   const [item, setItem] = useState<Destination | undefined>(undefined)
   const [loading, setLoading] = useState(true)
   const [allItems, setAllItems] = useState<Destination[]>([])
+  usePageTitle(item?.name || 'Wisata')
 
   useEffect(() => {
     Promise.all([

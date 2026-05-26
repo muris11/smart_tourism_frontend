@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { getDestinations, getCulinary, getHangouts, type Destination } from '@/lib/api'
 import DestinationCard from '@/components/cards/DestinationCard'
 import CulinaryCard from '@/components/cards/CulinaryCard'
 import HangoutCard from '@/components/cards/HangoutCard'
 
 export default function RekomendasiPage() {
+  usePageTitle('Rekomendasi')
   const [alamDestinations, setAlamDestinations] = useState<any[]>([])
   const [budayaDestinations, setBudayaDestinations] = useState<any[]>([])
   const [culinaryItems, setCulinaryItems] = useState<any[]>([])

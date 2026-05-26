@@ -8,6 +8,7 @@ import { Suspense, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useAuth } from '@/hooks/useAuth'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { useToast } from '@/hooks/useToast'
 import { useSearchParams } from 'next/navigation'
 import ToastContainer from '@/components/ui/ToastContainer'
@@ -151,6 +152,7 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
+  usePageTitle('Login')
   return (
     <Suspense fallback={
       <div className="flex min-h-screen items-center justify-center bg-citra-canvas">

@@ -1,4 +1,7 @@
+import type { Metadata } from 'next'
 import { Mountain, Heart, Search, Trees, Waves, Landmark, Coffee } from 'lucide-react'
+
+export const metadata: Metadata = { title: 'Tentang' }
 
 const regions = [
   {

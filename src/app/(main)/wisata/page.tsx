@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { MapPin, Star, ArrowUpDown, SlidersHorizontal, X } from 'lucide-react'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { Chip } from '@/components/ui/Chip'
 import { Skeleton } from '@/components/ui/Skeleton'
 import Pagination from '@/components/ui/Pagination'
@@ -271,6 +272,7 @@ function WisataPageContent() {
 }
 
 export default function WisataPage() {
+  usePageTitle('Wisata')
   return (
     <Suspense fallback={
       <div className="container-page section-spacing">

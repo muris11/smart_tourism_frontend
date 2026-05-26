@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import HeroSection from '@/components/sections/HeroSection'
 import SearchPlannerSection from '@/components/sections/SearchPlannerSection'
 import RegionGridSection from '@/components/sections/RegionGridSection'
@@ -8,6 +9,8 @@ import StoryBandSection from '@/components/sections/StoryBandSection'
 import PlannerCTASection from '@/components/sections/PlannerCTASection'
 import NewsletterSection from '@/components/sections/NewsletterSection'
 import InteractiveMap from '@/components/sections/InteractiveMap'
+
+export const metadata: Metadata = { title: 'Beranda' }
 
 export default function HomePage() {
   return (

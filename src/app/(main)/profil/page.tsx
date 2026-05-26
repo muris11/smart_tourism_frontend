@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { useToast } from '@/hooks/useToast'
 import {
   UserRound, Mail, Calendar, LogOut, ClipboardList, Star, Settings, Luggage,
@@ -33,6 +34,7 @@ function ProfileSkeleton() {
 type TabKey = 'rencana' | 'ulasan' | 'pengaturan'
 
 export default function ProfilPage() {
+  usePageTitle('Profil')
   const { isLoggedIn, isLoading, user, logout, updateProfile } = useAuth()
   const { toasts, error: toastError, success: toastSuccess, removeToast } = useToast()
   const [activeTab, setActiveTab] = useState<TabKey>('rencana')

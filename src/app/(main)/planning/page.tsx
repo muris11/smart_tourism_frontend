@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { useHydrated } from '@/stores/authStore'
 import ItineraryResult from '@/components/sections/planning/ItineraryResult'
 import PlanningForm from '@/components/sections/planning/PlanningForm'
 import { PlanningResult } from '@/types/recommendation'
 
 export default function PlanningPage() {
+  usePageTitle('Planning')
   const { isLoggedIn, isLoading } = useAuth()
   const hasHydrated = useHydrated()
   const router = useRouter()

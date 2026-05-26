@@ -4,8 +4,10 @@ import { MapPin, Calendar, SmilePlus, Luggage, ArrowRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/hooks/useAuth'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 export default function RencanaPage() {
+  usePageTitle('Rencana')
   const router = useRouter()
   const { isLoggedIn } = useAuth()
 

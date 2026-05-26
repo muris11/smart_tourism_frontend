@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { MapPin, Star, ArrowUpDown, SlidersHorizontal, X, Utensils } from 'lucide-react'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { Chip } from '@/components/ui/Chip'
 import { Skeleton } from '@/components/ui/Skeleton'
 import Pagination from '@/components/ui/Pagination'
@@ -282,6 +283,7 @@ function KulinerPageContent() {
 }
 
 export default function KulinerPage() {
+  usePageTitle('Kuliner')
   return (
     <Suspense fallback={
       <div className="container-page section-spacing">

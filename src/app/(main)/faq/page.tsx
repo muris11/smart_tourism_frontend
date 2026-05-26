@@ -1,6 +1,9 @@
+import type { Metadata } from 'next'
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
+
+export const metadata: Metadata = { title: 'FAQ' }
 
 const categories = ['Umum', 'Wisata', 'Kuliner', 'Nongkrong', 'Akun'] as const
 

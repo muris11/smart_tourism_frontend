@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useEffect, useRef, useState } from 'react'
 import { useToast } from '@/hooks/useToast'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { useAuth } from '@/hooks/useAuth'
 import { authApi } from '@/lib/api/auth'
 import ToastContainer from '@/components/ui/ToastContainer'
@@ -30,6 +31,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 export default function RegisterPage() {
+  usePageTitle('Daftar')
   const router = useRouter()
   const { isLoggedIn, hasHydrated } = useAuth()
   const { toasts, error: toastError, success: toastSuccess, removeToast } = useToast()

@@ -1,5 +1,6 @@
 'use client'
 
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { Mail, Phone, MapPin, Music2 } from 'lucide-react'
 import { FaInstagram, FaYoutube } from 'react-icons/fa6'
 import { Button } from '@/components/ui/Button'
@@ -16,6 +17,7 @@ const socialLinks = [
 ]
 
 export default function KontakPage() {
+  usePageTitle('Kontak')
   return (
     <div className="min-h-screen animate-fade-in pt-28 pb-24">
       <div className="container-page">
