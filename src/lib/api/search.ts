@@ -28,12 +28,12 @@ export interface SearchResultItem {
   harga_max: number | null
   jam_buka: string | null
   jam_tutup: string | null
-  rating_google: number | null
+  rating_google: string | null
   sentimen: string | null
-  skor_sentimen: number | null
+  skor_sentimen: string | null
   link_google_maps: string | null
-  /** Skor relevansi dari Full-Text Search */
-  rank: number
+  /** Skor relevansi dari Full-Text Search (string dari API) */
+  rank: string
 }
 
 /** Response dari endpoint search */

@@ -14,16 +14,24 @@ export interface RekoItem {
 
 /** Item hasil rekomendasi */
 export interface RecommendationItem {
+  id: number
   kode: string
   nama: string
   tipe: 'wisata' | 'kuliner' | 'nongkrong'
   wilayah: Wilayah
+  kecamatan: string
+  alamat: string | null
+  latitude: number | null
+  longitude: number | null
+  deskripsi: string | null
   rating_google: number | null
   harga_min: number
-  jarak_km?: number | null
-  skor_relevansi: number
+  harga_max: number
   gambar: string[]
-  deskripsi?: string | null
+  link_google_maps: string | null
+  sentimen: string | null
+  skor_sentimen: number
+  skor_rekomendasi: number
 }
 
 /** Request payload untuk rekomendasi */
@@ -39,12 +47,12 @@ export interface RecommendationPayload {
   mode?: 'personal' | 'popular' | 'nearby'
 }
 
-/** Response dari backend FastAPI untuk rekomendasi */
+/** Response dari backend Laravel untuk rekomendasi */
 export interface RecommendationResponse {
   success: boolean
   message: string
   data: {
-    recommendations: RecommendationItem[]
+    items: RecommendationItem[]
     mode: string
     total: number
   }

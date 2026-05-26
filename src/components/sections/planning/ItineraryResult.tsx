@@ -21,11 +21,12 @@ export default function ItineraryResult({ result }: Props) {
     setIsSaving(true)
     setSaveError(null)
     try {
+      const it = result.itinerary || []
       await apiClient.post('/planning', {
-        judul: `Perjalanan ${result.total_hari || result.itinerary.length} Hari`,
-        wilayah: result.itinerary.flatMap(d => d.tempat.map(t => t.wilayah)).filter((v, i, a) => a.indexOf(v) === i),
+        judul: `Perjalanan ${result.total_hari || it.length} Hari`,
+        wilayah: it.flatMap(d => d.tempat.map(t => t.wilayah)).filter((v, i, a) => a.indexOf(v) === i),
         jumlah_orang: 1,
-        items: result.itinerary.flatMap(day =>
+        items: it.flatMap(day =>
           day.tempat.map((t, idx) => ({
             hari: day.hari,
             urutan: idx + 1,
@@ -61,7 +62,7 @@ export default function ItineraryResult({ result }: Props) {
     }
   }
 
-  if (result.itinerary.length === 0) {
+  if (!result?.itinerary || result.itinerary.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
         <p className="text-sm text-slate-500">AI belum dapat menyusun itinerary. Coba ubah preferensi Anda.</p>
@@ -72,7 +73,7 @@ export default function ItineraryResult({ result }: Props) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-slate-900">Itinerary {result.total_hari || result.itinerary.length} Hari</h2>
+        <h2 className="text-2xl font-bold text-slate-900">Itinerary {result.total_hari || (result.itinerary?.length ?? 0)} Hari</h2>
         {isLoggedIn ? (
           <button
             onClick={handleSave}
@@ -110,7 +111,7 @@ export default function ItineraryResult({ result }: Props) {
         <div className="rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-600">{saveError}</div>
       )}
 
-      {result.itinerary.map((day) => (
+      {(result.itinerary || []).map((day) => (
         <div key={day.hari} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h3 className="mb-4 text-lg font-bold text-slate-800">Hari {day.hari}</h3>
           <div className="space-y-3">

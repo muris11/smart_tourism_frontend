@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'storage.googleapis.com' },
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'placehold.co' },
     ],
   },
   async headers() {
@@ -25,8 +26,14 @@ const nextConfig: NextConfig = {
       },
     ]
   },
-  async redirects() {
-    return []
+  async rewrites() {
+    const apiTarget = process.env.API_PROXY_TARGET || 'https://backend.smart-tourism-citra.web.id'
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${apiTarget}/api/v1/:path*`,
+      },
+    ]
   },
 }
 

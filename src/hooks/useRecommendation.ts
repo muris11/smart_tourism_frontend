@@ -118,7 +118,6 @@ export function useRecommendation() {
                 setPlanning(null)
             }
         } catch (err) {
-            console.error('Planning error:', err)
             setError(err instanceof Error ? err.message : 'Terjadi kesalahan')
         } finally {
             setIsLoading(false)
@@ -151,8 +150,8 @@ export function useRecommendation() {
                 nilai_rating: nilai_rating || null,
                 durasi_detik: durasi_detik || null,
             })
-        } catch (error) {
-            console.error('Failed to track history:', error)
+        } catch {
+            // ignore
         }
     }
 

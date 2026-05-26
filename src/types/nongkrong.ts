@@ -12,8 +12,7 @@ export interface NongkrongItem {
   wilayah: Wilayah
   kecamatan: string | null
   alamat_lengkap: string | null
-  latitude: number | null
-  longitude: number | null
+  koordinat: Koordinat | null
   id_wisata_ref: string | null
   konsep_suasana: string | null
   target_pengunjung: string | null
@@ -31,6 +30,7 @@ export interface NongkrongItem {
   link_google_maps: string | null
   kontak: string | null
   gambar: string[]
+  gambar_utama: string | null
   status: Status
   sentimen: Sentimen | null
   skor_sentimen: number | null
@@ -46,7 +46,6 @@ export interface NongkrongItem {
 export interface NongkrongDetail extends Omit<NongkrongItem, 'id' | 'uid' | 'status' | 'created_at' | 'updated_at'> {
   sumber_data: string | null
   catatan: string | null
-  koordinat: Koordinat | null
 }
 
 /** Filter untuk list nongkrong (match backend Laravel) */

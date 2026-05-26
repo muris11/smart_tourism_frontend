@@ -8,7 +8,7 @@ export interface Koordinat {
   lng: number
 }
 
-/** Item wisata untuk list (match response FastAPI) */
+/** Item wisata untuk list (match response Laravel) */
 export interface WisataItem {
   id: number
   uid: string
@@ -17,8 +17,7 @@ export interface WisataItem {
   wilayah: Wilayah
   kecamatan: string | null
   alamat_lengkap: string | null
-  latitude: number | null
-  longitude: number | null
+  koordinat: Koordinat | null
   kategori_utama: string | null
   sub_kategori: string | null
   jenis_tempat: string | null
@@ -40,6 +39,7 @@ export interface WisataItem {
   link_website: string | null
   kontak: string | null
   gambar: string[]
+  gambar_utama: string | null
   sumber_data: string | null
   status: Status
   sentimen: Sentimen | null
@@ -51,10 +51,8 @@ export interface WisataItem {
   updated_at: string
 }
 
-/** Detail wisata (FastAPI tidak memisahkan list dan detail) */
-export interface WisataDetail extends WisataItem {
-  koordinat?: Koordinat | null
-}
+/** Detail wisata */
+export interface WisataDetail extends WisataItem {}
 
 /** Filter untuk list wisata (match backend Laravel) */
 export interface WisataFilter {

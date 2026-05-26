@@ -1,118 +1,87 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useMemo, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Search, SlidersHorizontal, X, Sparkles } from 'lucide-react'
-import { useNongkrong, useFeaturedNongkrong } from '@/hooks/useNongkrong'
-import { useDebounce } from '@/hooks/useDebounce'
-import NongkrongCard from '@/components/cards/NongkrongCard'
+import Image from 'next/image'
+import Link from 'next/link'
+import { MapPin, Star, ArrowUpDown, SlidersHorizontal, X, Coffee } from 'lucide-react'
+import { Chip } from '@/components/ui/Chip'
+import { Skeleton } from '@/components/ui/Skeleton'
 import Pagination from '@/components/ui/Pagination'
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
-import { EmptyState } from '@/components/ui/EmptyState'
 import { cn } from '@/lib/utils/cn'
-import { WILAYAH_LIST, type Wilayah } from '@/lib/constants/wilayah'
-import type { Sentimen } from '@/lib/constants/sentimen'
+import { getHangouts, type Hangout } from '@/lib/api'
 
-interface FilterContentProps {
-  filters: {
-    wilayah: string
-    searchQuery: string
-    sentimen: string
-  }
-  onFilterChange: (key: string, value: string | number) => void
-  onReset: () => void
+const PAGE_SIZE = 12
+
+const REGIONS = ['Semua', 'Cirebon', 'Indramayu', 'Majalengka', 'Kuningan'] as const
+const CATEGORIES = ['Semua', 'Kafe', 'Kopi', 'Rooftop', 'Taman Baca'] as const
+
+// Map JSON category to filter categories
+function normalizeCategory(jsonCat: string): string {
+  if (jsonCat.includes('Coffee')) return 'Kopi'
+  if (jsonCat.includes('Working')) return 'Kafe'
+  if (jsonCat.includes('Outdoor')) return 'Taman Baca'
+  return jsonCat
 }
 
-function FilterContent({
-  filters,
-  onFilterChange,
-  onReset,
-}: FilterContentProps) {
+const SORT_OPTIONS = [
+  { value: 'popular', label: 'Terpopuler' },
+  { value: 'rating', label: 'Rating Tertinggi' },
+  { value: 'newest', label: 'Terbaru' },
+] as const
+
+type SortValue = (typeof SORT_OPTIONS)[number]['value']
+
+function HangoutCard({ item }: { item: Hangout }) {
   return (
-    <div className="space-y-6">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-semibold text-brand-navy">Filter</h3>
-        <button onClick={onReset} className="text-sm text-brand-navy hover:underline transition-colors">
-          Reset
-        </button>
-      </div>
-
-      <div>
-        <label className="mb-2 block text-sm font-medium text-slate-700">Wilayah</label>
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => onFilterChange('wilayah', '')}
-            className={cn(
-              'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
-              !filters.wilayah
-                ? 'bg-brand-navy text-white shadow-sm'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            )}
-          >
-            Semua
-          </button>
-          {WILAYAH_LIST.map((w) => (
-            <button
-              key={w}
-              onClick={() => onFilterChange('wilayah', w)}
-              className={cn(
-                'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
-                filters.wilayah === w
-                  ? 'bg-brand-navy text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              )}
-            >
-              {w}
-            </button>
-          ))}
+    <Link
+      href={`/nongkrong/${item.slug}`}
+      className="group block overflow-hidden rounded-lg bg-citra-surface shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
+    >
+      <div className="relative h-48 w-full overflow-hidden bg-citra-surface-soft">
+        <Image
+          src={item.images[0]?.src || '/images/fallback/fallback-3.jpg'}
+          alt={item.images[0]?.alt || item.name}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+        />
+        <div className="absolute left-3 top-3">
+          <span className="inline-flex items-center gap-1 rounded-full bg-white/92 px-3 py-1 text-xs font-semibold text-citra-ink backdrop-blur-sm">
+            <Coffee className="h-3 w-3" />
+            {item.category}
+          </span>
         </div>
       </div>
-
-      <div>
-        <label className="mb-2 block text-sm font-medium text-slate-700">Sentimen</label>
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => onFilterChange('sentimen', '')}
-            className={cn(
-              'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
-              !filters.sentimen
-                ? 'bg-brand-navy text-white shadow-sm'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            )}
-          >
-            Semua
-          </button>
-          {['positif', 'negatif', 'netral'].map((s) => (
-            <button
-              key={s}
-              onClick={() => onFilterChange('sentimen', s)}
-              className={cn(
-                'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
-                filters.sentimen === s
-                  ? 'bg-brand-navy text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              )}
-            >
-              {s.charAt(0).toUpperCase() + s.slice(1)}
-            </button>
-          ))}
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="line-clamp-1 text-base font-semibold font-display text-citra-ink group-hover:text-citra-primary transition-colors">
+            {item.name}
+          </h3>
+          {item.rating > 0 && (
+            <div className="flex shrink-0 items-center gap-1 rounded-full bg-citra-surface-green px-2 py-0.5 text-xs font-semibold text-citra-rating">
+              <Star className="h-3 w-3 fill-current" />
+              {item.rating.toFixed(1)}
+            </div>
+          )}
         </div>
-      </div>
-
-      <div>
-        <label className="mb-2 block text-sm font-medium text-slate-700">Cari Tempat Nongkrong</label>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            value={filters.searchQuery}
-            onChange={(e) => onFilterChange('searchQuery', e.target.value)}
-            placeholder="Cari tempat nongkrong, nama tempat, atau konsep..."
-            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition-all placeholder:text-slate-400 focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
-          />
+        <div className="mt-2 flex items-center gap-1 text-sm text-citra-muted">
+          <MapPin className="h-3.5 w-3.5 shrink-0" />
+          <span className="line-clamp-1">{item.region}</span>
         </div>
+        <p className="mt-2 line-clamp-1 text-sm text-citra-muted-soft italic">
+          {item.ambience}
+        </p>
+        <p className="mt-1 line-clamp-2 text-sm text-citra-body">
+          {item.description}
+        </p>
+        {item.priceRange && (
+          <div className="mt-3 text-sm font-semibold text-citra-primary">
+            {item.priceRange}
+          </div>
+        )}
       </div>
-    </div>
+    </Link>
   )
 }
 
@@ -120,242 +89,197 @@ function NongkrongPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const [filters, setFilters] = useState({
-    wilayah: searchParams.get('wilayah') || '',
-    searchQuery: searchParams.get('q') || '',
-    sentimen: searchParams.get('sentimen') || '',
-  })
-  const [currentPage, setCurrentPage] = useState(() => {
-    const page = searchParams.get('page')
-    return page ? parseInt(page, 10) : 1
-  })
+  const [hangouts, setHangouts] = useState<Hangout[]>([])
+  const [region, setRegion] = useState(searchParams.get('region') || 'Semua')
+  const [category, setCategory] = useState(searchParams.get('category') || 'Semua')
+  const [sort, setSort] = useState<SortValue>('popular')
   const [showMobileFilter, setShowMobileFilter] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
 
-  const debouncedSearch = useDebounce(filters.searchQuery, 500)
+  useEffect(() => {
+    getHangouts()
+      .then(setHangouts)
+      .finally(() => setLoading(false))
+  }, [])
 
   useEffect(() => {
     const params = new URLSearchParams()
-    if (filters.wilayah) params.set('wilayah', filters.wilayah)
-    if (filters.sentimen) params.set('sentimen', filters.sentimen)
-    if (debouncedSearch) params.set('q', debouncedSearch)
-    if (currentPage > 1) params.set('page', currentPage.toString())
+    if (region !== 'Semua') params.set('region', region)
+    if (category !== 'Semua') params.set('category', category)
+    const qs = params.toString()
+    router.replace(`/nongkrong${qs ? `?${qs}` : ''}`, { scroll: false })
+    setPage(1)
+  }, [region, category, router])
 
-    const newUrl = `/nongkrong${params.toString() ? `?${params.toString()}` : ''}`
-    router.push(newUrl, { scroll: false })
-  }, [filters, debouncedSearch, currentPage, router])
+  const filtered = useMemo(() => {
+    let result = [...hangouts]
 
-  const { data, isLoading, error, meta } = useNongkrong({
-    wilayah: (filters.wilayah as Wilayah) || undefined,
-    sentimen: (filters.sentimen as Sentimen) || undefined,
-    q: debouncedSearch || undefined,
-    page: currentPage,
-    per_page: 12,
-  })
+    if (region !== 'Semua') {
+      result = result.filter((d) => d.region === region)
+    }
+    if (category !== 'Semua') {
+      result = result.filter((d) => d.category === category)
+    }
 
-  const { data: rekomendasi, isLoading: rekomendasiLoading } = useFeaturedNongkrong()
+    switch (sort) {
+      case 'rating':
+        result.sort((a, b) => b.rating - a.rating)
+        break
+      case 'newest':
+        result.sort((a, b) => (a.featured === b.featured ? 0 : a.featured ? -1 : 1))
+        break
+      default:
+        result.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0))
+        break
+    }
 
-  const handleFilterChange = (key: string, value: string | number) => {
-    setFilters((prev) => ({ ...prev, [key]: value }))
-    setCurrentPage(1)
-  }
+    return result
+  }, [region, category, sort, hangouts])
 
-  const handleReset = () => {
-    setFilters({
-      wilayah: '',
-      searchQuery: '',
-      sentimen: '',
-    })
-    setCurrentPage(1)
-    setShowMobileFilter(false)
-  }
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const paginatedItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const activeFilterCount = [
-    filters.wilayah,
-    filters.sentimen,
-    filters.searchQuery,
-  ].filter(Boolean).length
+  const activeFilterCount = [region !== 'Semua' ? region : '', category !== 'Semua' ? category : ''].filter(Boolean).length
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-slate-50 to-white">
-      <div className="container mx-auto px-4 pb-8 pt-32 md:px-6 md:pt-36 lg:px-8 lg:pt-32">
-        <div className="mb-8 text-center lg:text-left">
-          <h1 className="text-3xl font-bold text-brand-navy md:text-4xl">
-            Tempat Nongkrong Ciayumajakuning
-          </h1>
-          <p className="mt-2 text-slate-500 max-w-2xl lg:mx-0 mx-auto">
-            Temukan berbagai tempat asyik untuk nongkrong, ngopi, dan bersantai
-            dari setiap wilayah di Ciayumajakuning.
-          </p>
+    <div className="container-page section-spacing">
+      <div className="mb-8">
+        <span className="eyebrow">Santai</span>
+        <h1 className="mt-2 text-3xl font-bold font-display text-citra-ink md:text-4xl">
+          Tempat Nongkrong
+        </h1>
+      </div>
+
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+        {REGIONS.map((r) => (
+          <Chip key={r} label={r} active={region === r} onClick={() => setRegion(r)} />
+        ))}
+        <button
+          onClick={() => setShowMobileFilter(true)}
+          className="md:hidden relative flex items-center justify-center gap-2 rounded-full bg-citra-primary px-4 py-2 text-sm font-semibold text-citra-on-primary shadow-sm transition-all active:scale-95"
+        >
+          <SlidersHorizontal className="h-4 w-4" />
+          Filter
+          {activeFilterCount > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-citra-terracotta text-[10px] font-bold text-white">
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
+      </div>
+
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-3">
+          {CATEGORIES.map((c) => (
+            <Chip key={c} label={c} active={category === c} onClick={() => setCategory(c)} />
+          ))}
         </div>
-
-        {/* REKOMENDASI TEMPAT NONGKRONG UNTUK KAMU - DUMMY */}
-        {rekomendasi && rekomendasi.length > 0 && (
-          <div className="mb-12">
-            <div className="mb-4 flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-brand-green" />
-              <h2 className="text-xl font-semibold text-brand-navy">
-                Rekomendasi Nongkrong untuk Kamu
-              </h2>
-              <span className="text-xs text-slate-400">
-                Berdasarkan aktivitasmu
-              </span>
-            </div>
-            {rekomendasiLoading ? (
-              <div className="flex justify-center py-10">
-                <LoadingSpinner size="lg" />
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                {rekomendasi.map((item) => (
-                  <NongkrongCard key={item.kode} data={item} />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
-          <aside className="hidden lg:block lg:w-80 xl:w-96 shrink-0">
-            <div className="sticky top-24 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <FilterContent
-                filters={filters}
-                onFilterChange={handleFilterChange}
-                onReset={handleReset}
-              />
-            </div>
-          </aside>
-
-          <main className="flex-1">
-            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between lg:hidden">
-              <p className="text-sm text-slate-500">
-                {!isLoading && !error && meta && (
-                  <span>
-                    Menampilkan <span className="font-semibold text-brand-navy">{data?.length || 0}</span>{' '}
-                    dari <span className="font-semibold">{meta.total}</span> tempat
-                  </span>
-                )}
-              </p>
-              <button
-                onClick={() => setShowMobileFilter(true)}
-                className="relative flex items-center justify-center gap-2 rounded-full bg-brand-navy px-4 py-2 text-sm font-medium text-white shadow-sm transition-all active:scale-95"
-              >
-                <SlidersHorizontal className="h-4 w-4" />
-                Filter
-                {activeFilterCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-brand-green text-[10px] font-bold text-white">
-                    {activeFilterCount}
-                  </span>
-                )}
-              </button>
-            </div>
-
-            <div className="mb-4 hidden items-center justify-between lg:flex">
-              <p className="text-sm text-slate-500">
-                {!isLoading && !error && meta && (
-                  <span>
-                    Menampilkan <span className="font-semibold text-brand-navy">{data?.length || 0}</span>{' '}
-                    dari <span className="font-semibold">{meta.total}</span> tempat
-                  </span>
-                )}
-              </p>
-            </div>
-
-            {isLoading && (
-              <div className="flex justify-center py-20">
-                <LoadingSpinner size="lg" />
-              </div>
-            )}
-
-            {error && !isLoading && (
-              <div className="flex justify-center py-20">
-                <EmptyState
-                  title="Gagal memuat data"
-                  description="Terjadi kesalahan saat memuat data tempat nongkrong. Silakan coba lagi."
-                  actionLabel="Coba Lagi"
-                  onAction={() => window.location.reload()}
-                />
-              </div>
-            )}
-
-            {!isLoading && !error && data && data.length === 0 && (
-              <div className="flex justify-center py-20">
-                <EmptyState
-                  title="Tidak ada tempat ditemukan"
-                  description="Coba ubah filter atau kata kunci pencarian Anda."
-                  actionLabel="Reset Filter"
-                  onAction={handleReset}
-                />
-              </div>
-            )}
-
-            {!isLoading && !error && data && data.length > 0 && (
-              <>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {data.map((item) => (
-                    <NongkrongCard key={item.kode} data={item} />
-                  ))}
-                </div>
-
-                {meta && meta.last_page > 1 && (
-                  <div className="mt-10 flex justify-center">
-                    <Pagination
-                      currentPage={meta.current_page}
-                      totalPages={meta.last_page}
-                      onPageChange={handlePageChange}
-                      siblingCount={1}
-                      size="md"
-                    />
-                  </div>
-                )}
-              </>
-            )}
-          </main>
+        <div className="relative">
+          <ArrowUpDown className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-citra-muted" />
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortValue)}
+            className="appearance-none rounded-full border border-citra-border bg-citra-surface py-2 pl-9 pr-10 text-sm font-medium text-citra-body transition-colors focus:border-citra-primary focus:ring-1 focus:ring-citra-primary"
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
         </div>
       </div>
 
-      {showMobileFilter && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/50 transition-opacity duration-300"
-            onClick={() => setShowMobileFilter(false)}
+      <div className="mb-6">
+        <p className="text-sm text-citra-muted">
+          {!loading && (
+            <span>
+              Menampilkan <span className="font-semibold text-citra-primary">{filtered.length}</span> tempat
+            </span>
+          )}
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="overflow-hidden rounded-lg bg-citra-surface shadow-card">
+              <Skeleton variant="card" className="h-48 rounded-none" />
+              <div className="p-4 space-y-3">
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-1/3" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="mb-4 rounded-full bg-citra-surface-soft p-5">
+            <Coffee className="h-10 w-10 text-citra-muted-soft" />
+          </div>
+          <h3 className="mb-2 text-lg font-semibold text-citra-ink">
+            Tidak ada tempat ditemukan
+          </h3>
+          <p className="mb-6 max-w-sm text-sm text-citra-muted">
+            Coba ubah filter wilayah atau kategori untuk menemukan lebih banyak tempat nongkrong.
+          </p>
+          <button
+            onClick={() => { setRegion('Semua'); setCategory('Semua') }}
+            className="rounded-full bg-citra-primary px-6 py-2.5 text-sm font-semibold text-citra-on-primary transition-all hover:bg-citra-primary-hover"
+          >
+            Reset Filter
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
+            {paginatedItems.map((item) => (
+              <HangoutCard key={item.id} item={item} />
+            ))}
+          </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
           />
-          <div className="absolute bottom-0 left-0 right-0 max-h-[85vh] animate-in slide-in-from-bottom duration-300 rounded-t-3xl bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-              <h3 className="text-lg font-semibold text-brand-navy">Filter</h3>
-              <button
-                onClick={() => setShowMobileFilter(false)}
-                className="rounded-full p-1.5 transition-colors hover:bg-slate-100"
-                aria-label="Tutup filter"
-              >
-                <X className="h-5 w-5 text-slate-500" />
+        </>
+      )}
+
+      {showMobileFilter && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div className="absolute inset-0 bg-citra-ink/50" onClick={() => setShowMobileFilter(false)} />
+          <div className="absolute bottom-0 left-0 right-0 max-h-[80vh] overflow-y-auto rounded-t-xl bg-citra-surface p-6 shadow-modal">
+            <div className="mb-5 flex items-center justify-between">
+              <h3 className="text-lg font-semibold font-display text-citra-ink">Filter</h3>
+              <button onClick={() => setShowMobileFilter(false)} className="rounded-full p-1 text-citra-muted hover:bg-citra-surface-soft">
+                <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="max-h-[calc(85vh-140px)] overflow-y-auto px-5 py-4">
-              <FilterContent
-                filters={filters}
-                onFilterChange={handleFilterChange}
-                onReset={handleReset}
-              />
+            <div className="space-y-5">
+              <div>
+                <p className="mb-2 text-sm font-semibold text-citra-ink">Wilayah</p>
+                <div className="flex flex-wrap gap-2">
+                  {REGIONS.map((r) => (
+                    <Chip key={r} label={r} active={region === r} onClick={() => setRegion(r)} />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="mb-2 text-sm font-semibold text-citra-ink">Kategori</p>
+                <div className="flex flex-wrap gap-2">
+                  {CATEGORIES.map((c) => (
+                    <Chip key={c} label={c} active={category === c} onClick={() => setCategory(c)} />
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="flex gap-3 border-t border-slate-100 px-5 py-4">
-              <button
-                onClick={handleReset}
-                className="flex-1 rounded-full border border-slate-300 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50"
-              >
-                Reset Filter
-              </button>
-              <button
-                onClick={() => setShowMobileFilter(false)}
-                className="flex-1 rounded-full bg-brand-navy py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-navy/90"
-              >
-                Terapkan
-              </button>
-            </div>
+            <button
+              onClick={() => setShowMobileFilter(false)}
+              className="mt-6 w-full rounded-full bg-citra-primary py-3 text-sm font-semibold text-citra-on-primary transition-all hover:bg-citra-primary-hover"
+            >
+              Terapkan
+            </button>
           </div>
         </div>
       )}
@@ -366,11 +290,20 @@ function NongkrongPageContent() {
 export default function NongkrongPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-linear-to-b from-slate-50 to-white">
-        <div className="container mx-auto px-4 pb-8 pt-32 md:px-6 md:pt-36 lg:px-8 lg:pt-32">
-          <div className="flex justify-center py-20">
-            <div className="h-10 w-48 animate-pulse rounded bg-slate-200" />
-          </div>
+      <div className="container-page section-spacing">
+        <div className="skeleton-shimmer mb-8 h-8 w-64 rounded-lg" />
+        <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="overflow-hidden rounded-lg bg-citra-surface shadow-card">
+              <Skeleton variant="card" className="h-48 rounded-none" />
+              <div className="p-4 space-y-3">
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-1/3" />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     }>

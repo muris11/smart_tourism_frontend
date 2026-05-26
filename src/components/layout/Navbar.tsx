@@ -9,12 +9,19 @@ import { ROUTES } from '@/lib/constants/routes'
 import { cn } from '@/lib/utils/cn'
 import UserMenu from '@/components/ui/UserMenu'
 
-const links = [
+const navLinks = [
   { href: ROUTES.WISATA, label: 'Wisata' },
   { href: ROUTES.KULINER, label: 'Kuliner' },
   { href: ROUTES.NONGKRONG, label: 'Nongkrong' },
   { href: ROUTES.PLANNING, label: 'Rencana' },
   { href: ROUTES.TENTANG, label: 'Tentang' },
+]
+
+const drawerExtraLinks = [
+  { href: ROUTES.CARI, label: 'Pencarian' },
+  { href: ROUTES.REKOMENDASI, label: 'Rekomendasi' },
+  { href: ROUTES.FAQ, label: 'FAQ' },
+  { href: ROUTES.KONTAK, label: 'Kontak' },
 ]
 
 export default function Navbar() {
@@ -24,11 +31,9 @@ export default function Navbar() {
   const isHome = pathname === '/'
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
+    const onScroll = () => setScrolled(window.scrollY > 20)
     onScroll()
-    window.addEventListener('scroll', onScroll)
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
@@ -44,122 +49,124 @@ export default function Navbar() {
   const handleMenuClose = useCallback(() => setMobileOpen(false), [])
   const handleMenuToggle = useCallback(() => setMobileOpen((prev) => !prev), [])
 
-  const isScrolledOrMobile = scrolled || mobileOpen || !isHome
+  const showScrolled = scrolled || !isHome
+
+  const isActiveLink = (href: string) =>
+    pathname === href || pathname.startsWith(href + '/')
 
   return (
     <>
       <header
         className={cn(
           'fixed top-0 z-50 w-full transition-all duration-500',
-          isScrolledOrMobile
-            ? 'bg-white/90 backdrop-blur-lg border-b border-stone-200/80 py-3 shadow-sm md:py-4'
-            : 'bg-transparent py-5 md:py-8'
+          'h-[68px] lg:h-20',
+          showScrolled
+            ? 'bg-citra-canvas/88 shadow-nav backdrop-blur-[18px] backdrop-saturate-[1.6]'
+            : 'bg-transparent'
         )}
       >
-        <div className="container px-4 md:px-6 lg:px-12">
-          <div className="flex items-center justify-between">
+        <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 md:px-6 lg:px-10">
+          <Link
+            href="/"
+            aria-label="CITRA - Beranda"
+            className="relative z-50 flex-shrink-0"
+          >
+            <span
+              className={cn(
+                'font-display text-xl font-bold tracking-[-0.045em] transition-colors duration-300 lg:text-[1.375rem]',
+                showScrolled
+                  ? 'text-citra-ink'
+                  : 'text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.18)]'
+              )}
+            >
+              CITRA
+            </span>
+          </Link>
 
-            <Link href="/" className="relative z-10 flex flex-col">
-              <span
-                className={cn(
-                  'text-xl leading-none tracking-[0.12em] transition-colors duration-300 md:text-2xl font-bold font-display',
-                  isScrolledOrMobile
-                    ? 'text-brand-deep'
-                    : 'text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.18)]'
-                )}
-              >
-                CITRA
-              </span>
-              <span
-                className={cn(
-                  'mt-0.5 text-[8px] font-semibold uppercase tracking-[0.22em] transition-colors duration-300 md:mt-1 md:text-[9px]',
-                  isScrolledOrMobile
-                    ? 'text-slate-400'
-                    : 'text-white/70'
-                )}
-              >
-                Tourism Assistant
-              </span>
+          <nav
+            aria-label="Navigasi utama"
+            className="hidden items-center gap-1 lg:flex"
+          >
+            {navLinks.map((link) => {
+              const isActive = isActiveLink(link.href)
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    'relative rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 xl:px-4',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
+                    isActive
+                      ? 'text-citra-primary'
+                      : showScrolled
+                        ? 'text-citra-muted hover:text-citra-ink'
+                        : 'text-white/80 hover:text-white'
+                  )}
+                >
+                  {link.label}
+                  {isActive && (
+                    <span className="absolute -bottom-0.5 left-1/2 h-0.5 w-5 -translate-x-1/2 rounded-full bg-citra-primary" />
+                  )}
+                </Link>
+              )
+            })}
+          </nav>
+
+          <div className="hidden items-center gap-3 lg:flex">
+            <Link
+              href={ROUTES.CARI}
+              aria-label="Cari"
+              className={cn(
+                'rounded-lg p-2 transition-all duration-300 hover:scale-110',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
+                showScrolled
+                  ? 'text-citra-muted hover:text-citra-ink'
+                  : 'text-white/80 hover:text-white'
+              )}
+            >
+              <Search className="h-4 w-4 md:h-5 md:w-5" />
             </Link>
 
-            <nav className="hidden items-center gap-8 text-sm font-medium lg:flex xl:gap-10">
-              {links.map((link) => {
-                const isActive =
-                  pathname === link.href ||
-                  pathname.startsWith(link.href + '/')
+            <div
+              className={cn(
+                'h-5 w-px',
+                showScrolled ? 'bg-citra-border' : 'bg-white/20'
+              )}
+            />
 
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                      'relative py-2 transition-all duration-300',
-                      isActive
-                        ? isScrolledOrMobile
-                          ? 'text-brand-deep font-semibold'
-                          : 'text-white'
-                        : isScrolledOrMobile
-                          ? 'text-slate-500 hover:text-brand-deep'
-                          : 'text-white/75 hover:text-white'
-                    )}
-                  >
-                    {link.label}
-                    {isActive && (
-                      <span
-                        className={cn(
-                          'absolute -bottom-1 left-1/2 h-0.5 w-5 -translate-x-1/2 rounded-full transition-all duration-300',
-                          isScrolledOrMobile
-                            ? 'bg-brand'
-                            : 'bg-white'
-                        )}
-                      />
-                    )}
-                  </Link>
-                )
-              })}
-            </nav>
+            <UserMenu variant="desktop" scrolled={showScrolled} />
+          </div>
 
-            <div className="hidden items-center gap-4 lg:flex lg:gap-5">
-              <Link
-                href={ROUTES.CARI}
-                aria-label="Search"
-                className={cn(
-                  'transition-all duration-300 hover:scale-110',
-                  isScrolledOrMobile
-                    ? 'text-slate-400 hover:text-brand-deep'
-                    : 'text-white/75 hover:text-white'
-                )}
-              >
-                <Search className="h-4 w-4 md:h-5 md:w-5" />
-              </Link>
-
-              <div
-                className={cn(
-                  'h-4 w-px',
-                  isScrolledOrMobile
-                    ? 'bg-slate-200'
-                    : 'bg-white/20'
-                )}
-              />
-
-              <UserMenu variant="desktop" scrolled={isScrolledOrMobile} />
-            </div>
+          <div className="flex items-center gap-1 lg:hidden">
+            <Link
+              href={ROUTES.CARI}
+              aria-label="Cari"
+              className={cn(
+                'rounded-lg p-2 transition-colors',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
+                showScrolled
+                  ? 'text-citra-muted hover:text-citra-ink'
+                  : 'text-white/80 hover:text-white'
+              )}
+            >
+              <Search className="h-5 w-5" />
+            </Link>
 
             <button
               onClick={handleMenuToggle}
-              aria-label="Toggle Menu"
+              aria-label={mobileOpen ? 'Tutup menu' : 'Buka menu'}
               className={cn(
-                'relative z-10 rounded-lg p-1.5 transition-colors md:p-2 lg:hidden',
-                isScrolledOrMobile
-                  ? 'text-brand-deep hover:bg-slate-100'
-                  : 'text-white hover:bg-white/10',
-                mobileOpen && 'bg-slate-100 text-brand-deep'
+                'relative z-50 rounded-lg p-2 transition-colors',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
+                showScrolled || mobileOpen
+                  ? 'text-citra-ink hover:bg-citra-surface-soft'
+                  : 'text-white hover:bg-white/10'
               )}
             >
               {mobileOpen ? (
-                <X className="h-5 w-5 md:h-6 md:w-6" />
+                <X className="h-5 w-5" />
               ) : (
-                <Menu className="h-5 w-5 md:h-6 md:w-6" />
+                <Menu className="h-5 w-5" />
               )}
             </button>
           </div>
@@ -170,61 +177,58 @@ export default function Navbar() {
         onClick={handleMenuClose}
         className={cn(
           'fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-500 lg:hidden',
-          mobileOpen
-            ? 'opacity-100'
-            : 'pointer-events-none opacity-0'
+          mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         )}
       />
 
       <div
         className={cn(
-          'fixed inset-y-0 right-0 z-40 flex w-full max-w-xs flex-col bg-[#faf5ef] px-5 pb-6 pt-20 shadow-xl transition-transform duration-500 sm:max-w-sm sm:px-6 sm:pb-8 sm:pt-24 lg:hidden',
+          'fixed inset-y-0 right-0 z-40 flex w-full flex-col bg-citra-canvas px-5 pb-6 pt-[4.25rem] shadow-2xl transition-transform duration-500 ease-out sm:max-w-sm lg:hidden',
           mobileOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
-        <div className="flex flex-col gap-1">
-          {links.map((link) => {
-            const isActive =
-              pathname === link.href ||
-              pathname.startsWith(link.href + '/')
-
+        <nav className="flex flex-col gap-1">
+          {navLinks.map((link) => {
+            const isActive = isActiveLink(link.href)
             return (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={handleMenuClose}
                 className={cn(
-                  'rounded-xl px-4 py-3 text-base font-medium transition-all hover:bg-slate-50 sm:px-5 sm:py-3.5 sm:text-lg',
+                  'flex min-h-[52px] items-center rounded-xl px-4 text-base font-medium transition-all',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-inset',
                   isActive
-                    ? 'bg-slate-50 text-brand font-semibold'
-                    : 'text-slate-600 hover:text-brand-deep'
+                    ? 'bg-citra-primary-soft text-citra-primary font-semibold'
+                    : 'text-citra-body hover:bg-citra-surface-soft hover:text-citra-ink'
                 )}
               >
                 {link.label}
               </Link>
             )
           })}
+        </nav>
 
-          <div className="my-3 h-px bg-slate-100 sm:my-4" />
+        <div className="my-4 h-px bg-citra-border" />
 
-          {[
-            { href: ROUTES.CARI, label: 'Pencarian' },
-            { href: ROUTES.REKOMENDASI, label: 'Rekomendasi' },
-            { href: ROUTES.FAQ, label: 'FAQ' },
-            { href: ROUTES.KONTAK, label: 'Kontak' },
-          ].map((item) => (
+        <div className="flex flex-col gap-1">
+          {drawerExtraLinks.map((link) => (
             <Link
-              key={item.href}
-              href={item.href}
+              key={link.href}
+              href={link.href}
               onClick={handleMenuClose}
-              className="rounded-xl px-4 py-3 text-base font-medium text-slate-500 transition-all hover:bg-slate-50 hover:text-brand-deep sm:px-5 sm:py-3.5 sm:text-lg"
+              className={cn(
+                'flex min-h-[52px] items-center rounded-xl px-4 text-base font-medium text-citra-muted transition-all',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-inset',
+                'hover:bg-citra-surface-soft hover:text-citra-ink'
+              )}
             >
-              {item.label}
+              {link.label}
             </Link>
           ))}
         </div>
 
-        <div className="mt-auto pt-4 sm:pt-6">
+        <div className="mt-auto">
           <UserMenu variant="mobile" onMobileClose={handleMenuClose} />
         </div>
       </div>

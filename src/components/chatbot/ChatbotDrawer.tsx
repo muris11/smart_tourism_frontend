@@ -6,7 +6,7 @@ import { useChatbot } from '@/hooks/useChatbot'
 import { useChatbotStore } from '@/stores/chatbotStore'
 import ChatMessage from './ChatMessage'
 import ChatInput from './ChatInput'
-import { X, MapPin, Bot, Trash2, ChevronDown } from 'lucide-react'
+import { X, MapPin, Headphones, Trash2, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
 interface ChatbotDrawerProps {
@@ -67,12 +67,12 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
       >
         <div className="flex items-center justify-between bg-gradient-to-r from-[#0d7a6a] to-[#0a6458] px-4 py-3 rounded-t-2xl">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15">
-              <Bot className="h-4 w-4 text-white" />
-            </div>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15">
+                <Headphones className="h-4 w-4 text-white" />
+              </div>
             <div>
               <h3 className="text-sm font-semibold text-white">SITA</h3>
-              <p className="text-[10px] text-white/60">AI Tourism Assistant</p>
+              <p className="text-[10px] text-white/60">Layanan Pelanggan AI</p>
             </div>
           </div>
 
@@ -147,12 +147,12 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
               {safeMessages.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center text-center px-4">
                   <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0d7a6a] to-[#0a6458] shadow-md">
-                    <Bot className="h-7 w-7 text-white" />
+                    <Headphones className="h-7 w-7 text-white" />
                   </div>
                   <h4 className="mb-2 text-base font-semibold text-brand-deep font-display">
                     Halo! Ada yang bisa dibantu?
                   </h4>
-                  <p className="max-w-xs text-sm leading-relaxed text-slate-400">
+                  <p className="max-w-xs text-sm leading-relaxed text-slate-500">
                     Tanyakan tentang wisata, kuliner, atau tempat nongkrong di
                     Ciayumajakuning. Saya siap membantu!
                   </p>
@@ -167,7 +167,7 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
                       <button
                         key={suggestion}
                         onClick={() => handleSend(suggestion)}
-                        className="rounded-full bg-slate-50 px-3.5 py-1.5 text-xs text-slate-500 transition-all hover:bg-brand hover:text-white"
+                        className="rounded-full bg-slate-50 px-3.5 py-1.5 text-xs text-slate-500 transition-all hover:bg-brand hover:text-white border border-slate-200"
                       >
                         {suggestion}
                       </button>
@@ -187,7 +187,7 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
                   {isTyping && (
                     <div className="flex gap-3">
                       <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10">
-                        <Bot className="h-3.5 w-3.5 text-brand" />
+                        <Headphones className="h-3.5 w-3.5 text-brand" />
                       </div>
                       <div className="rounded-xl rounded-tl-none bg-slate-100 px-4 py-3">
                         <div className="flex gap-1">

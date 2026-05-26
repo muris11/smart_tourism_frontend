@@ -1,112 +1,122 @@
-'use client'
+import { ChevronDown } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/Button'
 
-import { useState } from 'react'
+const categories = ['Umum', 'Wisata', 'Kuliner', 'Nongkrong', 'Akun'] as const
 
-function AccordionItem({ question, answer }: { question: string; answer: string }) {
-  const [isOpen, setIsOpen] = useState(false)
-
-  return (
-    <div className="border-b border-slate-200">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="group flex w-full items-center justify-between py-6 text-left focus:outline-none"
-      >
-        <span className="text-xl text-brand-navy transition-colors group-hover:text-brand-green">{question}</span>
-        <span className={`text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`}>
-          {isOpen ? '−' : '+'}
-        </span>
-      </button>
-      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}>
-        <p className="pr-12 leading-relaxed font-light text-slate-600">{answer}</p>
-      </div>
-    </div>
-  )
+interface FAQItem {
+  q: string
+  a: string
+  category: (typeof categories)[number]
 }
 
+const faqs: FAQItem[] = [
+  {
+    category: 'Umum',
+    q: 'Apa itu CITRA?',
+    a: 'CITRA (Ciayumajakuning Intelligent Tourism & Recommendation Assistant) adalah platform wisata cerdas yang membantu Anda menjelajahi potensi pariwisata di Cirebon, Indramayu, Majalengka, dan Kuningan. Kami menyediakan informasi destinasi, rekomendasi kuliner, tempat nongkrong, dan fitur rencana perjalanan.',
+  },
+  {
+    category: 'Umum',
+    q: 'Apakah CITRA gratis digunakan?',
+    a: 'Ya, CITRA sepenuhnya gratis untuk digunakan. Anda dapat menjelajahi semua fitur tanpa biaya, termasuk mencari destinasi, melihat rekomendasi, dan menyusun rencana perjalanan.',
+  },
+  {
+    category: 'Umum',
+    q: 'Bagaimana cara mencari destinasi di CITRA?',
+    a: 'Anda dapat menggunakan fitur pencarian di halaman Cari. Cukup ketik nama tempat atau kata kunci, lalu filter berdasarkan tipe (wisata, kuliner, nongkrong) atau wilayah (Cirebon, Indramayu, Majalengka, Kuningan) untuk menemukan yang Anda cari.',
+  },
+  {
+    category: 'Wisata',
+    q: 'Apa saja jenis wisata yang tersedia di CITRA?',
+    a: 'CITRA mencakup berbagai jenis wisata di Ciayumajakuning, mulai dari wisata alam (pantai, gunung, curug), wisata budaya (keraton, museum), wisata religi (masjid agung, gua maria), hingga wisata edukasi dan buatan.',
+  },
+  {
+    category: 'Wisata',
+    q: 'Bagaimana cara mengetahui rute menuju destinasi wisata?',
+    a: 'Setiap halaman detail destinasi dilengkapi dengan alamat lengkap dan integrasi peta yang dapat membantu Anda merencanakan rute perjalanan menuju lokasi.',
+  },
+  {
+    category: 'Kuliner',
+    q: 'Apa saja kuliner khas yang direkomendasikan?',
+    a: 'Kami merekomendasikan berbagai kuliner khas seperti Empal Gentong, Nasi Jamblang, Tahu Gejrot, dan Mie Koclok dari Cirebon; Ikan Bakar dari Indramayu; Sate Kalong dari Kuningan; serta berbagai hidangan khas Majalengka.',
+  },
+  {
+    category: 'Kuliner',
+    q: 'Apakah informasi harga dan jam buka kuliner akurat?',
+    a: 'Kami berusaha menyajikan informasi harga dan jam operasional yang akurat berdasarkan data terkini. Namun, disarankan untuk menghubungi tempat kuliner langsung untuk konfirmasi sebelum berkunjung.',
+  },
+  {
+    category: 'Nongkrong',
+    q: 'Tempat nongkrong apa yang cocok untuk bekerja?',
+    a: 'Beberapa tempat di Ciayumajakuning menyediakan suasana nyaman untuk bekerja, seperti Ruang Ngopi Jatiwangi di Majalengka yang dilengkapi Wi-Fi kencang, atau Atap Batik Coffee & Space di Cirebon dengan nuansa rooftop yang inspiratif.',
+  },
+  {
+    category: 'Akun',
+    q: 'Bagaimana cara menyimpan rencana perjalanan?',
+    a: 'Setelah membuat akun dan masuk, Anda dapat menggunakan fitur Rencana Perjalanan untuk menyusun dan menyimpan itinerary. Cukup pilih destinasi yang ingin dikunjungi, atur jadwal, dan simpan untuk dilihat kapan saja.',
+  },
+  {
+    category: 'Akun',
+    q: 'Apakah bisa memberikan ulasan tentang tempat yang dikunjungi?',
+    a: 'Tentu! Setelah mengunjungi suatu tempat, Anda dapat memberikan ulasan dan rating melalui halaman detail tempat tersebut. Ulasan Anda akan membantu wisatawan lain dalam memilih destinasi.',
+  },
+]
+
 export default function FAQPage() {
-  const faqs = [
-    {
-      category: 'Penggunaan Platform',
-      items: [
-        {
-          q: 'Apakah platform ini sepenuhnya gratis digunakan?',
-          a: 'Ya, akses ke artikel kurasi, panduan destinasi, dan alat pembuat itinerary dasar tersedia gratis untuk pengguna terdaftar.',
-        },
-        {
-          q: 'Bagaimana cara kerja fitur Perencana (Itinerary Builder)?',
-          a: 'Setelah membuat akun, Anda dapat masuk ke menu Rencana lalu menambahkan preferensi atau destinasi yang ingin disusun menjadi alur perjalanan.',
-        },
-        {
-          q: 'Apakah saya bisa menggunakan platform ini secara offline?',
-          a: 'Saat ini aplikasi berbasis web masih membutuhkan koneksi internet. Fitur unduh itinerary bisa ditambahkan pada iterasi berikutnya.',
-        },
-      ],
-    },
-    {
-      category: 'Kurasi & Rekomendasi',
-      items: [
-        {
-          q: 'Bagaimana tim editor memilih destinasi yang masuk ke platform?',
-          a: 'Tim menilai konteks lokal, otentisitas, kenyamanan eksplorasi, dan kekuatan cerita tempat sebelum direkomendasikan.',
-        },
-        {
-          q: 'Apakah saya bisa mengusulkan tempat makan atau wisata lokal?',
-          a: 'Tentu. Rekomendasi komunitas bisa dikirim melalui halaman Kontak untuk ditinjau lebih lanjut.',
-        },
-      ],
-    },
-    {
-      category: 'Akun & Keamanan',
-      items: [
-        {
-          q: 'Bagaimana cara menghapus akun saya?',
-          a: 'Pada iterasi penuh, opsi penghapusan akun dapat ditaruh di area Profil atau Pengaturan Keamanan.',
-        },
-        {
-          q: 'Apakah data perjalanan saya dibagikan ke pihak ketiga?',
-          a: 'Tidak. Data preferensi dipakai hanya untuk pengalaman produk dan tidak ditujukan untuk penjualan ke pihak eksternal.',
-        },
-      ],
-    },
-  ]
-
   return (
-    <div className="min-h-screen bg-[#FCFCFB] pt-32 pb-24 animate-fade-in">
-      <div className="mx-auto max-w-3xl px-6">
-        <div className="mb-16 text-center">
-          <span className="mb-4 block text-xs font-semibold uppercase tracking-[0.2em] text-brand-green">Pusat Bantuan</span>
-          <h1 className="mb-6 text-5xl text-brand-navy">Ada yang bisa kami bantu?</h1>
-          <p className="text-lg font-light text-slate-500">Temukan jawaban atas pertanyaan umum terkait penggunaan fitur dan layanan kami.</p>
+    <div className="min-h-screen animate-fade-in pt-28 pb-24">
+      <div className="container-page">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="eyebrow">Pusat Bantuan</p>
+          <h1 className="mt-3 font-display text-4xl font-bold text-citra-ink md:text-5xl">Pertanyaan Umum</h1>
+          <p className="mt-4 text-citra-muted">
+            Temukan jawaban atas pertanyaan yang sering diajukan tentang CITRA
+          </p>
         </div>
 
-        <div className="relative mb-16">
-          <span className="absolute top-1/2 left-6 -translate-y-1/2 text-xl text-slate-400">⌕</span>
-          <input
-            type="text"
-            placeholder="Cari topik bantuan (misal: 'itinerary', 'akun')..."
-            className="w-full rounded-full border border-slate-200 bg-white py-5 pl-14 pr-8 text-base text-slate-800 shadow-sm outline-none transition-all focus:border-brand-green focus:ring-1 focus:ring-brand-green"
-          />
-        </div>
-
-        <div className="space-y-16">
-          {faqs.map((group) => (
-            <div key={group.category}>
-              <h3 className="mb-6 inline-block border-b-2 border-brand-navy pb-2 text-2xl text-brand-navy">{group.category}</h3>
-              <div className="rounded-3xl border border-slate-100 bg-white px-8 py-2 shadow-sm">
-                {group.items.map((item) => (
-                  <AccordionItem key={item.q} question={item.q} answer={item.a} />
-                ))}
-              </div>
-            </div>
+        <div className="mx-auto mt-4 flex max-w-3xl flex-wrap justify-center gap-2">
+          {categories.map((cat) => (
+            <a
+              key={cat}
+              href={`#${cat.toLowerCase()}`}
+              className="rounded-full border border-citra-border bg-citra-surface px-4 py-2 text-sm font-medium text-citra-body shadow-hairline transition-all hover:border-citra-primary hover:text-citra-primary"
+            >
+              {cat}
+            </a>
           ))}
         </div>
 
-        <div className="mt-20 rounded-3xl border border-slate-200 bg-brand-pale p-10 text-center">
-          <h4 className="mb-3 text-2xl text-brand-navy">Belum menemukan jawaban?</h4>
-          <p className="mb-8 font-light text-slate-500">Tim dukungan kami siap membantu merespons pertanyaan khusus Anda.</p>
-          <a href="/kontak" className="inline-flex items-center justify-center rounded-full bg-brand-navy px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800">
-            Hubungi Customer Support
-          </a>
+        <div className="mx-auto mt-12 max-w-3xl">
+          {categories.map((category) => {
+            const items = faqs.filter((f) => f.category === category)
+            return (
+              <div key={category} id={category.toLowerCase()} className="mb-8">
+                <h2 className="mb-4 font-display text-xl font-bold text-citra-ink">{category}</h2>
+                <div className="divide-y divide-citra-border overflow-hidden rounded-lg bg-citra-surface shadow-card">
+                  {items.map((faq) => (
+                    <details key={faq.q} className="group">
+                      <summary className="flex cursor-pointer items-center justify-between px-6 py-5 text-sm font-medium text-citra-ink transition-colors hover:bg-citra-surface-soft [&::-webkit-details-marker]:hidden">
+                        {faq.q}
+                        <ChevronDown className="h-4 w-4 shrink-0 text-citra-muted transition-transform duration-200 group-open:rotate-180" />
+                      </summary>
+                      <div className="px-6 pb-5">
+                        <p className="text-sm leading-relaxed text-citra-body">{faq.a}</p>
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className="mx-auto mt-16 max-w-lg rounded-lg bg-citra-surface-soft p-8 text-center shadow-card">
+          <h3 className="font-display text-xl font-bold text-citra-ink">Masih punya pertanyaan?</h3>
+          <p className="mt-2 text-sm text-citra-muted">Tim kami siap membantu menjawab pertanyaan Anda</p>
+          <Link href="/kontak">
+            <Button className="mt-5">Hubungi Kami</Button>
+          </Link>
         </div>
       </div>
     </div>

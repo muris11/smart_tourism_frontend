@@ -15,7 +15,7 @@ const wilayah: WilayahItem[] = [
     name: 'Cirebon',
     description:
       'Kota budaya dengan kekayaan sejarah keraton, wisata religi, dan kuliner legendaris.',
-    total: '45+ Destinasi',
+    total: '120+ Tempat',
     icon: <Landmark className="h-5 w-5" />,
     color: 'text-amber-600',
     bgGradient: 'from-amber-50 to-amber-100/60',
@@ -24,7 +24,7 @@ const wilayah: WilayahItem[] = [
     name: 'Indramayu',
     description:
       'Pesona pantai utara dengan suasana laut, mangrove, dan wisata alam yang menenangkan.',
-    total: '30+ Destinasi',
+    total: '110+ Tempat',
     icon: <Waves className="h-5 w-5" />,
     color: 'text-cyan-600',
     bgGradient: 'from-cyan-50 to-cyan-100/60',
@@ -33,7 +33,7 @@ const wilayah: WilayahItem[] = [
     name: 'Majalengka',
     description:
       'Hamparan pegunungan, air terjun, dan panorama alam terbaik di Jawa Barat.',
-    total: '50+ Destinasi',
+    total: '130+ Tempat',
     icon: <Mountain className="h-5 w-5" />,
     color: 'text-emerald-600',
     bgGradient: 'from-emerald-50 to-emerald-100/60',
@@ -42,7 +42,7 @@ const wilayah: WilayahItem[] = [
     name: 'Kuningan',
     description:
       'Udara sejuk kaki Gunung Ciremai dengan destinasi alam dan healing terbaik.',
-    total: '40+ Destinasi',
+    total: '130+ Tempat',
     icon: <TreePine className="h-5 w-5" />,
     color: 'text-violet-600',
     bgGradient: 'from-violet-50 to-violet-100/60',

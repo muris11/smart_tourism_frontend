@@ -1,23 +1,18 @@
 import { Wilayah } from '@/lib/constants/wilayah'
 
-/** Ringkasan sentimen per wilayah */
+/** Ringkasan sentimen per wilayah (match Laravel API) */
 export interface SentimentSummary {
   wilayah: Wilayah
+  tipe: string
   total_ulasan: number
-  positif_count: number
-  negatif_count: number
-  netral_count?: number
-  positif_pct: number
-  negatif_pct: number
-  netral_pct?: number
-  per_tipe: {
-    wisata: { positif: number; negatif: number; netral?: number }
-    kuliner: { positif: number; negatif: number; netral?: number }
-    nongkrong: { positif: number; negatif: number; netral?: number }
-  }
+  positif: number
+  negatif: number
+  netral: number
+  persentase_positif: number
+  avg_confidence: number
 }
 
-/** Response dari backend FastAPI untuk summary sentimen */
+/** Response dari backend Laravel untuk summary sentimen */
 export interface SentimentSummaryResponse {
   success: boolean
   message: string

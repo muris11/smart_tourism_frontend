@@ -1,252 +1,252 @@
-/**
- * UserMenu - Komponen menu pengguna untuk autentikasi
- * 
- * Fitur:
- * - Menampilkan tombol login/register jika belum login
- * - Menampilkan dropdown menu jika sudah login (desktop)
- * - Menampilkan drawer menu jika sudah login (mobile)
- * - Toggle dropdown dengan klik di luar area
- * - Styling responsif untuk desktop dan mobile
- * - Styling berbeda berdasarkan scroll state
- * 
- * @component
- * @param {Object} props - Component props
- * @param {string} [props.className] - Additional CSS classes
- * @param {'desktop' | 'mobile'} [props.variant='desktop'] - Variant untuk tampilan desktop atau mobile
- * @param {function} [props.onMobileClose] - Callback saat menu mobile ditutup
- * @param {boolean} [props.scrolled=false] - Status scroll navbar untuk styling
- * 
- * @returns {JSX.Element} Menu pengguna sesuai variant
- * 
- * @example
- * // Desktop usage
- * <UserMenu variant="desktop" scrolled={isScrolledOrMobile} />
- * 
- * @example
- * // Mobile usage
- * <UserMenu variant="mobile" onMobileClose={handleMenuClose} />
- */
 'use client'
 
 import Link from 'next/link'
-import { User, LogOut, Settings, UserCircle } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { User, LogOut, LayoutDashboard, ChevronDown, UserCircle, Settings } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { useHydrated } from '@/stores/authStore'
 import { cn } from '@/lib/utils/cn'
+import { Button } from '@/components/ui/Button'
 import { ROUTES } from '@/lib/constants/routes'
+import { getAvatarUrl } from '@/lib/api/client'
 
-/** Interface untuk props UserMenu component */
 interface UserMenuProps {
-    /** Additional CSS classes */
-    className?: string
-    /** Variant tampilan: desktop atau mobile */
-    variant?: 'desktop' | 'mobile'
-    /** Callback saat menu mobile ditutup */
-    onMobileClose?: () => void
-    /** Status scroll navbar untuk styling */
-    scrolled?: boolean
+  className?: string
+  variant?: 'desktop' | 'mobile'
+  scrolled?: boolean
+  onMobileClose?: () => void
 }
 
 export default function UserMenu({
-    className,
-    variant = 'desktop',
-    onMobileClose,
-    scrolled = false
+  className,
+  variant = 'desktop',
+  scrolled = false,
+  onMobileClose,
 }: UserMenuProps) {
-    /** Hook autentikasi untuk mendapatkan user dan fungsi login/logout */
-    const { user, isLoggedIn, logout } = useAuth()
+  const router = useRouter()
+  const { user, isLoggedIn, logout } = useAuth()
+  const hydrated = useHydrated()
+  const [isOpen, setIsOpen] = useState(false)
+  const [avatarError, setAvatarError] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
-    /** State untuk membuka/tutup dropdown menu (desktop) */
-    const [isOpen, setIsOpen] = useState(false)
-
-    /** Ref untuk mendeteksi klik di luar dropdown */
-    const dropdownRef = useRef<HTMLDivElement>(null)
-
-    /**
-     * Effect: Menutup dropdown saat klik di luar area
-     * - Menambahkan event listener klik pada document
-     * - Memeriksa apakah target klik berada di luar dropdownRef
-     */
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsOpen(false)
-            }
-        }
-
-        document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
-    }, [])
-
-    /**
-     * Handler untuk logout
-     * - Memanggil fungsi logout dari useAuth
-     * - Menutup dropdown
-     * - Menutup mobile drawer jika ada
-     */
-    const handleLogout = async () => {
-        await logout()
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false)
-        if (onMobileClose) onMobileClose()
+      }
     }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
-    // ========== MOBILE VARIANT ==========
+  if (!hydrated) {
     if (variant === 'mobile') {
-
-        // Mobile: Belum Login
-        if (!isLoggedIn) {
-            return (
-                <div className={cn('flex flex-col gap-3 pt-8', className)}>
-                    <Link
-                        href={ROUTES.LOGIN}
-                        onClick={onMobileClose}
-                        className="w-full rounded-full border border-slate-200 py-3.5 text-center text-sm font-semibold text-brand-navy transition-all hover:border-brand-navy hover:bg-brand-pale"
-                    >
-                        Masuk ke Akun
-                    </Link>
-                    <Link
-                        href={ROUTES.REGISTER}
-                        onClick={onMobileClose}
-                        className="w-full rounded-full bg-brand-navy py-3.5 text-center text-sm font-semibold text-white transition-all hover:scale-[1.02] hover:bg-brand-navy/90"
-                    >
-                        Daftar Sekarang
-                    </Link>
-                </div>
-            )
-        }
-
-        // Mobile: Sudah Login
-        return (
-            <div className={cn('flex flex-col gap-2 pt-8', className)}>
-                {/* Profile Info Card */}
-                <div className="flex items-center gap-3 px-4 py-3 bg-brand-pale rounded-xl">
-                    <div className="h-10 w-10 rounded-full bg-brand-navy/10 flex items-center justify-center">
-                        <UserCircle className="h-6 w-6 text-brand-navy" />
-                    </div>
-                    <div>
-                        <p className="font-semibold text-brand-navy">{user?.nama}</p>
-                        <p className="text-xs text-slate-500">{user?.email}</p>
-                    </div>
-                </div>
-
-                {/* Settings Link */}
-                <Link
-                    href='/profil'
-                    onClick={onMobileClose}
-                    className="rounded-lg px-4 py-3 text-lg font-medium text-slate-600 transition-all hover:bg-brand-pale hover:text-brand-navy"
-                >
-                    <Settings className="inline h-5 w-5 mr-2" />
-                    Pengaturan
-                </Link>
-
-                {/* Logout Button */}
-                <button
-                    onClick={handleLogout}
-                    className="rounded-lg px-4 py-3 text-lg font-medium text-red-600 transition-all hover:bg-red-50 text-left"
-                >
-                    <LogOut className="inline h-5 w-5 mr-2" />
-                    Keluar
-                </button>
-            </div>
-        )
+      return <div className="skeleton-shimmer h-24 rounded-xl" />
     }
+    return <div className="skeleton-shimmer h-9 w-24 rounded-full" />
+  }
 
-    // ========== DESKTOP VARIANT ==========
+  const handleLogout = async () => {
+    setIsOpen(false)
+    onMobileClose?.()
+    await logout()
+  }
 
-    // Desktop: Belum Login
-    if (!isLoggedIn) {
-        return (
-            <div className={cn('hidden items-center gap-6 lg:flex', className)}>
-                <Link
-                    href={ROUTES.LOGIN}
-                    className={cn(
-                        'text-sm font-semibold transition-all duration-300 hover:scale-105',
-                        scrolled
-                            ? 'text-slate-600 hover:text-brand-navy'
-                            : 'text-white/90 hover:text-white'
-                    )}
-                >
-                    Masuk
-                </Link>
-                <Link
-                    href={ROUTES.REGISTER}
-                    className={cn(
-                        'rounded-full px-5 py-2.5 text-sm font-semibold shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-md',
-                        scrolled
-                            ? 'bg-brand-navy text-white hover:bg-brand-navy/90'
-                            : 'bg-white text-brand-navy hover:bg-gray-100'
-                    )}
-                >
-                    Daftar
-                </Link>
-            </div>
-        )
+  const initial = user?.nama?.charAt(0)?.toUpperCase() || '?'
+
+  const avatarEl = (size: 'sm' | 'md', scrolled = false) => {
+    const avatarUrl = getAvatarUrl(user?.avatar_url)
+    if (avatarUrl && !avatarError) {
+      return (
+        <img
+          src={avatarUrl}
+          alt={user?.nama || 'Avatar'}
+          className={cn(
+            'rounded-full object-cover',
+            size === 'md' ? 'h-10 w-10' : 'h-8 w-8'
+          )}
+          onError={() => setAvatarError(true)}
+        />
+      )
     }
-
-    // Desktop: Sudah Login (dengan dropdown)
     return (
-        <div className={cn('relative hidden lg:block', className)} ref={dropdownRef}>
-            {/* Dropdown Toggle Button */}
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className={cn(
-                    'flex items-center gap-2 rounded-full px-3 py-2 transition-all hover:bg-brand-pale/80',
-                    scrolled
-                        ? 'bg-brand-pale'
-                        : 'bg-white/10 backdrop-blur-sm hover:bg-white/20'
-                )}
-            >
-                {/* Avatar Icon */}
-                <div className={cn(
-                    'h-7 w-7 rounded-full flex items-center justify-center',
-                    scrolled
-                        ? 'bg-brand-navy/20'
-                        : 'bg-white/20'
-                )}>
-                    <User className={cn(
-                        'h-3.5 w-3.5',
-                        scrolled ? 'text-brand-navy' : 'text-white'
-                    )} />
-                </div>
-
-                {/* User Name */}
-                <span className={cn(
-                    'text-sm font-medium max-w-30 truncate',
-                    scrolled ? 'text-brand-navy' : 'text-white'
-                )}>
-                    {user?.nama}
-                </span>
-            </button>
-
-            {/* Dropdown Menu */}
-            {isOpen && (
-                <div className="absolute right-0 mt-2 w-56 rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden z-50">
-                    {/* User Info Header */}
-                    <div className="px-4 py-3 border-b border-slate-100 bg-slate-50">
-                        <p className="text-sm font-semibold text-brand-navy truncate">{user?.nama}</p>
-                        <p className="text-xs text-slate-500 truncate">{user?.email}</p>
-                    </div>
-
-                    {/* Profile Link */}
-                    <Link
-                        href='/profil'
-                        onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-brand-pale transition-colors"
-                    >
-                        <UserCircle className="h-4 w-4" />
-                        Profil Saya
-                    </Link>
-
-                    {/* Logout Button */}
-                    <button
-                        onClick={handleLogout}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-slate-100"
-                    >
-                        <LogOut className="h-4 w-4" />
-                        Keluar
-                    </button>
-                </div>
-            )}
-        </div>
+      <span className={cn(
+        'flex items-center justify-center rounded-full text-sm font-bold',
+        size === 'md' ? 'h-10 w-10' : 'h-8 w-8',
+        scrolled
+          ? 'bg-citra-primary text-citra-on-primary'
+          : 'bg-white/20 text-white'
+      )}>
+        {initial}
+      </span>
     )
+  }
+
+  // ===== MOBILE VARIANT =====
+  if (variant === 'mobile') {
+    if (!isLoggedIn) {
+      return (
+        <div className={cn('flex flex-col gap-3', className)}>
+          <Link
+            href={ROUTES.LOGIN}
+            onClick={onMobileClose}
+            className="w-full rounded-full border border-citra-border-strong py-3.5 text-center text-sm font-semibold text-citra-ink transition-all hover:bg-citra-surface-soft"
+          >
+            Masuk
+          </Link>
+          <Link
+            href={ROUTES.REGISTER}
+            onClick={onMobileClose}
+            className="inline-flex items-center justify-center rounded-full bg-citra-primary text-white hover:bg-citra-primary-hover active:bg-citra-primary-active active:scale-[.97] shadow-sm min-h-12 px-6 text-[0.9375rem] font-semibold leading-none transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-offset-2 focus-visible:ring-offset-citra-canvas disabled:pointer-events-none disabled:opacity-50 w-full"
+          >
+            Daftar
+          </Link>
+        </div>
+      )
+    }
+
+    return (
+      <div className={cn('flex flex-col gap-2', className)}>
+        <div className="flex items-center gap-3 rounded-xl bg-citra-surface-green px-4 py-3">
+          {avatarEl('md')}
+          <div>
+            <p className="font-semibold text-citra-ink">{user?.nama}</p>
+            <p className="text-xs text-citra-muted">{user?.email}</p>
+          </div>
+        </div>
+
+        <Link
+          href="/profil"
+          onClick={onMobileClose}
+          className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-citra-body transition-all hover:bg-citra-primary-soft hover:text-citra-ink"
+        >
+          <UserCircle className="h-5 w-5 text-citra-muted" />
+          Profil
+        </Link>
+
+        <Link
+          href="/planning"
+          onClick={onMobileClose}
+          className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-citra-body transition-all hover:bg-citra-primary-soft hover:text-citra-ink"
+        >
+          <LayoutDashboard className="h-5 w-5 text-citra-muted" />
+          Rencana Saya
+        </Link>
+
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-citra-terracotta transition-all hover:bg-citra-primary-soft text-left"
+        >
+          <LogOut className="h-5 w-5" />
+          Keluar
+        </button>
+      </div>
+    )
+  }
+
+  // ===== DESKTOP VARIANT =====
+
+  if (!isLoggedIn) {
+    return (
+      <div className={cn('hidden items-center gap-3 lg:flex', className)}>
+        <Link
+          href={ROUTES.LOGIN}
+          className={cn(
+            'text-sm font-semibold transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-offset-2',
+            scrolled
+              ? 'text-citra-body hover:text-citra-ink'
+              : 'text-white/90 hover:text-white'
+          )}
+        >
+          Masuk
+        </Link>
+        <Link
+          href={ROUTES.REGISTER}
+          className={cn(
+            'rounded-full px-5 py-2.5 text-sm font-semibold shadow-sm transition-all duration-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-offset-2',
+            scrolled
+              ? 'bg-citra-primary text-citra-on-primary hover:bg-citra-primary-hover'
+              : 'bg-white text-citra-ink hover:bg-gray-100'
+          )}
+        >
+          Daftar
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className={cn('relative hidden lg:block', className)} ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          'flex items-center gap-2 rounded-full pl-1 pr-3 py-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-offset-2',
+          scrolled
+            ? 'bg-citra-surface-soft hover:bg-citra-primary-soft'
+            : 'bg-white/10 backdrop-blur-sm hover:bg-white/20'
+        )}
+        aria-label="Menu pengguna"
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+      >
+        {avatarEl('sm', scrolled)}
+        <span className={cn(
+          'hidden text-sm font-semibold sm:inline max-w-28 truncate',
+          scrolled ? 'text-citra-ink' : 'text-white'
+        )}>
+          {user?.nama}
+        </span>
+        <ChevronDown className={cn(
+          'h-4 w-4 transition-transform',
+          isOpen && 'rotate-180',
+          scrolled ? 'text-citra-muted' : 'text-white/70'
+        )} />
+      </button>
+
+      {isOpen && (
+        <div
+          className="absolute right-0 mt-2 w-56 rounded-md bg-citra-surface shadow-floating border border-citra-border py-1 z-50"
+          role="menu"
+        >
+          <div className="border-b border-citra-border px-4 py-3">
+            <p className="truncate text-sm font-semibold text-citra-ink">{user?.nama}</p>
+            <p className="truncate text-xs text-citra-muted">{user?.email}</p>
+          </div>
+
+          <Link
+            href="/profil"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center gap-3 px-4 py-2.5 text-sm text-citra-ink transition-colors hover:bg-citra-primary-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-inset"
+            role="menuitem"
+          >
+            <User className="h-4 w-4 text-citra-muted" />
+            Profil
+          </Link>
+
+          <Link
+            href="/planning"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center gap-3 px-4 py-2.5 text-sm text-citra-ink transition-colors hover:bg-citra-primary-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-inset"
+            role="menuitem"
+          >
+            <LayoutDashboard className="h-4 w-4 text-citra-muted" />
+            Rencana Saya
+          </Link>
+
+          <div className="mt-1 border-t border-citra-border pt-1">
+            <button
+              onClick={handleLogout}
+              className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-citra-terracotta transition-colors hover:bg-citra-primary-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-inset"
+              role="menuitem"
+            >
+              <LogOut className="h-4 w-4" />
+              Keluar
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }

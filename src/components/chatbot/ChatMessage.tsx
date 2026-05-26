@@ -1,6 +1,6 @@
 'use client'
 
-import { User, Bot, Clock } from 'lucide-react'
+import { User, Headphones, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import { ChatMessage as ChatMessageType } from '@/types'
 import { format } from 'date-fns'
@@ -47,7 +47,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         {isUser ? (
           <User className="h-3.5 w-3.5 text-white" />
         ) : (
-          <Bot className="h-3.5 w-3.5 text-slate-500" />
+          <Headphones className="h-3.5 w-3.5 text-slate-500" />
         )}
       </div>
 
@@ -55,18 +55,18 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         'max-w-[85%] rounded-xl px-3.5 py-2.5',
         isUser
           ? 'rounded-tr-sm bg-brand text-white'
-          : 'rounded-tl-sm bg-slate-50 border border-slate-100'
+          : 'rounded-tl-sm bg-white border border-slate-200'
       )}>
         {!isUser && (
           <div className="flex items-center gap-1.5 mb-1.5 pb-1 border-b border-slate-100/80">
-            <Bot className="h-3 w-3 text-brand" />
+            <Headphones className="h-3 w-3 text-brand" />
             <span className="text-[11px] font-semibold text-brand">SITA</span>
           </div>
         )}
 
         {message.content && (
           <div
-            className="text-sm leading-relaxed whitespace-pre-wrap wrap-break-word"
+            className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap wrap-break-word"
             dangerouslySetInnerHTML={{ __html: formatContent(message.content) }}
           />
         )}

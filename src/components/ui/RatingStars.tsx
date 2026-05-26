@@ -24,7 +24,7 @@
  * 
  * @example
  * // Interactive mode (bisa memberi rating)
- * <RatingStars rating={0} readonly={false} onRate={(value) => console.log(value)} />
+ * <RatingStars rating={0} readonly={false} onRate={(value) => value} />
  * 
  * @example
  * // Large size untuk tampilan desktop

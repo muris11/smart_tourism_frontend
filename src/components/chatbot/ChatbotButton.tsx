@@ -1,6 +1,6 @@
 'use client'
 
-import { MessageCircle, X } from 'lucide-react'
+import { Headphones, X } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import { useChatbotStore } from '@/stores/chatbotStore'
 
@@ -26,7 +26,7 @@ export default function ChatbotButton({ className }: ChatbotButtonProps) {
       {isOpen ? (
         <X className="h-6 w-6 text-white" />
       ) : (
-        <MessageCircle className="h-6 w-6 text-white" />
+        <Headphones className="h-6 w-6 text-white" />
       )}
     </button>
   )

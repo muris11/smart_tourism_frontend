@@ -4,22 +4,24 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
+import { useHydrated } from '@/stores/authStore'
 import ItineraryResult from '@/components/sections/planning/ItineraryResult'
 import PlanningForm from '@/components/sections/planning/PlanningForm'
 import { PlanningResult } from '@/types/recommendation'
 
 export default function PlanningPage() {
   const { isLoggedIn, isLoading } = useAuth()
+  const hasHydrated = useHydrated()
   const router = useRouter()
   const [result, setResult] = useState<PlanningResult | null>(null)
 
   useEffect(() => {
-    if (!isLoading && !isLoggedIn) {
+    if (hasHydrated && !isLoggedIn) {
       router.push('/login?callback=/planning')
     }
-  }, [isLoggedIn, isLoading, router])
+  }, [isLoggedIn, hasHydrated, router])
 
-  if (isLoading || !isLoggedIn) {
+  if (!hasHydrated || !isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white pt-28 pb-24">
         <div className="flex flex-col items-center gap-4">
@@ -38,7 +40,13 @@ export default function PlanningPage() {
           <p className="text-base text-slate-600">Buat itinerary perjalanan Anda dengan bantuan AI. Pilih durasi, wilayah, dan preferensi.</p>
         </div>
 
-        <PlanningForm onResult={setResult} />
+        <PlanningForm onResult={(r) => {
+          if (r && Array.isArray(r.itinerary)) {
+            setResult(r as PlanningResult)
+          } else {
+            setResult({ itinerary: [], total_budget: 0, total_durasi_jam: 0 })
+          }
+        }} />
 
         {result && (
           <div className="mt-10">

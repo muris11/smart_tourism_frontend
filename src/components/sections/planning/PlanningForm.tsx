@@ -8,7 +8,6 @@ import { Loader2, Save, Calendar, MapPin, Tag, Wallet } from 'lucide-react'
 import { recommendationApi } from '@/lib/api/recommendation'
 import { PlanningPayload, PlanningResult } from '@/types/recommendation'
 import { useAuth } from '@/hooks/useAuth'
-import { apiClient } from '@/lib/api/client'
 
 const WILAYAH_OPTIONS = ['Cirebon', 'Indramayu', 'Majalengka', 'Kuningan']
 const KATEGORI_OPTIONS = ['Alam', 'Buatan', 'Budaya', 'Religi', 'Petualangan', 'Edukasi', 'Kuliner', 'Nongkrong']
@@ -27,6 +26,7 @@ interface Props {
 }
 
 export default function PlanningForm({ onResult }: Props) {
+  const { user } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -51,17 +51,24 @@ export default function PlanningForm({ onResult }: Props) {
     }
 
     const payload: PlanningPayload = {
+      user_id: user?.id ?? null,
       jumlah_hari: data.jumlah_hari,
+      jumlah_orang: 1,
       wilayah: data.wilayah as PlanningPayload['wilayah'],
       kategori_preferensi: data.kategori_preferensi,
       budget: data.budget ? budgetMap[data.budget] : null,
+      tanggal_mulai: new Date().toISOString().split('T')[0],
     }
 
     try {
       const result = await recommendationApi.planning(payload)
       onResult(result)
-    } catch {
-      setError('Gagal membuat itinerary. Layanan AI mungkin sedang tidak tersedia.')
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as { message?: string })?.message ||
+        'Gagal membuat itinerary. Layanan AI mungkin sedang tidak tersedia.'
+      setError(msg)
       onResult({ itinerary: [], total_budget: 0, total_durasi_jam: 0 })
     } finally {
       setIsLoading(false)

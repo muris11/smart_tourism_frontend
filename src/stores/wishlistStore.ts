@@ -29,8 +29,8 @@ export const useWishlistStore = create<WishlistState>()(
                             tempat_kode: kode,
                             aksi: 'simpan',
                         })
-                    } catch (error) {
-                        console.error('Failed to track save:', error)
+                    } catch {
+                        // ignore
                     }
                 }
             },
@@ -46,8 +46,8 @@ export const useWishlistStore = create<WishlistState>()(
                             tempat_kode: kode,
                             aksi: 'simpan',
                         })
-                    } catch (error) {
-                        console.error('Failed to track unsave:', error)
+                    } catch {
+                        // ignore
                     }
                 }
             },

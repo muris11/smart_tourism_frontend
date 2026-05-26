@@ -52,7 +52,7 @@ export function useRecommendationList(params?: UseRecommendationParams): UseReco
     )
 
     return {
-        data: (data?.recommendations as RecommendationItem[]) ?? [],
+        data: (data?.items as RecommendationItem[]) ?? [],
         mode: data?.mode || 'personal',
         total: data?.total || 0,
         isLoading,

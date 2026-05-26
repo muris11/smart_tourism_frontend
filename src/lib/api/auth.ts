@@ -39,18 +39,13 @@ export const authApi = {
   login: async (payload: LoginPayload): Promise<AuthData> => {
     const { data } = await apiClient.post<LoginResponse>('/auth/login', payload)
 
-    const token = data.data.access_token
+    const token = data.data.token
     if (token) {
       Cookies.set(TOKEN_KEY, token, { expires: 7, sameSite: 'lax' })
     }
 
     return {
-      user: {
-        id: data.data.user_id,
-        nama: data.data.nama,
-        email: payload.email,
-        role: data.data.role,
-      },
+      user: data.data.user,
       token: token,
       token_type: data.data.token_type,
     }
@@ -60,8 +55,18 @@ export const authApi = {
    * Register user baru
    * POST /api/v1/auth/register
    */
-  register: async (payload: RegisterPayload): Promise<{ success: boolean; message: string }> => {
+  register: async (payload: RegisterPayload): Promise<{ success: boolean; message: string } & Partial<AuthData>> => {
     const { data } = await apiClient.post<RegisterResponse>('/auth/register', payload)
+    if (data.data?.token) {
+      Cookies.set(TOKEN_KEY, data.data.token, { expires: 7, sameSite: 'lax' })
+      return {
+        success: data.success,
+        message: data.message,
+        user: data.data.user,
+        token: data.data.token,
+        token_type: data.data.token_type,
+      }
+    }
     return { success: data.success, message: data.message }
   },
 
@@ -86,7 +91,10 @@ export const authApi = {
   me: async (): Promise<User | null> => {
     try {
       const { data } = await apiClient.get<MeResponse>('/auth/me')
-      return data.data ?? null
+      if (data?.data?.id) return data.data as User
+      const maybeNested = data?.data as unknown as { user?: User } | undefined
+      if (maybeNested?.user?.id) return maybeNested.user
+      return null
     } catch {
       return null
     }
@@ -95,9 +103,19 @@ export const authApi = {
   /**
    * Update user profile
    * PUT /api/v1/auth/profile
+   * Supports both JSON payload and FormData (for file upload)
    */
-  updateProfile: async (payload: { nama?: string; avatar_url?: string }): Promise<void> => {
-    await apiClient.put('/auth/profile', payload)
+  updateProfile: async (payload: { nama?: string; avatar_url?: string } | FormData): Promise<User | null> => {
+    try {
+      if (payload instanceof FormData) {
+        await apiClient.post('/auth/profile', payload)
+      } else {
+        await apiClient.put('/auth/profile', payload)
+      }
+      return await authApi.me()
+    } catch {
+      return null
+    }
   },
 
   /**

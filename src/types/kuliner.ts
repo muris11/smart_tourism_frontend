@@ -12,8 +12,7 @@ export interface KulinerItem {
   wilayah: Wilayah
   kecamatan: string | null
   alamat_lengkap: string | null
-  latitude: number | null
-  longitude: number | null
+  koordinat: Koordinat | null
   jenis_tempat: string | null
   kategori_menu_utama: string | null
   menu_unggulan: string | null
@@ -31,6 +30,7 @@ export interface KulinerItem {
   link_google_maps: string | null
   kontak: string | null
   gambar: string[]
+  gambar_utama: string | null
   status: Status
   sentimen: Sentimen | null
   skor_sentimen: number | null
@@ -46,7 +46,6 @@ export interface KulinerDetail extends Omit<KulinerItem, 'id' | 'uid' | 'status'
   id_wisata_terdekat: string | null
   sumber_data: string | null
   catatan: string | null
-  koordinat: Koordinat | null
 }
 
 /** Filter untuk list kuliner (match backend Laravel) */

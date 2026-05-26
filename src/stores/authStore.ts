@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react'
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 import type { User } from '@/types'
 
 /** State untuk autentikasi user */
@@ -20,7 +21,7 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       token: null,
-      isLoading: false,
+      isLoading: true,
       setAuth: (user, token) => set({ user, token, isLoading: false }),
       setUser: (user) => set({ user, isLoading: false }),
       setToken: (token) => set({ token }),
@@ -31,7 +32,24 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ user: state.user, token: state.token }),
     }
   )
 )
+
+/** Helper hook: returns true once Zustand has rehydrated from localStorage */
+export function useHydrated() {
+  const [hydrated, setHydrated] = useState(false)
+
+  useEffect(() => {
+    if (useAuthStore.persist.hasHydrated()) {
+      setHydrated(true)
+    } else {
+      const unsub = useAuthStore.persist.onFinishHydration(() => setHydrated(true))
+      return unsub
+    }
+  }, [])
+
+  return hydrated
+}
