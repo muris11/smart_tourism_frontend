@@ -1,27 +1,49 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { useEffect, useState, useRef } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useHydrated } from '@/stores/authStore'
 import ItineraryResult from '@/components/sections/planning/ItineraryResult'
-import PlanningForm from '@/components/sections/planning/PlanningForm'
+import PlanningForm, { PlanningFormRef } from '@/components/sections/planning/PlanningForm'
 import { PlanningResult } from '@/types/recommendation'
 
 export default function PlanningPage() {
   usePageTitle('Planning')
-  const { isLoggedIn, isLoading } = useAuth()
+  const { isLoggedIn } = useAuth()
   const hasHydrated = useHydrated()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [result, setResult] = useState<PlanningResult | null>(null)
+  const formRef = useRef<PlanningFormRef>(null)
+
+  // Baca params dari URL
+  const wilayah = searchParams.get('wilayah')
+  const hari = searchParams.get('hari')
+  const budget = searchParams.get('budget')
+  const kategoriParam = searchParams.get('kategori')
 
   useEffect(() => {
     if (hasHydrated && !isLoggedIn) {
       router.push('/login?callback=/planning')
     }
   }, [isLoggedIn, hasHydrated, router])
+
+  // Auto submit form jika ada params dari chatbot
+  useEffect(() => {
+    if (wilayah || hari || budget || kategoriParam) {
+      const timer = setTimeout(() => {
+        formRef.current?.submitWithData({
+          wilayah: wilayah || undefined,
+          hari: hari ? parseInt(hari) : undefined,
+          budget: budget ? parseInt(budget) : undefined,
+          kategori: kategoriParam || undefined,
+        })
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [wilayah, hari, budget, kategoriParam])
 
   if (!hasHydrated || !isLoggedIn) {
     return (
@@ -42,13 +64,16 @@ export default function PlanningPage() {
           <p className="text-base text-slate-600">Buat itinerary perjalanan Anda dengan bantuan AI. Pilih durasi, wilayah, dan preferensi.</p>
         </div>
 
-        <PlanningForm onResult={(r) => {
-          if (r && Array.isArray(r.itinerary)) {
-            setResult(r as PlanningResult)
-          } else {
-            setResult({ itinerary: [], total_budget: 0, total_durasi_jam: 0 })
-          }
-        }} />
+        <PlanningForm
+          ref={formRef}
+          onResult={(r) => {
+            if (r && Array.isArray(r.itinerary)) {
+              setResult(r as PlanningResult)
+            } else {
+              setResult({ itinerary: [], total_budget: 0, total_durasi_jam: 0 })
+            }
+          }}
+        />
 
         {result && (
           <div className="mt-10">

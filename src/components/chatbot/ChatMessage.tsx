@@ -1,6 +1,6 @@
 'use client'
 
-import { User, Headphones, Clock } from 'lucide-react'
+import { User, Headphones, Clock, MapPin, Utensils, Coffee, Compass } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import { ChatMessage as ChatMessageType } from '@/types'
 import { format } from 'date-fns'
@@ -64,11 +64,57 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           </div>
         )}
 
+        {!isUser && message.wilayah && (
+          <div className="mb-2">
+            <span className="inline-flex items-center gap-1 text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded">
+              <span>🗺️</span>
+              <span>Wilayah terdeteksi: {message.wilayah}</span>
+            </span>
+          </div>
+        )}
+
         {message.content && (
           <div
             className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap wrap-break-word"
             dangerouslySetInnerHTML={{ __html: formatContent(message.content) }}
           />
+        )}
+
+        {!isUser && message.references && message.references.length > 0 && (
+          <div className="mt-3 pt-2 border-t border-slate-100">
+            <p className="text-xs font-medium text-slate-500 mb-2 flex items-center gap-1">
+              <MapPin className="h-3 w-3" />
+              Rekomendasi Tempat:
+            </p>
+            <div className="space-y-2">
+              {message.references.map((ref, idx) => (
+                <div key={idx} className="text-xs">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-medium text-slate-700">{ref.nama}</span>
+                    <span className="inline-flex items-center gap-1 text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                      {ref.tipe === 'wisata' && <Compass className="h-2.5 w-2.5" />}
+                      {ref.tipe === 'kuliner' && <Utensils className="h-2.5 w-2.5" />}
+                      {ref.tipe === 'nongkrong' && <Coffee className="h-2.5 w-2.5" />}
+                      {ref.tipe === 'wisata' && ' Wisata'}
+                      {ref.tipe === 'kuliner' && ' Kuliner'}
+                      {ref.tipe === 'nongkrong' && ' Nongkrong'}
+                    </span>
+                  </div>
+                  {ref.link_maps && (
+                    <a
+                      href={ref.link_maps}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-brand text-[10px] mt-1 hover:underline"
+                    >
+                      <MapPin className="h-3 w-3" />
+                      Lihat di Google Maps
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         {message.timestamp && (

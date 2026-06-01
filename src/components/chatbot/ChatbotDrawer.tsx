@@ -16,7 +16,7 @@ interface ChatbotDrawerProps {
 export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
   const { isOpen, close, messages, clearChat, isTyping } = useChatbotStore()
   const { sendMessage, isLoading, stopGenerating } = useChatbot()
-  const { lat, lon, namaKota, getLocation, isLoading: locationLoading } = useGeolocation()
+  const { lat, lon, getLocation, isLoading: locationLoading } = useGeolocation()
   const [showLocation, setShowLocation] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -67,9 +67,9 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
       >
         <div className="flex items-center justify-between bg-gradient-to-r from-[#0d7a6a] to-[#0a6458] px-4 py-3 rounded-t-2xl">
           <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15">
-                <Headphones className="h-4 w-4 text-white" />
-              </div>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15">
+              <Headphones className="h-4 w-4 text-white" />
+            </div>
             <div>
               <h3 className="text-sm font-semibold text-white">SITA</h3>
               <p className="text-[10px] text-white/60">Layanan Pelanggan AI</p>
@@ -123,10 +123,11 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
               <div className="flex items-center justify-between bg-slate-50 px-4 py-2 text-xs border-b border-slate-100">
                 <span className="flex items-center gap-1.5 text-slate-500">
                   <MapPin className="h-3.5 w-3.5 text-brand" />
-                  {lat && lon && namaKota ? (
+                  {lat && lon ? (
                     <span>
-                      <span className="font-medium text-brand-deep">{namaKota}</span>
-                      <span className="text-slate-300 ml-1">&bull; {lat.toFixed(3)}, {lon.toFixed(3)}</span>
+                      <span className="font-medium text-brand-deep">
+                        {lat.toFixed(3)}, {lon.toFixed(3)}
+                      </span>
                     </span>
                   ) : locationLoading ? (
                     'Mendapatkan lokasi...'
@@ -180,7 +181,6 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
                     <ChatMessage
                       key={idx}
                       message={msg}
-                      isLast={idx === safeMessages.length - 1}
                     />
                   ))}
 

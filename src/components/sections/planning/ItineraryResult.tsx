@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { MapPin, Clock, Save, CheckCircle, Loader2 } from 'lucide-react'
+import { MapPin, Save, CheckCircle, Loader2 } from 'lucide-react'
 import { PlanningResult } from '@/types/recommendation'
 import { useAuth } from '@/hooks/useAuth'
 import { apiClient } from '@/lib/api/client'
@@ -79,8 +79,8 @@ export default function ItineraryResult({ result }: Props) {
             onClick={handleSave}
             disabled={isSaving || saved}
             className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all ${saved
-                ? 'bg-green-100 text-green-700'
-                : 'bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50'
+              ? 'bg-green-100 text-green-700'
+              : 'bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50'
               }`}
           >
             {saved ? (

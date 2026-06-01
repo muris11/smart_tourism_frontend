@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { forwardRef, useImperativeHandle, useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Loader2, Save, Calendar, MapPin, Tag, Wallet } from 'lucide-react'
+import { Loader2, Calendar, MapPin, Tag, Wallet } from 'lucide-react'
 import { recommendationApi } from '@/lib/api/recommendation'
 import { PlanningPayload, PlanningResult } from '@/types/recommendation'
 import { useAuth } from '@/hooks/useAuth'
@@ -21,16 +21,40 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>
 
+// TYPES FOR REF
+
+export interface PlanningFormRef {
+  submitWithData: (data: SubmitData) => void
+}
+
+interface SubmitData {
+  wilayah?: string
+  hari?: number
+  budget?: number
+  kategori?: string
+}
+
 interface Props {
   onResult: (result: PlanningResult) => void
 }
 
-export default function PlanningForm({ onResult }: Props) {
+// BUDGET MAPPING
+
+const budgetToValueMap: Record<string, number> = {
+  murah: 200000,
+  sedang: 500000,
+  mahal: 1000000,
+}
+
+// COMPONENT
+
+const PlanningForm = forwardRef<PlanningFormRef, Props>(({ onResult }, ref) => {
   const { user } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const hasAutoSubmitted = useRef(false)
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors }, setValue, getValues } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       jumlah_hari: 2,
@@ -40,15 +64,16 @@ export default function PlanningForm({ onResult }: Props) {
     },
   })
 
+  // SUBMIT HANDLER
   const onSubmit = async (data: FormData) => {
+    console.log('🚀 Form data saat submit:', data)
+    console.log('📊 Jumlah hari:', data.jumlah_hari)
+    console.log('💰 Budget:', data.budget)
+    console.log('📍 Wilayah:', data.wilayah)
+    console.log('🏷️ Kategori:', data.kategori_preferensi)
+
     setIsLoading(true)
     setError(null)
-
-    const budgetMap: Record<string, number> = {
-      murah: 200000,
-      sedang: 500000,
-      mahal: 1000000,
-    }
 
     const payload: PlanningPayload = {
       user_id: user?.id ?? null,
@@ -56,9 +81,11 @@ export default function PlanningForm({ onResult }: Props) {
       jumlah_orang: 1,
       wilayah: data.wilayah as PlanningPayload['wilayah'],
       kategori_preferensi: data.kategori_preferensi,
-      budget: data.budget ? budgetMap[data.budget] : null,
+      budget: data.budget ? budgetToValueMap[data.budget] : null,
       tanggal_mulai: new Date().toISOString().split('T')[0],
     }
+
+    console.log('📤 Payload yang dikirim ke API:', payload)
 
     try {
       const result = await recommendationApi.planning(payload)
@@ -74,6 +101,69 @@ export default function PlanningForm({ onResult }: Props) {
       setIsLoading(false)
     }
   }
+
+  // AUTO SUBMIT FROM CHATBOT (via ref) - ONLY ONCE
+  useImperativeHandle(ref, () => ({
+    submitWithData: (data: SubmitData) => {
+      // Prevent auto-submit more than once
+      if (hasAutoSubmitted.current) {
+        console.log('Auto-submit already done, skipping...')
+        return
+      }
+
+      console.log('🤖 Auto-submit from chatbot:', data)
+
+      // Set wilayah dari URL
+      if (data.wilayah) {
+        const wilayahMatch = WILAYAH_OPTIONS.find(
+          (w) => w.toLowerCase() === data.wilayah?.toLowerCase()
+        )
+        if (wilayahMatch) {
+          setValue('wilayah', [wilayahMatch])
+        }
+      }
+
+      // Set jumlah hari dari URL
+      if (data.hari) {
+        setValue('jumlah_hari', Math.min(Math.max(data.hari, 1), 14))
+      }
+
+      // Set budget dari URL
+      if (data.budget) {
+        const budgetNum = data.budget
+        let closestBudget: string | undefined
+        if (budgetNum <= 200000) closestBudget = 'murah'
+        else if (budgetNum <= 500000) closestBudget = 'sedang'
+        else closestBudget = 'mahal'
+
+        if (closestBudget) {
+          setValue('budget', closestBudget)
+        }
+      }
+
+      // Set kategori dari URL
+      if (data.kategori) {
+        const kategoriArray = data.kategori.split(',').map((k: string) => k.trim())
+        const validKategori = kategoriArray.filter((k: string) =>
+          KATEGORI_OPTIONS.some((opt) => opt.toLowerCase() === k.toLowerCase())
+        )
+        if (validKategori.length > 0) {
+          setValue('kategori_preferensi', validKategori)
+        }
+      }
+
+      // Mark auto-submit as done
+      hasAutoSubmitted.current = true
+
+      // Submit form setelah state update
+      setTimeout(() => {
+        const formData = getValues()
+        if (formData.wilayah.length > 0) {
+          handleSubmit(onSubmit)()
+        }
+      }, 200)
+    }
+  }))
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
@@ -110,9 +200,9 @@ export default function PlanningForm({ onResult }: Props) {
             aria-label="Budget"
           >
             <option value="">Fleksibel</option>
-            <option value="murah">Murah (&lt; 200rb/hari)</option>
-            <option value="sedang">Sedang (200-500rb/hari)</option>
-            <option value="mahal">Mahal (&gt; 500rb/hari)</option>
+            <option value="murah">Murah (&lt; 200rb)</option>
+            <option value="sedang">Sedang (200-500rb)</option>
+            <option value="mahal">Mahal (&gt; 500rb)</option>
           </select>
         </div>
 
@@ -180,4 +270,8 @@ export default function PlanningForm({ onResult }: Props) {
       </button>
     </form>
   )
-}
+})
+
+PlanningForm.displayName = 'PlanningForm'
+
+export default PlanningForm
