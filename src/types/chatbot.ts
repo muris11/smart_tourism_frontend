@@ -14,6 +14,7 @@ export interface ChatMessage {
   content: string
   timestamp?: string
   references?: ChatReference[]
+  wilayah?: string | null
 }
 
 /** Referensi tempat yang direkomendasikan chatbot */
@@ -26,8 +27,6 @@ export interface ChatReference {
 
 /** Response dari backend FastAPI untuk chat */
 export interface ChatbotResponse {
-  success: boolean
-  message: string
   data: {
     session_token: string
     answer: string
@@ -39,8 +38,6 @@ export interface ChatbotResponse {
 
 /** Response dari backend FastAPI untuk riwayat chat */
 export interface ChatHistoryResponse {
-  success: boolean
-  message: string
   data: {
     session_token: string
     messages: ChatMessage[]
