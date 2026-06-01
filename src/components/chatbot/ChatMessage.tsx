@@ -23,17 +23,18 @@ export default function ChatMessage({ message }: ChatMessageProps) {
 
     let formatted = content
     formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
+
+    formatted = formatted.replace(
+      /(https?:\/\/maps\.app\.goo\.gl\/[^\s\n<)]+)/g,
+      '<a href="$1" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-blue-600 underline underline-offset-2 hover:text-blue-700 font-medium"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Lihat di Maps</a>'
+    )
+
+    formatted = formatted.replace(
+      /(https?:\/\/www\.google\.com\/maps\/[^\s\n<)]+)/g,
+      '<a href="$1" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-blue-600 underline underline-offset-2 hover:text-blue-700 font-medium"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Lihat di Maps</a>'
+    )
+
     formatted = formatted.replace(/\n/g, '<br/>')
-
-    formatted = formatted.replace(
-      /(https?:\/\/maps\.app\.goo\.gl\/[^\s)]+)/g,
-      '<a href="$1" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-brand hover:underline"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Lihat di Maps</a>'
-    )
-
-    formatted = formatted.replace(
-      /(https?:\/\/www\.google\.com\/maps\/[^\s)]+)/g,
-      '<a href="$1" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-brand hover:underline"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Lihat di Maps</a>'
-    )
 
     return formatted
   }

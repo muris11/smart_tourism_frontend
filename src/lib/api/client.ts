@@ -6,7 +6,7 @@ export const TOKEN_KEY = 'st_token'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
 const isLocalhost = typeof window !== 'undefined' &&
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  (window.location.hostname === 'localhost' || window.location.hostname === 'https://backend.smart-tourism-citra.web.id')
 
 /** Axios instance untuk API calls */
 export const apiClient: AxiosInstance = axios.create({
@@ -15,7 +15,7 @@ export const apiClient: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
     Accept: 'application/json',
   },
-  timeout: 15000,
+  timeout: 60000,
 })
 
 /**

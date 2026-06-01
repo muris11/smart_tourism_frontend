@@ -14,7 +14,7 @@ export default function FeaturedDestinationsSection() {
 
   useEffect(() => {
     getDestinations()
-      .then((data) => setFeatured(data.filter((d) => d.featured)))
+      .then((data) => setFeatured(data.filter((d) => d.featured).slice(0, 16)))
       .finally(() => setLoading(false))
   }, [])
 

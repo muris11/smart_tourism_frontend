@@ -283,88 +283,101 @@ async function fetchAllPages<T>(
   return [...(first.items as T[]), ...rest]
 }
 
-export async function getDestinations(): Promise<Destination[]> {
-  const all = await fetchAllPages((page) =>
-    wisataApi.list({ page, per_page: 50 }).then((r) => ({
-      items: r.items,
-      total: r.total,
-      total_pages: r.total_pages,
-    }))
-  )
-  return dedupeBy(
-    (all as WisataItem[]).map(wisataToDestination),
-    (d) => d.id
-  )
+let destPromise: Promise<Destination[]> | null = null
+export function getDestinations(): Promise<Destination[]> {
+  if (!destPromise) {
+    destPromise = fetchAllPages((page) =>
+      wisataApi.list({ page, per_page: 50 }).then((r) => ({
+        items: r.items,
+        total: r.total,
+        total_pages: r.total_pages,
+      }))
+    ).then(all => dedupeBy(
+      (all as WisataItem[]).map(wisataToDestination),
+      (d) => d.id
+    )).catch(err => { destPromise = null; throw err })
+  }
+  return destPromise
 }
 
-export async function getCulinary(): Promise<Culinary[]> {
-  const all = await fetchAllPages((page) =>
-    kulinerApi.list({ page, per_page: 50 }).then((r) => ({
-      items: r.items,
-      total: r.total,
-      total_pages: r.total_pages,
-    }))
-  )
-  return dedupeBy(
-    (all as KulinerItem[]).map(kulinerToCulinary),
-    (c) => c.id
-  )
+let culinaryPromise: Promise<Culinary[]> | null = null
+export function getCulinary(): Promise<Culinary[]> {
+  if (!culinaryPromise) {
+    culinaryPromise = fetchAllPages((page) =>
+      kulinerApi.list({ page, per_page: 50 }).then((r) => ({
+        items: r.items,
+        total: r.total,
+        total_pages: r.total_pages,
+      }))
+    ).then(all => dedupeBy(
+      (all as KulinerItem[]).map(kulinerToCulinary),
+      (c) => c.id
+    )).catch(err => { culinaryPromise = null; throw err })
+  }
+  return culinaryPromise
 }
 
-export async function getHangouts(): Promise<Hangout[]> {
-  const all = await fetchAllPages((page) =>
-    nongkrongApi.list({ page, per_page: 50 }).then((r) => ({
-      items: r.items,
-      total: r.total,
-      total_pages: r.total_pages,
-    }))
-  )
-  return dedupeBy(
-    (all as NongkrongItem[]).map(nongkrongToHangout),
-    (h) => h.id
-  )
+let hangoutPromise: Promise<Hangout[]> | null = null
+export function getHangouts(): Promise<Hangout[]> {
+  if (!hangoutPromise) {
+    hangoutPromise = fetchAllPages((page) =>
+      nongkrongApi.list({ page, per_page: 50 }).then((r) => ({
+        items: r.items,
+        total: r.total,
+        total_pages: r.total_pages,
+      }))
+    ).then(all => dedupeBy(
+      (all as NongkrongItem[]).map(nongkrongToHangout),
+      (h) => h.id
+    )).catch(err => { hangoutPromise = null; throw err })
+  }
+  return hangoutPromise
 }
 
-export async function getHomepage(): Promise<HomepageData> {
-  const [destinations, culinary, hangouts, counts] = await Promise.all([
-    getDestinations(),
-    getCulinary(),
-    getHangouts(),
-    getWilayahCounts(),
-  ])
+let homepagePromise: Promise<HomepageData> | null = null
+export function getHomepage(): Promise<HomepageData> {
+  if (!homepagePromise) {
+    homepagePromise = Promise.all([
+      getDestinations(),
+      getCulinary(),
+      getHangouts(),
+      getWilayahCounts(),
+    ]).then(([destinations, culinary, hangouts, counts]) => {
+      const wisataTotal = counts.wisata ?? destinations.length
+      const kulinerTotal = counts.kuliner ?? culinary.length
+      const nongkrongTotal = counts.nongkrong ?? hangouts.length
 
-  const wisataTotal = counts.wisata ?? destinations.length
-  const kulinerTotal = counts.kuliner ?? culinary.length
-  const nongkrongTotal = counts.nongkrong ?? hangouts.length
+      const heroSlides: HeroSlide[] = destinations
+        .filter((d) => d.images.length > 0)
+        .slice(0, 4)
+        .map((d) => ({
+          id: d.id,
+          region: d.region,
+          src: d.images[0].src,
+          alt: d.name,
+        }))
 
-  const heroSlides: HeroSlide[] = destinations
-    .filter((d) => d.images.length > 0)
-    .slice(0, 4)
-    .map((d) => ({
-      id: d.id,
-      region: d.region,
-      src: d.images[0].src,
-      alt: d.name,
-    }))
+      const stats: Stat[] = [
+        { label: 'Tempat wisata terdaftar', value: `${wisataTotal.toLocaleString('id-ID')}`, isPrototype: false },
+        { label: 'Restoran & tempat makan', value: `${kulinerTotal.toLocaleString('id-ID')}`, isPrototype: false },
+        { label: 'Cafe & tempat hangout', value: `${nongkrongTotal.toLocaleString('id-ID')}`, isPrototype: false },
+      ]
 
-  const stats: Stat[] = [
-    { label: 'Tempat wisata terdaftar', value: `${wisataTotal.toLocaleString('id-ID')}`, isPrototype: false },
-    { label: 'Restoran & tempat makan', value: `${kulinerTotal.toLocaleString('id-ID')}`, isPrototype: false },
-    { label: 'Cafe & tempat hangout', value: `${nongkrongTotal.toLocaleString('id-ID')}`, isPrototype: false },
-  ]
+      const topDest = destinations.filter((d) => d.featured).slice(1, 4)
+      const topCul = culinary.filter((c) => c.featured).slice(0, 2)
+      const topHang = hangouts.filter((h) => h.featured).slice(0, 2)
+      const hiddenGems: HiddenGem[] = [...topDest, ...topCul, ...topHang].slice(0, 6).map((item) => ({
+        id: `gem-${item.id}`,
+        label: item.name,
+        region: item.region,
+        src: item.images[0]?.src || '/images/fallback/fallback-1.jpg',
+        alt: item.name,
+      }))
 
-  const topDest = destinations.filter((d) => d.featured).slice(1, 4)
-  const topCul = culinary.filter((c) => c.featured).slice(0, 2)
-  const topHang = hangouts.filter((h) => h.featured).slice(0, 2)
-  const hiddenGems: HiddenGem[] = [...topDest, ...topCul, ...topHang].slice(0, 6).map((item) => ({
-    id: `gem-${item.id}`,
-    label: item.name,
-    region: item.region,
-    src: item.images[0]?.src || '/images/fallback/fallback-1.jpg',
-    alt: item.name,
-  }))
-
-  return { heroSlides, stats, hiddenGems }
+      return { heroSlides, stats, hiddenGems }
+    }).catch(err => { homepagePromise = null; throw err })
+  }
+  return homepagePromise
 }
 
 export async function getRegionBySlug(slug: string): Promise<Region | undefined> {
