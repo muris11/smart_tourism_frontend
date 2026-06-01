@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, KeyboardEvent } from 'react'
-import { Send } from 'lucide-react'
+import { Send, Square } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
 interface ChatInputProps {
@@ -55,7 +55,7 @@ export default function ChatInput({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Tanyakan sesuatu..."
+            placeholder="Tanyakan sesuatu tempat di Ciayumajakuning..."
             disabled={disabled || isLoading}
             rows={1}
             className={cn(
@@ -73,6 +73,7 @@ export default function ChatInput({
             onClick={onStop}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors"
           >
+            <Square className="h-4 w-4 fill-current" />
           </button>
         ) : (
           <button
@@ -80,6 +81,7 @@ export default function ChatInput({
             disabled={!input.trim() || disabled || isLoading}
             className={cn(
               'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
+              'bg-slate-100 text-slate-600 transition-all duration-300',
               'text-slate-600 transition-all duration-300',
               'hover:scale-105 hover:text-green-700',
               'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100'
