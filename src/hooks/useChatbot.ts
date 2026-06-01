@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAuthStore } from '@/stores/authStore'
 import { useChatbotStore } from '@/stores/chatbotStore'
 import { chatbotApi } from '@/lib/api/chatbot'
 import type { ChatRequest } from '@/types'
@@ -18,6 +19,7 @@ interface PlanningDetect {
   wilayah: string | null
   hari: number
   budget: number | null
+  kategori: string | null
 }
 
 /**
@@ -29,13 +31,13 @@ function detectPlanning(message: string): PlanningDetect {
 
   const planningKeywords = /(plan|rencana|itinerary|rute|urutan|susun|jadwal|buatkan|buatin)/i
   if (!planningKeywords.test(lowerMsg)) {
-    return { isPlanning: false, wilayah: null, hari: 2, budget: null }
+    return { isPlanning: false, wilayah: null, hari: 2, budget: null, kategori: null }
   }
-
   const wilayahList = ['Cirebon', 'Indramayu', 'Majalengka', 'Kuningan', 'Ciayumajakuning']
   let detectedWilayah: string | null = null
+  const lowerMessage = message.toLowerCase()
   for (const w of wilayahList) {
-    if (message.includes(w)) {
+    if (lowerMessage.includes(w.toLowerCase())) {
       detectedWilayah = w === 'Ciayumajakuning' ? 'Cirebon' : w
       break
     }
@@ -48,17 +50,57 @@ function detectPlanning(message: string): PlanningDetect {
   }
 
   let budget: number | null = null
-  const budgetMatch = message.match(/budget\s*(\d+)/i)
+  const budgetMatch = message.match(/budget\s*(\d+(?:\.\d+)?)\s*(rb|ribu|k|jt|juta)?/i)
   if (budgetMatch) {
-    budget = parseInt(budgetMatch[1])
+    let nominal = parseFloat(budgetMatch[1])
+    const unit = budgetMatch[2]?.toLowerCase()
+    if (unit === 'rb' || unit === 'ribu' || unit === 'k') {
+      nominal = nominal * 1000
+    } else if (unit === 'jt' || unit === 'juta') {
+      nominal = nominal * 1000000
+    }
+    budget = nominal
   }
 
-  return { isPlanning: true, wilayah: detectedWilayah, hari, budget }
+  const kategoriOptions = ['Alam', 'Buatan', 'Budaya', 'Religi', 'Petualangan', 'Edukasi', 'Kuliner', 'Nongkrong']
+  const detectedKategori: string[] = []
+
+  for (const opt of kategoriOptions) {
+    if (lowerMsg.includes(opt.toLowerCase())) {
+      detectedKategori.push(opt)
+    }
+  }
+
+  // Deteksi "dan" untuk multiple kategori
+  if (lowerMsg.includes('alam') && lowerMsg.includes('kuliner') && !detectedKategori.includes('Kuliner')) {
+    detectedKategori.push('Kuliner')
+  }
+  if (lowerMsg.includes('alam') && !detectedKategori.includes('Alam')) {
+    detectedKategori.push('Alam')
+  }
+  if (lowerMsg.includes('kuliner') && !detectedKategori.includes('Kuliner')) {
+    detectedKategori.push('Kuliner')
+  }
+  if (lowerMsg.includes('nongkrong') && !detectedKategori.includes('Nongkrong')) {
+    detectedKategori.push('Nongkrong')
+  }
+
+  // Default kategori
+  let kategori: string | null = null
+  if (detectedKategori.length > 0) {
+    kategori = detectedKategori.join(',')
+  } else {
+    // Default: semua kategori (wisata, kuliner, nongkrong)
+    kategori = 'Wisata,Kuliner,Nongkrong'
+  }
+
+  return { isPlanning: true, wilayah: detectedWilayah, hari, budget, kategori }
 }
 
 /** Hook untuk mengelola chatbot (kirim pesan, loading, stop, redirect planning) */
 export function useChatbot(): UseChatbotReturn {
   const router = useRouter()
+  const { user } = useAuthStore()
   const { addMessage, setSession, setTyping, sessionToken } = useChatbotStore()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -88,6 +130,7 @@ export function useChatbot(): UseChatbotReturn {
         if (planning.wilayah) responseText += ` di ${planning.wilayah}`
         responseText += ` selama ${planning.hari} hari`
         if (planning.budget) responseText += ` dengan budget Rp${planning.budget.toLocaleString()}`
+        if (planning.kategori) responseText += ` dengan kategori ${planning.kategori}`
         responseText += `. Silakan lengkapi detail di halaman berikut.`
 
         const assistantMessage = {
@@ -101,6 +144,7 @@ export function useChatbot(): UseChatbotReturn {
         if (planning.wilayah) params.set('wilayah', planning.wilayah)
         if (planning.hari) params.set('hari', planning.hari.toString())
         if (planning.budget) params.set('budget', planning.budget.toString())
+        if (planning.kategori) params.set('kategori', planning.kategori)
 
         setTimeout(() => {
           router.push(`/planning?${params.toString()}`)
@@ -127,13 +171,16 @@ export function useChatbot(): UseChatbotReturn {
           payload.longitude = location.lon
         }
 
-        const response = await chatbotApi.ask(payload)
+        const response = await chatbotApi.ask(payload, {
+          userId: user?.id,
+        })
 
         const assistantMessage = {
           role: 'assistant' as const,
           content: response.answer,
           timestamp: new Date().toISOString(),
           references: response.referensi,
+          wilayah: response.wilayah_terdeteksi,
         }
         addMessage(assistantMessage)
 
@@ -157,7 +204,7 @@ export function useChatbot(): UseChatbotReturn {
         setAbortController(null)
       }
     },
-    [sessionToken, addMessage, setSession, setTyping, router]
+    [sessionToken, addMessage, setSession, setTyping, router, user]
   )
 
   /** Stop generating response (membatalkan request) */
