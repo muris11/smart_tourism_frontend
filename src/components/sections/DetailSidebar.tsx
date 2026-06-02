@@ -3,8 +3,9 @@
 import { Clock, Ticket, CalendarPlus, Share2 } from 'lucide-react'
 import { FaInstagram, FaTiktok, FaWhatsapp } from 'react-icons/fa6'
 import { Button } from '@/components/ui/Button'
-import { cn } from '@/lib/utils/cn'
+import SentimentSection from './SentimentSection'
 import type { DetailItem } from '@/types/detail'
+import { Wilayah } from '@/lib/constants/wilayah'
 
 interface DetailSidebarProps {
   item: DetailItem
@@ -13,6 +14,16 @@ interface DetailSidebarProps {
 export default function DetailSidebar({ item }: DetailSidebarProps) {
   const shareUrl = typeof window !== 'undefined' ? window.location.href : ''
   const shareText = `Coba lihat ${item.name} di CITRA!`
+
+  // Tentukan tipe tempat berdasarkan kategori yang tersedia di DetailItem
+  const tipeTempat = (() => {
+    // Berdasarkan category yang ada di DetailItem
+    if (item.category === 'wisata' || item.category === 'Wisata') return 'wisata'
+    if (item.category === 'kuliner' || item.category === 'Kuliner') return 'kuliner'
+    if (item.category === 'nongkrong' || item.category === 'Nongkrong') return 'nongkrong'
+    // Fallback: cek dari slug atau asumsi
+    return 'wisata'
+  })()
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -109,9 +120,21 @@ export default function DetailSidebar({ item }: DetailSidebarProps) {
               </div>
             </div>
           </div>
+
+          {/* Sentiment Section - Menampilkan data sentimen per wilayah */}
+          {item.region && (
+            <SentimentSection
+              wilayah={item.region as Wilayah}
+              tipeTempat={tipeTempat}
+            />
+          )}
+
+          {/* Spacer - memberikan ruang kosong di bawah */}
+          <div className="h-8" />
         </div>
       </aside>
 
+      {/* Mobile Bottom Bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-citra-border bg-citra-surface p-4 shadow-floating lg:hidden">
         <div className="flex items-center gap-3">
           <div className="flex-1">
