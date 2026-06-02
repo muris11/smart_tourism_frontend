@@ -1,5 +1,4 @@
-/** Sentimen (match OpenAPI FastAPI) */
-export type Sentimen = 'positif' | 'negatif' | 'netral'
+import type { Sentimen } from '@/types/sentiment'
 
 /** Daftar semua sentimen */
 export const SENTIMEN_LIST: Sentimen[] = ['positif', 'negatif', 'netral']

@@ -1,5 +1,8 @@
 import { Wilayah } from '@/lib/constants/wilayah'
 
+/** Sentimen (match OpenAPI FastAPI) */
+export type Sentimen = 'positif' | 'negatif' | 'netral'
+
 /** Ringkasan sentimen per wilayah (match Laravel API) */
 export interface SentimentSummary {
   wilayah: Wilayah
