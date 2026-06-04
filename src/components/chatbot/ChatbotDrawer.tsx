@@ -6,7 +6,7 @@ import { useChatbot } from '@/hooks/useChatbot'
 import { useChatbotStore } from '@/stores/chatbotStore'
 import ChatMessage from './ChatMessage'
 import ChatInput from './ChatInput'
-import { X, MapPin, Headphones, Trash2, ChevronDown } from 'lucide-react'
+import { X, MapPin, Headphones, Trash2, ChevronDown, Compass, Utensils, Coffee, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
 interface ChatbotDrawerProps {
@@ -163,17 +163,18 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
 
                   <div className="flex flex-col gap-2 w-full max-w-[280px]">
                     {[
-                      { label: '🌲 Wisata Keluarga di Kuningan', query: 'Rekomendasi wisata keluarga di Kuningan' },
-                      { label: '🍽️ Kuliner Malam di Cirebon', query: 'Kuliner malam legendaris di Cirebon' },
-                      { label: '☕ Tempat Nongkrong Indramayu', query: 'Tempat nongkrong estetik di Indramayu' },
-                      { label: '📅 Buat Rencana Trip 2 Hari', query: 'Buatkan rencana perjalanan 2 hari di Ciayumajakuning' },
+                      { icon: <Compass className="w-3.5 h-3.5 text-brand" />, label: 'Wisata Keluarga di Kuningan', query: 'Rekomendasi wisata keluarga di Kuningan' },
+                      { icon: <Utensils className="w-3.5 h-3.5 text-orange-600" />, label: 'Kuliner Malam di Cirebon', query: 'Kuliner malam legendaris di Cirebon' },
+                      { icon: <Coffee className="w-3.5 h-3.5 text-slate-500" />, label: 'Tempat Nongkrong Indramayu', query: 'Tempat nongkrong estetik di Indramayu' },
+                      { icon: <Calendar className="w-3.5 h-3.5 text-[#DFC291]" />, label: 'Buat Rencana Trip 2 Hari', query: 'Buatkan rencana perjalanan 2 hari di Ciayumajakuning' },
                     ].map((item) => (
                       <button
                         key={item.query}
                         onClick={() => handleSend(item.query)}
-                        className="w-full text-left rounded-xl bg-slate-50 hover:bg-brand-light px-4 py-2.5 text-xs font-medium text-slate-600 transition-all hover:text-brand border border-slate-200 hover:border-brand/40 shadow-xs hover:shadow-sm"
+                        className="w-full flex items-center gap-2 text-left rounded-xl bg-slate-50 hover:bg-brand-light px-4 py-2.5 text-xs font-medium text-slate-600 transition-all hover:text-brand border border-slate-200 hover:border-brand/40 shadow-xs hover:shadow-sm"
                       >
-                        {item.label}
+                        {item.icon}
+                        <span>{item.label}</span>
                       </button>
                     ))}
                   </div>

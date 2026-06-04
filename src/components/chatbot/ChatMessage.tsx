@@ -67,8 +67,8 @@ export default function ChatMessage({ message }: ChatMessageProps) {
 
         {!isUser && message.wilayah && (
           <div className="mb-2">
-            <span className="inline-flex items-center gap-1 text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded">
-              <span>🗺️</span>
+            <span className="inline-flex items-center gap-1.5 text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded">
+              <Compass className="h-3 w-3 text-green-600" />
               <span>Wilayah terdeteksi: {message.wilayah}</span>
             </span>
           </div>

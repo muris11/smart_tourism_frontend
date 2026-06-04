@@ -377,7 +377,7 @@ export default function InteractiveMap({ className }: InteractiveMapProps) {
               )}
             >
               <span className="w-2 h-2 rounded-full bg-[#17624A]" />
-              Wisata 🌲
+              Wisata
             </button>
 
             <button
@@ -390,7 +390,7 @@ export default function InteractiveMap({ className }: InteractiveMapProps) {
               )}
             >
               <span className="w-2 h-2 rounded-full bg-[#C86A49]" />
-              Kuliner 🍽️
+              Kuliner
             </button>
 
             <button
@@ -403,7 +403,7 @@ export default function InteractiveMap({ className }: InteractiveMapProps) {
               )}
             >
               <span className="w-2 h-2 rounded-full bg-[#507664]" />
-              Nongkrong ☕
+              Nongkrong
             </button>
           </div>
 
