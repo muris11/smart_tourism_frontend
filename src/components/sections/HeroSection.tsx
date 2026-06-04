@@ -142,19 +142,27 @@ export default function HeroSection() {
               </form>
 
               <div className="flex flex-wrap items-center justify-center gap-2">
-                {categoryChips.map((chip) => {
-                  const Icon = chip.icon
-                  return (
-                    <Link
-                      key={chip.label}
-                      href={`/wisata?kategori=${chip.label.toLowerCase().replace(/\s+/g, '-')}`}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-white/85 backdrop-blur-sm transition-all hover:bg-white/20 hover:text-white"
-                    >
-                      <Icon className="h-3.5 w-3.5" />
-                      {chip.label}
-                    </Link>
-                  )
-                })}
+                <Link
+                  href="/wisata"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-white/85 backdrop-blur-sm transition-all hover:bg-white/20 hover:text-white"
+                >
+                  <MapPin className="h-3.5 w-3.5" />
+                  Wisata Alam
+                </Link>
+                <Link
+                  href="/kuliner"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-white/85 backdrop-blur-sm transition-all hover:bg-white/20 hover:text-white"
+                >
+                  <UtensilsCrossed className="h-3.5 w-3.5" />
+                  Kuliner Khas
+                </Link>
+                <Link
+                  href="/nongkrong"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-white/85 backdrop-blur-sm transition-all hover:bg-white/20 hover:text-white"
+                >
+                  <Coffee className="h-3.5 w-3.5" />
+                  Tempat Nongkrong
+                </Link>
               </div>
             </div>
           </div>
