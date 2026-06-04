@@ -18,6 +18,8 @@ export default function WisataDetailPage() {
   const [item, setItem] = useState<Destination | undefined>(undefined)
   const [loading, setLoading] = useState(true)
   const [allItems, setAllItems] = useState<Destination[]>([])
+
+  // Chatbot offset handling
   const setChatbotOffset = useUIStore(
     (state) => state.setChatbotOffset
   )

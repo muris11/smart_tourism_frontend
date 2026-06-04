@@ -18,6 +18,7 @@ export default function NongkrongDetailPage() {
   const [loading, setLoading] = useState(true)
   const [allItems, setAllItems] = useState<Hangout[]>([])
 
+  // Chatbot offset handling
   const setChatbotOffset = useUIStore(
     (state) => state.setChatbotOffset
   )

@@ -18,6 +18,7 @@ export default function KulinerDetailPage() {
   const [loading, setLoading] = useState(true)
   const [allItems, setAllItems] = useState<Culinary[]>([])
 
+  // Chatbot offset handling
   const setChatbotOffset = useUIStore(
     (state) => state.setChatbotOffset
   )
