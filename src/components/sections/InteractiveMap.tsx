@@ -217,16 +217,60 @@ export default function InteractiveMap({ className }: InteractiveMapProps) {
     items.forEach((item) => {
       const color = TYPE_COLORS[item.type]
       
-      // Determine lucide-like icon representing the category or type
-      let markerChar = '📍'
-      if (item.type === 'kuliner') markerChar = '🍽️'
-      if (item.type === 'nongkrong') markerChar = '☕'
-      if (item.type === 'wisata') {
-        if (item.category.includes('Alam')) markerChar = '🌲'
-        else if (item.category.includes('Pantai')) markerChar = '🏖️'
-        else if (item.category.includes('Religi')) markerChar = '🕌'
-        else if (item.category.includes('Budaya')) markerChar = '🏛️'
-        else markerChar = '🏞️'
+      // Determine SVG paths for matching icons (Compass for Wisata, Utensils for Kuliner, Coffee for Nongkrong)
+      let svgIconContent = ""
+      
+      if (item.type === 'kuliner') {
+        // Utensils Icon Path
+        svgIconContent = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/>
+            <path d="M7 2v20"/>
+            <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>
+          </svg>
+        `
+      } else if (item.type === 'nongkrong') {
+        // Coffee Icon Path
+        svgIconContent = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 8h1a4 4 0 1 1 0 8h-1"/>
+            <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/>
+            <line x1="6" y1="2" x2="6" y2="4"/>
+            <line x1="10" y1="2" x2="10" y2="4"/>
+            <line x1="14" y1="2" x2="14" y2="4"/>
+          </svg>
+        `
+      } else {
+        // Wisata category icons
+        if (item.category.includes('Alam') || item.category.includes('Pantai')) {
+          // Tree/Nature Icon Path
+          svgIconContent = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m12 3-8 12h16l-8-12Z"/>
+              <path d="M12 15v6"/>
+            </svg>
+          `
+        } else if (item.category.includes('Religi') || item.category.includes('Budaya')) {
+          // Landmark/History Icon Path
+          svgIconContent = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="22" x2="21" y2="22"/>
+              <line x1="6" y1="18" x2="6" y2="11"/>
+              <line x1="10" y1="18" x2="10" y2="11"/>
+              <line x1="14" y1="18" x2="14" y2="11"/>
+              <line x1="18" y1="18" x2="18" y2="11"/>
+              <path d="m12 2-8 6h16l-8-6Z"/>
+            </svg>
+          `
+        } else {
+          // Compass / MapPin Icon Path Default
+          svgIconContent = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+            </svg>
+          `
+        }
       }
 
       const markerHtml = `
@@ -234,17 +278,16 @@ export default function InteractiveMap({ className }: InteractiveMapProps) {
           display:flex;align-items:center;justify-content:center;
           width:30px;height:30px;border-radius:50%;
           background:${color};color:#fff;
-          font-size:14px;
           box-shadow:0 2px 6px rgba(0,0,0,0.3);
           border:2px solid white;
           cursor:pointer;
-        ">${markerChar}</div>
+        ">${svgIconContent}</div>
       `
 
       const icon = L.divIcon({ html: markerHtml, className: '', iconSize: [30, 30], iconAnchor: [15, 15] })
       const marker = L.marker([item.lat, item.lng], { icon }).addTo(markersGroup)
 
-      marker.bindTooltip(`<b>${item.nama}</b><br/>${item.category} (${item.rating} ⭐)`, {
+      marker.bindTooltip(`<b>${item.nama}</b><br/>${item.category} (${item.rating} ★)`, {
         offset: [0, -15],
         direction: 'top',
       })
@@ -252,7 +295,7 @@ export default function InteractiveMap({ className }: InteractiveMapProps) {
       marker.bindPopup(`
         <div style="font-family:var(--font-body),system-ui,sans-serif;width:220px;padding:2px">
           <div style="position:relative;width:100%;height:100px;border-radius:6px;overflow:hidden;margin-bottom:8px">
-            <img src="${item.image}" alt="${item.nama}" style="width:100%;height:100%;object-cover:cover;display:block" />
+            <img src="${item.image}" alt="${item.nama}" style="width:100%;height:100%;object-fit:cover;display:block" />
           </div>
           <b style="font-size:14px;color:#1e293b;display:block;margin-bottom:2px">${item.nama}</b>
           <span style="font-size:11px;color:${color};font-weight:600;text-transform:uppercase">${item.category}</span>
