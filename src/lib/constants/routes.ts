@@ -32,6 +32,12 @@ export const ROUTES = {
   FAQ: '/faq',
   /** Halaman kontak */
   KONTAK: '/kontak',
+  /** Halaman Kebijakan Privasi */
+  KEBIJAKAN_PRIVASI: '/kebijakan-privasi',
+  /** Halaman Syarat & Ketentuan */
+  SYARAT_KETENTUAN: '/syarat-ketentuan',
+  /** Halaman Lisensi Aset */
+  LISENSI_ASET: '/lisensi-aset',
 } as const
 
 /** Tipe untuk route yang tersedia */

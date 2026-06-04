@@ -6,7 +6,7 @@ import { useChatbot } from '@/hooks/useChatbot'
 import { useChatbotStore } from '@/stores/chatbotStore'
 import ChatMessage from './ChatMessage'
 import ChatInput from './ChatInput'
-import { X, MapPin, Headphones, Trash2, ChevronDown } from 'lucide-react'
+import { X, MapPin, Headphones, Trash2, ChevronDown, Compass, Utensils, Coffee, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
 interface ChatbotDrawerProps {
@@ -23,7 +23,10 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
 
   useEffect(() => {
     if (messagesEndRef.current && !isMinimized) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+      const timer = setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+      }, 80)
+      return () => clearTimeout(timer)
     }
   }, [messages, isTyping, isMinimized])
 
@@ -153,24 +156,25 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
                   <h4 className="mb-2 text-base font-semibold text-brand-deep font-display">
                     Halo! Ada yang bisa dibantu?
                   </h4>
-                  <p className="max-w-xs text-sm leading-relaxed text-slate-500">
+                  <p className="max-w-xs text-sm leading-relaxed text-slate-500 mb-6">
                     Tanyakan tentang wisata, kuliner, atau tempat nongkrong di
                     Ciayumajakuning. Saya siap membantu!
                   </p>
 
-                  <div className="mt-6 flex flex-wrap justify-center gap-2">
+                  <div className="flex flex-col gap-2 w-full max-w-[280px]">
                     {[
-                      'Wisata alam di Kuningan?',
-                      'Kuliner enak di Cirebon',
-                      'Tempat nongkrong di Indramayu',
-                      'Rekomendasi wisata dekat sini',
-                    ].map((suggestion) => (
+                      { icon: <Compass className="w-3.5 h-3.5 text-brand" />, label: 'Wisata Keluarga di Kuningan', query: 'Rekomendasi wisata keluarga di Kuningan' },
+                      { icon: <Utensils className="w-3.5 h-3.5 text-orange-600" />, label: 'Kuliner Malam di Cirebon', query: 'Kuliner malam legendaris di Cirebon' },
+                      { icon: <Coffee className="w-3.5 h-3.5 text-slate-500" />, label: 'Tempat Nongkrong Indramayu', query: 'Tempat nongkrong estetik di Indramayu' },
+                      { icon: <Calendar className="w-3.5 h-3.5 text-[#DFC291]" />, label: 'Buat Rencana Trip 2 Hari', query: 'Buatkan rencana perjalanan 2 hari di Ciayumajakuning' },
+                    ].map((item) => (
                       <button
-                        key={suggestion}
-                        onClick={() => handleSend(suggestion)}
-                        className="rounded-full bg-slate-50 px-3.5 py-1.5 text-xs text-slate-500 transition-all hover:bg-brand hover:text-white border border-slate-200"
+                        key={item.query}
+                        onClick={() => handleSend(item.query)}
+                        className="w-full flex items-center gap-2 text-left rounded-xl bg-slate-50 hover:bg-brand-light px-4 py-2.5 text-xs font-medium text-slate-600 transition-all hover:text-brand border border-slate-200 hover:border-brand/40 shadow-xs hover:shadow-sm"
                       >
-                        {suggestion}
+                        {item.icon}
+                        <span>{item.label}</span>
                       </button>
                     ))}
                   </div>
