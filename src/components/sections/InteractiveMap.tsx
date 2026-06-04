@@ -9,6 +9,7 @@ import { kulinerApi } from '@/lib/api/kuliner'
 import { nongkrongApi } from '@/lib/api/nongkrong'
 import type { WisataItem, KulinerItem, NongkrongItem } from '@/types'
 import { getFirstImage } from '@/lib/utils/format'
+import { Maximize2, Minimize2, Eye, EyeOff } from 'lucide-react'
 
 interface InteractiveMapProps {
   className?: string
@@ -38,9 +39,29 @@ export default function InteractiveMap({ className }: InteractiveMapProps) {
   const [regions, setRegions] = useState<Region[]>([])
   const [items, setItems] = useState<MapItem[]>([])
   const [loading, setLoading] = useState(true)
+  
+  // Filters state
+  const [filterType, setFilterType] = useState<{ wisata: boolean; kuliner: boolean; nongkrong: boolean }>({
+    wisata: true,
+    kuliner: true,
+    nongkrong: true
+  })
+  
+  // Fullscreen state
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
   const mapRef = useRef<HTMLDivElement>(null)
   const instanceRef = useRef<any>(null)
   const markersGroupRef = useRef<any>(null)
+
+  // Listen to escape key or change size triggers on map container resize
+  useEffect(() => {
+    if (instanceRef.current) {
+      setTimeout(() => {
+        instanceRef.current.invalidateSize()
+      }, 300)
+    }
+  }, [isFullscreen])
 
   useEffect(() => {
     // Fetch regions and all items with coordinate data
@@ -151,13 +172,13 @@ export default function InteractiveMap({ className }: InteractiveMapProps) {
     }
   }, [regions])
 
-  // Update markers when items load
+  // Update markers when items or filters change
   useEffect(() => {
     if (!instanceRef.current || items.length === 0) return
     import('leaflet').then((L) => {
       renderMarkers(L)
     })
-  }, [items])
+  }, [items, filterType])
 
   const renderMarkers = (L: any) => {
     const map = instanceRef.current
@@ -214,8 +235,10 @@ export default function InteractiveMap({ className }: InteractiveMapProps) {
     })
 
     // Add individual destination markers
-    items.forEach((item) => {
-      const color = TYPE_COLORS[item.type]
+    items
+      .filter((item) => filterType[item.type])
+      .forEach((item) => {
+        const color = TYPE_COLORS[item.type]
       
       // Determine SVG paths for matching icons (Compass for Wisata, Utensils for Kuliner, Coffee for Nongkrong)
       let svgIconContent = ""
@@ -339,10 +362,97 @@ export default function InteractiveMap({ className }: InteractiveMapProps) {
           </p>
         </div>
 
-        <div className="relative">
+        {/* Filter Toolbar */}
+        <div className="mb-4 flex flex-wrap justify-between items-center gap-3 bg-citra-surface-soft p-3 rounded-xl border border-citra-border">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-xs font-bold uppercase tracking-wider text-citra-muted mr-1">Tampilkan:</span>
+            
+            <button
+              onClick={() => setFilterType(prev => ({ ...prev, wisata: !prev.wisata }))}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all",
+                filterType.wisata
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  : "bg-white text-slate-400 border-slate-200 hover:text-slate-600"
+              )}
+            >
+              <span className="w-2 h-2 rounded-full bg-[#17624A]" />
+              Wisata 🌲
+            </button>
+
+            <button
+              onClick={() => setFilterType(prev => ({ ...prev, kuliner: !prev.kuliner }))}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all",
+                filterType.kuliner
+                  ? "bg-orange-50 text-orange-700 border-orange-200"
+                  : "bg-white text-slate-400 border-slate-200 hover:text-slate-600"
+              )}
+            >
+              <span className="w-2 h-2 rounded-full bg-[#C86A49]" />
+              Kuliner 🍽️
+            </button>
+
+            <button
+              onClick={() => setFilterType(prev => ({ ...prev, nongkrong: !prev.nongkrong }))}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all",
+                filterType.nongkrong
+                  ? "bg-slate-50 text-slate-700 border-slate-200"
+                  : "bg-white text-slate-400 border-slate-200 hover:text-slate-600"
+              )}
+            >
+              <span className="w-2 h-2 rounded-full bg-[#507664]" />
+              Nongkrong ☕
+            </button>
+          </div>
+
+          <button
+            onClick={() => setIsFullscreen(prev => !prev)}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 hover:bg-slate-50 transition-all text-slate-700 shadow-xs"
+          >
+            {isFullscreen ? (
+              <>
+                <Minimize2 className="w-3.5 h-3.5" />
+                <span>Kecilkan</span>
+              </>
+            ) : (
+              <>
+                <Maximize2 className="w-3.5 h-3.5" />
+                <span>Fullscreen</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Map Container Wrapper */}
+        <div 
+          className={cn(
+            "relative transition-all duration-300 z-10",
+            isFullscreen 
+              ? "fixed inset-0 !z-[9999] bg-white p-4 flex flex-col h-screen w-screen" 
+              : "w-full aspect-[4/3] sm:aspect-[16/9] rounded-lg overflow-hidden shadow-card border border-citra-border"
+          )}
+        >
+          {isFullscreen && (
+            <div className="flex justify-between items-center mb-3">
+              <div>
+                <h3 className="font-display font-bold text-lg text-citra-ink">Peta Interaktif Ciayumajakuning</h3>
+                <p className="text-xs text-slate-500">Klik marker untuk melihat detail destinasi wisata</p>
+              </div>
+              <button
+                onClick={() => setIsFullscreen(false)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 transition-all text-slate-700"
+              >
+                <Minimize2 className="w-3.5 h-3.5" />
+                <span>Tutup</span>
+              </button>
+            </div>
+          )}
+
           <div
             ref={mapRef}
-            className="w-full aspect-[4/3] sm:aspect-[16/9] rounded-lg overflow-hidden shadow-card border border-citra-border"
+            className="w-full h-full rounded-lg overflow-hidden border border-citra-border"
           />
 
           <div className="absolute top-3 left-3 z-[1000]">
