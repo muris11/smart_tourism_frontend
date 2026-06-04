@@ -83,7 +83,11 @@ export default function DetailSidebar({ item }: DetailSidebarProps) {
             </div>
 
             <div className="mt-6 space-y-3">
-              <Button variant="primary" size="lg" className="w-full">
+              <Button variant="primary" size="lg" className="w-full" onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.location.href = '/planning'
+                }
+              }}>
                 <CalendarPlus className="mr-2 h-4 w-4" />
                 Tambahkan ke Rencana
               </Button>
@@ -147,7 +151,11 @@ export default function DetailSidebar({ item }: DetailSidebarProps) {
             <Share2 className="mr-2 h-4 w-4" />
             Bagikan
           </Button>
-          <Button variant="secondary" size="default">
+          <Button variant="secondary" size="default" onClick={() => {
+            if (typeof window !== 'undefined') {
+              window.location.href = '/planning'
+            }
+          }}>
             <CalendarPlus className="mr-2 h-4 w-4" />
             Rencana
           </Button>

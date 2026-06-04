@@ -387,17 +387,20 @@ export async function getRegionBySlug(slug: string): Promise<Region | undefined>
 
 export async function getDestinationBySlug(slug: string): Promise<Destination | undefined> {
   const list = await getDestinations()
-  return list.find((d) => d.slug === slug)
+  const decodedSlug = decodeURIComponent(slug).toLowerCase()
+  return list.find((d) => d.slug === decodedSlug || d.id.toLowerCase() === decodedSlug)
 }
 
 export async function getCulinaryBySlug(slug: string): Promise<Culinary | undefined> {
   const list = await getCulinary()
-  return list.find((c) => c.slug === slug)
+  const decodedSlug = decodeURIComponent(slug).toLowerCase()
+  return list.find((c) => c.slug === decodedSlug || c.id.toLowerCase() === decodedSlug)
 }
 
 export async function getHangoutBySlug(slug: string): Promise<Hangout | undefined> {
   const list = await getHangouts()
-  return list.find((h) => h.slug === slug)
+  const decodedSlug = decodeURIComponent(slug).toLowerCase()
+  return list.find((h) => h.slug === decodedSlug || h.id.toLowerCase() === decodedSlug)
 }
 
 export async function searchAll(query: string): Promise<{

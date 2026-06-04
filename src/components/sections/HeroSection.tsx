@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Search, MapPin, UtensilsCrossed, Coffee } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import { Button } from '@/components/ui/Button'
@@ -15,6 +16,7 @@ const categoryChips = [
 ]
 
 export default function HeroSection() {
+  const router = useRouter()
   const [slides, setSlides] = useState<HeroSlide[]>([])
   const [loading, setLoading] = useState(true)
   const [current, setCurrent] = useState(0)
@@ -120,17 +122,24 @@ export default function HeroSection() {
                 Temukan tempat wisata, kuliner khas, dan sudut favorit dari Cirebon, Indramayu, Majalengka, dan Kuningan — satu pintu.
               </p>
 
-              <div className="mx-auto mb-6 flex max-w-xl items-center gap-2 rounded-full border border-white/20 bg-white/12 p-1.5 pl-5 backdrop-blur-md">
+              <form onSubmit={(e) => {
+                e.preventDefault()
+                const val = (e.currentTarget.elements.namedItem('search') as HTMLInputElement).value
+                if (val) {
+                  router.push(`/cari?q=${encodeURIComponent(val)}`)
+                }
+              }} className="mx-auto mb-6 flex max-w-xl items-center gap-2 rounded-full border border-white/20 bg-white/12 p-1.5 pl-5 backdrop-blur-md">
                 <Search className="h-4 w-4 shrink-0 text-white/60" />
                 <input
                   type="text"
+                  name="search"
                   placeholder="Cari destinasi, kuliner, atau tempat nongkrong..."
                   className="w-full bg-transparent text-sm text-white placeholder-white/50 outline-none"
                 />
-                <Button variant="primary" size="sm" className="shrink-0 rounded-full px-5">
+                <Button type="submit" variant="primary" size="sm" className="shrink-0 rounded-full px-5 cursor-pointer">
                   Jelajahi
                 </Button>
-              </div>
+              </form>
 
               <div className="flex flex-wrap items-center justify-center gap-2">
                 {categoryChips.map((chip) => {
