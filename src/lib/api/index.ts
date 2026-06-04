@@ -206,6 +206,7 @@ const REGION_META: Record<string, { description: string; image: string; theme: s
 }
 
 let cachedCounts: Record<string, number> | null = null
+let cachedRegionCounts: Record<string, number> | null = null
 
 async function getWilayahCounts(): Promise<Record<string, number>> {
   if (cachedCounts) return cachedCounts
@@ -225,30 +226,60 @@ async function getWilayahCounts(): Promise<Record<string, number>> {
   }
 }
 
-export async function getRegions(): Promise<Region[]> {
-  let destinationCount = '50+ Destinasi'
-  try {
-    const counts = await getWilayahCounts()
-    const total = (counts.wisata || 0) + (counts.kuliner || 0) + (counts.nongkrong || 0)
-    destinationCount = `${total}+ Destinasi`
-  } catch {
-    // use default
+async function getCountsPerRegion(regionName: string): Promise<number> {
+  const cacheKey = regionName.toLowerCase()
+  if (cachedRegionCounts && cachedRegionCounts[cacheKey] !== undefined) {
+    return cachedRegionCounts[cacheKey]
+  }
+  
+  if (!cachedRegionCounts) {
+    cachedRegionCounts = {}
   }
 
-  return Object.entries(REGION_META).map(([name, meta]) => {
-    const slug = name.toLowerCase()
-    const center = WILAYAH_CENTER[name as keyof typeof WILAYAH_CENTER]
-    return {
-      id: slug,
-      name,
-      slug,
-      description: meta.description,
-      image: { src: meta.image, alt: name },
-      destinationCount,
-      imageTheme: meta.theme,
-      coordinates: center ? { lat: center.lat, lng: center.lon } : undefined,
-    }
-  })
+  try {
+    const regionFilter = regionName as any
+    const wisata = await wisataApi.list({ wilayah: regionFilter, per_page: 1, page: 1 })
+    const kuliner = await kulinerApi.list({ wilayah: regionFilter, per_page: 1, page: 1 })
+    const nongkrong = await nongkrongApi.list({ wilayah: regionFilter, per_page: 1, page: 1 })
+    
+    const total = (wisata.total || 0) + (kuliner.total || 0) + (nongkrong.total || 0)
+    cachedRegionCounts[cacheKey] = total
+    return total
+  } catch {
+    cachedRegionCounts[cacheKey] = 0
+    return 0
+  }
+}
+
+export async function getRegions(): Promise<Region[]> {
+  const regionsData = await Promise.all(
+    Object.entries(REGION_META).map(async ([name, meta]) => {
+      const slug = name.toLowerCase()
+      const center = WILAYAH_CENTER[name as keyof typeof WILAYAH_CENTER]
+      
+      let count = 0
+      try {
+        count = await getCountsPerRegion(name)
+      } catch (e) {
+        // Fallback
+      }
+
+      const destinationCount = count > 0 ? `${count} Destinasi` : '0 Destinasi'
+
+      return {
+        id: slug,
+        name,
+        slug,
+        description: meta.description,
+        image: { src: meta.image, alt: name },
+        destinationCount,
+        imageTheme: meta.theme,
+        coordinates: center ? { lat: center.lat, lng: center.lon } : undefined,
+      }
+    })
+  )
+
+  return regionsData
 }
 
 function dedupeBy<T>(arr: T[], key: (item: T) => string): T[] {
