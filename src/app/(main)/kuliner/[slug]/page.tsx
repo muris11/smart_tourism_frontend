@@ -18,7 +18,7 @@ export default function KulinerDetailPage() {
   const [loading, setLoading] = useState(true)
   const [allItems, setAllItems] = useState<Culinary[]>([])
 
-  // Chatbot offset handling
+  // Chatbot offset handling for mobile view when sidebar is present
   const setChatbotOffset = useUIStore(
     (state) => state.setChatbotOffset
   )

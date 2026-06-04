@@ -19,7 +19,7 @@ export default function WisataDetailPage() {
   const [loading, setLoading] = useState(true)
   const [allItems, setAllItems] = useState<Destination[]>([])
 
-  // Chatbot offset handling
+  // Chatbot offset handling for mobile view when sidebar is present
   const setChatbotOffset = useUIStore(
     (state) => state.setChatbotOffset
   )
