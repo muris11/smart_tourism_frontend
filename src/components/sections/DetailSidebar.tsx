@@ -136,21 +136,37 @@ export default function DetailSidebar({ item }: DetailSidebarProps) {
 
       {/* Mobile Bottom Bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-citra-border bg-citra-surface p-4 shadow-floating lg:hidden">
-        <div className="flex items-center gap-3">
-          <div className="flex-1">
+        <div className="flex items-center">
+          <div className="flex-1 min-w-0">
             {item.priceRange && (
-              <p className="text-xs text-citra-muted">Mulai dari</p>
+              <p className="whitespace-nowrap text-[11px] text-citra-muted">
+                Mulai dari
+              </p>
             )}
-            <p className="font-semibold text-citra-ink">{item.priceRange || item.hours}</p>
+
+            <p className="text-sm font-semibold text-citra-ink">
+              {item.priceRange || item.hours}
+            </p>
           </div>
-          <Button variant="primary" size="default" onClick={handleShare}>
-            <Share2 className="mr-2 h-4 w-4" />
-            Bagikan
-          </Button>
-          <Button variant="secondary" size="default">
-            <CalendarPlus className="mr-2 h-4 w-4" />
-            Rencana
-          </Button>
+
+          <div className="ml-auto flex items-center gap-2">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleShare}
+            >
+              <Share2 className="mr-1 h-3.5 w-3.5" />
+              Bagikan
+            </Button>
+
+            <Button
+              variant="secondary"
+              size="sm"
+            >
+              <CalendarPlus className="mr-1 h-3.5 w-3.5" />
+              Rencana
+            </Button>
+          </div>
         </div>
       </div>
     </>
