@@ -46,9 +46,9 @@ export default function InteractiveMap({ className }: InteractiveMapProps) {
     // Fetch regions and all items with coordinate data
     Promise.all([
       getRegions(),
-      wisataApi.list({ per_page: 100 }),
-      kulinerApi.list({ per_page: 100 }),
-      nongkrongApi.list({ per_page: 100 })
+      wisataApi.list({ per_page: 50 }),
+      kulinerApi.list({ per_page: 50 }),
+      nongkrongApi.list({ per_page: 50 })
     ])
       .then(([regionsData, wisataRes, kulinerRes, nongkrongRes]) => {
         setRegions(regionsData)
