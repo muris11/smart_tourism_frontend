@@ -98,7 +98,6 @@ export default function SentimentSection({ wilayah, tipeTempat }: SentimentSecti
 
     const positifPersen = (sentimentData.positif / (sentimentData.total_ulasan || 1)) * 100
     const negatifPersen = (sentimentData.negatif / (sentimentData.total_ulasan || 1)) * 100
-    const netralPersen = (sentimentData.netral / (sentimentData.total_ulasan || 1)) * 100
 
     return (
         <div className="rounded-lg border border-slate-200 bg-white shadow-card">
