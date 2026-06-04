@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <!-- Rounded rectangle background with CITRA's primary forest green color -->
+  <rect width="180" height="180" rx="36" fill="#17624A" />
+  
+  <!-- Stylized Mountain Icon in White -->
+  <path d="M90 35L30 135H150L90 35Z" fill="white" stroke="white" stroke-width="10" stroke-linejoin="round" />
+  <path d="M90 70L60 120H120L90 70Z" fill="#17624A" />
+  <path d="M90 95L80 112H100L90 95Z" fill="white" />
+</svg>

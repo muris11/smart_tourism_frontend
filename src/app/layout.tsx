@@ -29,7 +29,13 @@ export const metadata: Metadata = {
   },
   description: 'CITRA — Ciayumajakuning Intelligent Tourism & Recommendation Assistant. Jelajahi keindahan, rasa, dan cerita Ciayumajakuning.',
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon-dark.svg', type: 'image/svg+xml', media: '(prefers-color-scheme: dark)' }
+    ],
+    apple: [
+      { url: '/apple-icon.svg', type: 'image/svg+xml' }
+    ]
   },
 }
 
