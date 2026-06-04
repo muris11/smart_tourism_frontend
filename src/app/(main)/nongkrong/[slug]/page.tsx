@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'next/navigation'
 import { usePageTitle } from '@/hooks/usePageTitle'
+import { useUIStore } from '@/stores/uiStore'
 import { getHangouts, getHangoutBySlug, type Hangout } from '@/lib/api'
 import DetailHero from '@/components/sections/DetailHero'
 import DetailContent from '@/components/sections/DetailContent'
@@ -16,6 +17,20 @@ export default function NongkrongDetailPage() {
   const [item, setItem] = useState<Hangout | undefined>(undefined)
   const [loading, setLoading] = useState(true)
   const [allItems, setAllItems] = useState<Hangout[]>([])
+
+  // Chatbot offset handling
+  const setChatbotOffset = useUIStore(
+    (state) => state.setChatbotOffset
+  )
+
+  useEffect(() => {
+    setChatbotOffset(true)
+
+    return () => {
+      setChatbotOffset(false)
+    }
+  }, [setChatbotOffset])
+
   usePageTitle(item?.name || 'Nongkrong')
 
   useEffect(() => {
