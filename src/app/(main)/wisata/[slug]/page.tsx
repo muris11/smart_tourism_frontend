@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'next/navigation'
 import { usePageTitle } from '@/hooks/usePageTitle'
+import { useUIStore } from '@/stores/uiStore'
 import { getDestinations, getDestinationBySlug, type Destination } from '@/lib/api'
 import DetailHero from '@/components/sections/DetailHero'
 import DetailContent from '@/components/sections/DetailContent'
@@ -10,12 +11,25 @@ import DetailSidebar from '@/components/sections/DetailSidebar'
 import RekomendasiLain from '@/components/sections/RekomendasiLain'
 import NotFoundState from '@/components/sections/NotFoundState'
 
+
 export default function WisataDetailPage() {
   const params = useParams()
   const slug = params.slug as string
   const [item, setItem] = useState<Destination | undefined>(undefined)
   const [loading, setLoading] = useState(true)
   const [allItems, setAllItems] = useState<Destination[]>([])
+  const setChatbotOffset = useUIStore(
+    (state) => state.setChatbotOffset
+  )
+
+  useEffect(() => {
+    setChatbotOffset(true)
+
+    return () => {
+      setChatbotOffset(false)
+    }
+  }, [setChatbotOffset])
+
   usePageTitle(item?.name || 'Wisata')
 
   useEffect(() => {

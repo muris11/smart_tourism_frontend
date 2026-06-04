@@ -75,9 +75,7 @@ export default function UserMenu({
       <span className={cn(
         'flex items-center justify-center rounded-full text-sm font-bold',
         size === 'md' ? 'h-10 w-10' : 'h-8 w-8',
-        scrolled
-          ? 'bg-citra-primary text-citra-on-primary'
-          : 'bg-white/20 text-white'
+        'bg-citra-primary text-white' // Warna hijau dari tema CITRA
       )}>
         {initial}
       </span>
@@ -124,15 +122,6 @@ export default function UserMenu({
         >
           <UserCircle className="h-5 w-5 text-citra-muted" />
           Profil
-        </Link>
-
-        <Link
-          href="/planning"
-          onClick={onMobileClose}
-          className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-citra-body transition-all hover:bg-citra-primary-soft hover:text-citra-ink"
-        >
-          <LayoutDashboard className="h-5 w-5 text-citra-muted" />
-          Rencana Saya
         </Link>
 
         <button

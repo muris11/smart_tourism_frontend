@@ -183,53 +183,56 @@ export default function Navbar() {
 
       <div
         className={cn(
-          'fixed inset-y-0 right-0 z-40 flex w-full flex-col bg-citra-canvas px-5 pb-6 pt-[4.25rem] shadow-2xl transition-transform duration-500 ease-out sm:max-w-sm lg:hidden',
+          'fixed inset-y-0 right-0 z-40 flex w-full flex-col bg-citra-canvas px-5 pb-6 shadow-2xl transition-transform duration-500 ease-out sm:max-w-sm lg:hidden',
           mobileOpen ? 'translate-x-0' : 'translate-x-full'
         )}
+        style={{ paddingTop: 'calc(68px + 0.75rem)' }}
       >
-        <nav className="flex flex-col gap-1">
-          {navLinks.map((link) => {
-            const isActive = isActiveLink(link.href)
-            return (
+        <div className="flex-1 overflow-y-auto">
+          <nav className="flex flex-col gap-1">
+            {navLinks.map((link) => {
+              const isActive = isActiveLink(link.href)
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={handleMenuClose}
+                  className={cn(
+                    'flex min-h-[52px] items-center rounded-xl px-4 text-base font-medium transition-all',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-inset',
+                    isActive
+                      ? 'bg-citra-primary-soft text-citra-primary font-semibold'
+                      : 'text-citra-body hover:bg-citra-surface-soft hover:text-citra-ink'
+                  )}
+                >
+                  {link.label}
+                </Link>
+              )
+            })}
+          </nav>
+
+          <div className="my-4 h-px bg-citra-border" />
+
+          <div className="flex flex-col gap-1">
+            {drawerExtraLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={handleMenuClose}
                 className={cn(
-                  'flex min-h-[52px] items-center rounded-xl px-4 text-base font-medium transition-all',
+                  'flex min-h-[52px] items-center rounded-xl px-4 text-base font-medium text-citra-muted transition-all',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-inset',
-                  isActive
-                    ? 'bg-citra-primary-soft text-citra-primary font-semibold'
-                    : 'text-citra-body hover:bg-citra-surface-soft hover:text-citra-ink'
+                  'hover:bg-citra-surface-soft hover:text-citra-ink'
                 )}
               >
                 {link.label}
               </Link>
-            )
-          })}
-        </nav>
+            ))}
+          </div>
 
-        <div className="my-4 h-px bg-citra-border" />
-
-        <div className="flex flex-col gap-1">
-          {drawerExtraLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={handleMenuClose}
-              className={cn(
-                'flex min-h-[52px] items-center rounded-xl px-4 text-base font-medium text-citra-muted transition-all',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-inset',
-                'hover:bg-citra-surface-soft hover:text-citra-ink'
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
-
-        <div className="mt-auto">
-          <UserMenu variant="mobile" onMobileClose={handleMenuClose} />
+          <div className="mt-auto pt-4">
+            <UserMenu variant="mobile" onMobileClose={handleMenuClose} />
+          </div>
         </div>
       </div>
     </>
