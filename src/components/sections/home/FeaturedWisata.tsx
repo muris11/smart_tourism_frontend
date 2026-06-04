@@ -27,12 +27,12 @@ function getGradientByWilayah(wilayah: string): string {
 
 function getAccentByWilayah(wilayah: string): string {
   const accents: Record<string, string> = {
-    Cirebon: 'text-amber-500',
-    Indramayu: 'text-cyan-500',
-    Majalengka: 'text-emerald-500',
-    Kuningan: 'text-violet-500',
+    Cirebon: 'text-amber-700',
+    Indramayu: 'text-cyan-700',
+    Majalengka: 'text-emerald-700',
+    Kuningan: 'text-violet-700',
   }
-  return accents[wilayah] || 'text-brand'
+  return accents[wilayah] || 'text-citra-primary'
 }
 
 export default function FeaturedWisata() {
@@ -42,12 +42,12 @@ export default function FeaturedWisata() {
 
   if (isLoading) {
     return (
-      <section className="bg-brand-cream py-20 md:py-28">
-        <div className="container px-6 md:px-12">
+      <section className="bg-citra-canvas-alt py-20 md:py-28">
+        <div className="container-page">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="relative overflow-hidden rounded-3xl bg-white shadow-card">
-                <div className="aspect-[16/10] animate-pulse bg-slate-200" />
+                <div className="aspect-[16/10] skeleton-shimmer bg-slate-200" />
                 <div className="space-y-3 p-6">
                   <div className="h-5 w-24 rounded-full bg-slate-200" />
                   <div className="h-7 w-3/4 rounded bg-slate-200" />
@@ -63,8 +63,8 @@ export default function FeaturedWisata() {
 
   if (error) {
     return (
-      <section className="bg-brand-cream py-20 md:py-28">
-        <div className="container px-6 md:px-12 text-center">
+      <section className="bg-citra-canvas-alt py-20 md:py-28">
+        <div className="container-page text-center">
           <p className="text-red-500">Gagal memuat data wisata</p>
         </div>
       </section>
@@ -73,8 +73,8 @@ export default function FeaturedWisata() {
 
   if (!wisataList || wisataList.length === 0) {
     return (
-      <section className="bg-brand-cream py-20 md:py-28">
-        <div className="container px-6 md:px-12 text-center">
+      <section className="bg-citra-canvas-alt py-20 md:py-28">
+        <div className="container-page text-center">
           <p className="text-slate-500">Belum ada data wisata</p>
         </div>
       </section>
@@ -108,16 +108,16 @@ export default function FeaturedWisata() {
   const featuredWisata = getVariedWisata()
 
   return (
-    <section className="bg-brand-cream py-20 md:py-28">
-      <div className="container px-6 md:px-12">
+    <section className="bg-citra-canvas-alt py-20 md:py-28">
+      <div className="container-page">
         <div className="mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div className="max-w-2xl">
-            <span className="eyebrow mb-4 block">Featured Destination</span>
-            <h2 className="section-title">
-              Destinasi Pilihan
+            <span className="eyebrow mb-4 block">Destinasi Pilihan</span>
+            <h2 className="font-display text-3xl font-bold tracking-tight text-citra-ink md:text-4xl lg:text-5xl mt-2">
+              Destinasi Pilihan Terbaik
             </h2>
           </div>
-          <p className="section-copy max-w-lg">
+          <p className="text-citra-body max-w-lg">
             Tempat wisata terbaik dari berbagai wilayah Ciayumajakuning yang siap kamu jelajahi.
           </p>
         </div>
@@ -185,7 +185,7 @@ export default function FeaturedWisata() {
                     <span className={`text-xs font-semibold uppercase tracking-wider ${accent}`}>
                       Jelajahi
                     </span>
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-pale text-muted transition-all duration-300 group-hover:bg-brand group-hover:text-white">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-citra-canvas-alt text-citra-muted transition-all duration-300 group-hover:bg-citra-primary group-hover:text-white">
                       <ArrowUpRight className="h-4 w-4" />
                     </div>
                   </div>
@@ -198,7 +198,7 @@ export default function FeaturedWisata() {
         <div className="mt-14 text-center">
           <Link
             href="/wisata"
-            className="btn-outline inline-flex items-center gap-2 border-slate-300 text-brand-deep hover:border-brand-deep hover:bg-white"
+            className="inline-flex items-center gap-2 rounded-full border border-citra-border bg-white px-6 py-3 text-sm font-semibold text-citra-ink transition-all hover:bg-citra-canvas-alt hover:border-citra-border-strong"
           >
             Lihat Semua Wisata
             <ArrowUpRight className="h-4 w-4" />
