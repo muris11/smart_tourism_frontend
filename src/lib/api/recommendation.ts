@@ -49,6 +49,7 @@ export const recommendationApi = {
         }>
       }>
       estimasi_budget?: number | null
+      narasi?: string | null
     } | undefined
 
     if (!raw?.hari || !Array.isArray(raw.hari)) {
@@ -83,7 +84,7 @@ export const recommendationApi = {
       }),
     }))
 
-    return { itinerary, total_hari: raw.hari.length, total_budget: totalBudget, total_durasi_jam: totalDurasi }
+    return { itinerary, total_hari: raw.hari.length, total_budget: totalBudget, total_durasi_jam: totalDurasi, narasi: raw.narasi ?? undefined }
   },
 
   /**
