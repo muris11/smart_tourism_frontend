@@ -155,9 +155,9 @@ export default function ChatMessage({ message, onFeedback }: ChatMessageProps) {
                 <button 
                   onClick={() => handleFeedback(1)}
                   disabled={feedbackStatus !== null}
-                  className={cn("p-1 rounded transition-colors", 
+                  className={cn("p-1 rounded transition-colors disabled:cursor-default disabled:pointer-events-none", 
                     feedbackStatus === 1 ? "text-green-600 bg-green-50" : "text-slate-300 hover:text-green-600 hover:bg-slate-50",
-                    feedbackStatus === -1 ? "opacity-30" : ""
+                    feedbackStatus !== null && feedbackStatus !== 1 ? "opacity-30" : ""
                   )}
                   title="Jawaban membantu"
                 >
@@ -166,9 +166,9 @@ export default function ChatMessage({ message, onFeedback }: ChatMessageProps) {
                 <button 
                   onClick={() => handleFeedback(-1)}
                   disabled={feedbackStatus !== null}
-                  className={cn("p-1 rounded transition-colors", 
+                  className={cn("p-1 rounded transition-colors disabled:cursor-default disabled:pointer-events-none", 
                     feedbackStatus === -1 ? "text-red-600 bg-red-50" : "text-slate-300 hover:text-red-600 hover:bg-slate-50",
-                    feedbackStatus === 1 ? "opacity-30" : ""
+                    feedbackStatus !== null && feedbackStatus !== -1 ? "opacity-30" : ""
                   )}
                   title="Jawaban tidak membantu"
                 >
