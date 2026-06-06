@@ -100,6 +100,7 @@ export interface PlanningResponse {
     total_hari?: number
     total_budget: number
     total_durasi_jam: number
+    narasi?: string
   }
 }
 
@@ -109,6 +110,7 @@ export interface PlanningResult {
   total_hari?: number
   total_budget: number
   total_durasi_jam: number
+  narasi?: string
 }
 
 /** Request payload untuk track history */
