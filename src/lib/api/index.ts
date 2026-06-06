@@ -1,6 +1,7 @@
 import { wisataApi } from './wisata'
 import { kulinerApi } from './kuliner'
 import { nongkrongApi } from './nongkrong'
+import { regionsApi } from './regions'
 import { WILAYAH_CENTER } from '@/lib/constants/wilayah'
 import type { WisataItem, KulinerItem, NongkrongItem } from '@/types'
 
@@ -182,28 +183,7 @@ function nongkrongToHangout(item: NongkrongItem): Hangout {
   }
 }
 
-const REGION_META: Record<string, { description: string; image: string; theme: string }> = {
-  Cirebon: {
-    description: 'Kota Udang, pusat budaya dan kuliner khas Nusantara',
-    image: 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=600',
-    theme: 'budaya',
-  },
-  Indramayu: {
-    description: 'Kota Mangga dengan pesona pantai dan alam asri',
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600',
-    theme: 'pantai',
-  },
-  Majalengka: {
-    description: 'Kota Kaki Gunung Ciremai dengan udara sejuk',
-    image: 'https://images.unsplash.com/photo-1585409677983-0f6c41ca9c3b?w=600',
-    theme: 'alam',
-  },
-  Kuningan: {
-    description: 'Kota Kuda dengan panorama pegunungan hijau',
-    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600',
-    theme: 'pegunungan',
-  },
-}
+// Remove hardcoded REGION_META
 
 let cachedCounts: Record<string, number> | null = null
 let cachedRegionCounts: Record<string, number> | null = null
@@ -252,34 +232,53 @@ async function getCountsPerRegion(regionName: string): Promise<number> {
 }
 
 export async function getRegions(): Promise<Region[]> {
-  const regionsData = await Promise.all(
-    Object.entries(REGION_META).map(async ([name, meta]) => {
-      const slug = name.toLowerCase()
-      const center = WILAYAH_CENTER[name as keyof typeof WILAYAH_CENTER]
-      
-      let count = 0
-      try {
-        count = await getCountsPerRegion(name)
-      } catch (e) {
-        // Fallback
-      }
+  try {
+    const apiRegions = await regionsApi.list()
+    const regionsData = await Promise.all(
+      apiRegions.map(async (apiRegion) => {
+        const slug = apiRegion.name.toLowerCase()
+        const center = { lat: apiRegion.latitude, lon: apiRegion.longitude }
+        
+        let count = 0
+        try {
+          count = await getCountsPerRegion(apiRegion.name)
+        } catch (e) {
+          // Fallback
+        }
 
-      const destinationCount = count > 0 ? `${count} Destinasi` : '0 Destinasi'
+        const destinationCount = count > 0 ? `${count} Destinasi` : '0 Destinasi'
+        
+        // Define default images based on code or name (bisa dipindah ke DB kelak jika ada image)
+        let defaultImage = 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=600'
+        let theme = 'budaya'
+        if (apiRegion.name.includes('Indramayu')) {
+            defaultImage = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600'
+            theme = 'pantai'
+        } else if (apiRegion.name.includes('Majalengka')) {
+            defaultImage = 'https://images.unsplash.com/photo-1585409677983-0f6c41ca9c3b?w=600'
+            theme = 'alam'
+        } else if (apiRegion.name.includes('Kuningan')) {
+            defaultImage = 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600'
+            theme = 'pegunungan'
+        }
 
-      return {
-        id: slug,
-        name,
-        slug,
-        description: meta.description,
-        image: { src: meta.image, alt: name },
-        destinationCount,
-        imageTheme: meta.theme,
-        coordinates: center ? { lat: center.lat, lng: center.lon } : undefined,
-      }
-    })
-  )
-
-  return regionsData
+        return {
+          id: slug,
+          name: apiRegion.name,
+          slug,
+          description: apiRegion.description || `Destinasi wisata ${apiRegion.name}`,
+          image: { src: defaultImage, alt: apiRegion.name },
+          destinationCount,
+          imageTheme: theme,
+          coordinates: center ? { lat: center.lat, lng: center.lon } : undefined,
+        }
+      })
+    )
+    return regionsData
+  } catch (error) {
+    console.error('Error fetching regions:', error)
+    return []
+  }
 }
 
 function dedupeBy<T>(arr: T[], key: (item: T) => string): T[] {
@@ -295,7 +294,7 @@ function dedupeBy<T>(arr: T[], key: (item: T) => string): T[] {
 async function fetchAllPages<T>(
   fetcher: (page: number) => Promise<{ items: T[]; total: number; total_pages: number }>,
 ): Promise<T[]> {
-  const PER_PAGE = 50
+  const PER_PAGE = 500
   const first = await fetcher(1)
   const total = first.total || first.items.length
   const totalPages = Math.max(first.total_pages, Math.ceil(total / PER_PAGE))
@@ -318,7 +317,7 @@ let destPromise: Promise<Destination[]> | null = null
 export function getDestinations(): Promise<Destination[]> {
   if (!destPromise) {
     destPromise = fetchAllPages((page) =>
-      wisataApi.list({ page, per_page: 50 }).then((r) => ({
+      wisataApi.list({ page, per_page: 500 }).then((r) => ({
         items: r.items,
         total: r.total,
         total_pages: r.total_pages,
@@ -335,7 +334,7 @@ let culinaryPromise: Promise<Culinary[]> | null = null
 export function getCulinary(): Promise<Culinary[]> {
   if (!culinaryPromise) {
     culinaryPromise = fetchAllPages((page) =>
-      kulinerApi.list({ page, per_page: 50 }).then((r) => ({
+      kulinerApi.list({ page, per_page: 500 }).then((r) => ({
         items: r.items,
         total: r.total,
         total_pages: r.total_pages,
@@ -352,7 +351,7 @@ let hangoutPromise: Promise<Hangout[]> | null = null
 export function getHangouts(): Promise<Hangout[]> {
   if (!hangoutPromise) {
     hangoutPromise = fetchAllPages((page) =>
-      nongkrongApi.list({ page, per_page: 50 }).then((r) => ({
+      nongkrongApi.list({ page, per_page: 500 }).then((r) => ({
         items: r.items,
         total: r.total,
         total_pages: r.total_pages,

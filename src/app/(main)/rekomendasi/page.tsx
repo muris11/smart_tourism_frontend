@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { getDestinations, getCulinary, getHangouts, type Destination } from '@/lib/api'
+import { feedbackApi } from '@/lib/api/feedback'
+import { ThumbsUp, ThumbsDown } from 'lucide-react'
 import DestinationCard from '@/components/cards/DestinationCard'
 import CulinaryCard from '@/components/cards/CulinaryCard'
 import HangoutCard from '@/components/cards/HangoutCard'
@@ -15,6 +17,21 @@ export default function RekomendasiPage() {
   const [hangoutItems, setHangoutItems] = useState<any[]>([])
   const [hiddenGems, setHiddenGems] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [feedbackStatus, setFeedbackStatus] = useState<number | null>(null)
+
+  const handleFeedback = async (rating: number) => {
+    if (feedbackStatus !== null) return
+    setFeedbackStatus(rating)
+    try {
+      await feedbackApi.submit({
+        feature: 'recommendation',
+        rating,
+        context: { page: 'rekomendasi_spesial' }
+      })
+    } catch {
+      setFeedbackStatus(null)
+    }
+  }
 
   useEffect(() => {
     Promise.all([
@@ -202,6 +219,33 @@ export default function RekomendasiPage() {
               return <HangoutCard key={item.id} hangout={item} />
             })}
           </div>
+        </div>
+      </section>
+
+      <section className="section-spacing">
+        <div className="container-page flex flex-col items-center text-center">
+          <p className="text-sm font-medium text-slate-700 mb-4">Apakah rekomendasi di halaman ini membantu Anda?</p>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => handleFeedback(1)}
+              disabled={feedbackStatus !== null}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium transition-colors ${
+                feedbackStatus === 1 ? "bg-green-100 text-green-700" : "bg-citra-surface-soft text-citra-ink hover:bg-green-50 hover:text-green-600 border border-citra-border"
+              } ${feedbackStatus === -1 ? "opacity-40" : ""}`}
+            >
+              <ThumbsUp className="h-4 w-4" /> Sangat Membantu
+            </button>
+            <button 
+              onClick={() => handleFeedback(-1)}
+              disabled={feedbackStatus !== null}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium transition-colors ${
+                feedbackStatus === -1 ? "bg-red-100 text-red-700" : "bg-citra-surface-soft text-citra-ink hover:bg-red-50 hover:text-red-600 border border-citra-border"
+              } ${feedbackStatus === 1 ? "opacity-40" : ""}`}
+            >
+              <ThumbsDown className="h-4 w-4" /> Kurang Membantu
+            </button>
+          </div>
+          {feedbackStatus !== null && <p className="text-xs text-green-600 mt-3 font-medium">Terima kasih atas tanggapan Anda!</p>}
         </div>
       </section>
     </div>

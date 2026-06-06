@@ -10,6 +10,8 @@ interface ChatbotState {
   sessionToken: string | null
   wilayah: string | null
   isTyping: boolean
+  guestQuestionCount: number
+  guestCooldownUntil: number | null
   open: () => void
   close: () => void
   toggle: () => void
@@ -17,7 +19,9 @@ interface ChatbotState {
   setSession: (token: string) => void
   setWilayah: (w: string) => void
   setTyping: (v: boolean) => void
-  clearChat: () => Promise<void>
+  incrementGuestQuestion: () => void
+  resetGuestLimit: () => void
+  clearChat: () => void
 }
 
 export const useChatbotStore = create<ChatbotState>()(
@@ -29,6 +33,9 @@ export const useChatbotStore = create<ChatbotState>()(
       wilayah: null,
       isTyping: false,
 
+      guestQuestionCount: 0,
+      guestCooldownUntil: null,
+
       open: () => set({ isOpen: true }),
       close: () => set({ isOpen: false }),
       toggle: () => set((s) => ({ isOpen: !s.isOpen })),
@@ -36,16 +43,17 @@ export const useChatbotStore = create<ChatbotState>()(
       setSession: (token) => set({ sessionToken: token }),
       setWilayah: (w) => set({ wilayah: w }),
       setTyping: (v) => set({ isTyping: v }),
-      clearChat: async () => {
-        const token = get().sessionToken
-        if (token) {
-          try {
-            await chatbotApi.deleteHistory(token)
-          } catch (error) {
-            console.error('Failed to delete chat history:', error)
-          }
+      incrementGuestQuestion: () => set((s) => {
+        const count = s.guestQuestionCount + 1
+        if (count >= 5) {
+          return { guestQuestionCount: count, guestCooldownUntil: Date.now() + 2 * 60 * 1000 }
         }
-        set({ messages: [], sessionToken: null, wilayah: null })
+        return { guestQuestionCount: count }
+      }),
+      resetGuestLimit: () => set({ guestQuestionCount: 0, guestCooldownUntil: null }),
+      clearChat: () => {
+        // Just clear local state to start a new session, do not delete from backend
+        set({ messages: [], sessionToken: null, wilayah: null, guestQuestionCount: 0, guestCooldownUntil: null })
       },
     }),
     {
@@ -54,6 +62,8 @@ export const useChatbotStore = create<ChatbotState>()(
         messages: state.messages.slice(-50),
         sessionToken: state.sessionToken,
         wilayah: state.wilayah,
+        guestQuestionCount: state.guestQuestionCount,
+        guestCooldownUntil: state.guestCooldownUntil,
       }),
     }
   )
