@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { MapPin, Save, CheckCircle, Loader2 } from 'lucide-react'
+import { MapPin, Save, CheckCircle, Loader2, ThumbsUp, ThumbsDown } from 'lucide-react'
 import { PlanningResult } from '@/types/recommendation'
 import { useAuth } from '@/hooks/useAuth'
 import { apiClient } from '@/lib/api/client'
+import { feedbackApi } from '@/lib/api/feedback'
 
 interface Props {
   result: PlanningResult
@@ -16,6 +17,21 @@ export default function ItineraryResult({ result }: Props) {
   const [isSaving, setIsSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [feedbackStatus, setFeedbackStatus] = useState<number | null>(null)
+
+  const handleFeedback = async (rating: number) => {
+    if (feedbackStatus !== null) return
+    setFeedbackStatus(rating)
+    try {
+      await feedbackApi.submit({
+        feature: 'planning',
+        rating,
+        context: { result }
+      })
+    } catch {
+      setFeedbackStatus(null)
+    }
+  }
 
   const handleSave = async () => {
     setIsSaving(true)
@@ -145,6 +161,31 @@ export default function ItineraryResult({ result }: Props) {
           </div>
         </div>
       ))}
+
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col items-center justify-center space-y-4">
+        <p className="text-sm font-medium text-slate-700">Apakah rekomendasi itinerary ini membantu Anda?</p>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => handleFeedback(1)}
+            disabled={feedbackStatus !== null}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              feedbackStatus === 1 ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600 hover:bg-green-50 hover:text-green-600"
+            } ${feedbackStatus === -1 ? "opacity-40" : ""}`}
+          >
+            <ThumbsUp className="h-4 w-4" /> Membantu
+          </button>
+          <button 
+            onClick={() => handleFeedback(-1)}
+            disabled={feedbackStatus !== null}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              feedbackStatus === -1 ? "bg-red-100 text-red-700" : "bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-600"
+            } ${feedbackStatus === 1 ? "opacity-40" : ""}`}
+          >
+            <ThumbsDown className="h-4 w-4" /> Kurang
+          </button>
+        </div>
+        {feedbackStatus !== null && <p className="text-xs text-green-600 mt-2">Terima kasih atas tanggapan Anda!</p>}
+      </div>
     </div>
   )
 }

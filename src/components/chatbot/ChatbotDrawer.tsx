@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { useChatbot } from '@/hooks/useChatbot'
 import { useChatbotStore } from '@/stores/chatbotStore'
+import { useAuthStore } from '@/stores/authStore'
 import ChatMessage from './ChatMessage'
 import ChatInput from './ChatInput'
 import { X, MapPin, Headphones, Trash2, ChevronDown, Compass, Utensils, Coffee, Calendar } from 'lucide-react'
@@ -14,12 +15,29 @@ interface ChatbotDrawerProps {
 }
 
 export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
-  const { isOpen, close, messages, clearChat, isTyping } = useChatbotStore()
+  const { isOpen, close, messages, clearChat, isTyping, guestQuestionCount, guestCooldownUntil, incrementGuestQuestion, resetGuestLimit } = useChatbotStore()
   const { sendMessage, isLoading, stopGenerating } = useChatbot()
+  const { user } = useAuthStore()
   const { lat, lon, getLocation, isLoading: locationLoading } = useGeolocation()
   const [showLocation, setShowLocation] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
+  const [showConfirmTrash, setShowConfirmTrash] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  
+  // Custom polling for cooldown update so UI reflects immediately
+  const [now, setNow] = useState(Date.now())
+  useEffect(() => {
+    if (!user && guestCooldownUntil && guestCooldownUntil > now) {
+      const interval = setInterval(() => setNow(Date.now()), 1000)
+      return () => clearInterval(interval)
+    }
+  }, [user, guestCooldownUntil, now])
+
+  const isInCooldown = !user && guestCooldownUntil && guestCooldownUntil > now
+  const cooldownRemainingSeconds = Math.max(0, Math.ceil(((guestCooldownUntil || 0) - now) / 1000))
+  const cooldownMinutes = Math.floor(cooldownRemainingSeconds / 60)
+  const cooldownSeconds = cooldownRemainingSeconds % 60
+  const cooldownText = `${cooldownMinutes.toString().padStart(2, '0')}:${cooldownSeconds.toString().padStart(2, '0')}`
 
   useEffect(() => {
     if (messagesEndRef.current && !isMinimized) {
@@ -31,16 +49,21 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
   }, [messages, isTyping, isMinimized])
 
   const handleSend = async (message: string) => {
+    if (isInCooldown) return
+    
     await sendMessage(message, {
       lat: showLocation ? lat || undefined : undefined,
       lon: showLocation ? lon || undefined : undefined,
     })
+
+    if (!user) {
+      incrementGuestQuestion()
+    }
   }
 
-  const handleClearChat = () => {
-    if (confirm('Hapus semua percakapan?')) {
-      clearChat()
-    }
+  const confirmClearChat = () => {
+    clearChat()
+    setShowConfirmTrash(false)
   }
 
   const handleEnableLocation = () => {
@@ -104,9 +127,9 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
             </button>
 
             <button
-              onClick={handleClearChat}
+              onClick={() => setShowConfirmTrash(true)}
               className="rounded-lg p-1.5 text-white/50 transition-colors hover:bg-white/10 hover:text-white/80"
-              title="Hapus percakapan"
+              title="Buat sesi baru"
             >
               <Trash2 className="h-4 w-4" />
             </button>
@@ -185,6 +208,7 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
                     <ChatMessage
                       key={idx}
                       message={msg}
+                      onFeedback={resetGuestLimit}
                     />
                   ))}
 
@@ -208,12 +232,48 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
               )}
             </div>
 
-            <ChatInput
-              onSend={handleSend}
-              onStop={stopGenerating}
-              isLoading={isLoading}
-            />
+            {isInCooldown ? (
+              <div className="border-t border-slate-100 bg-red-50 p-3 text-center">
+                <p className="text-xs text-red-600 font-medium mb-1">
+                  Batas pesan tamu tercapai. Tunggu {cooldownText} untuk lanjut.
+                </p>
+                <p className="text-[10px] text-red-500/80">
+                  <a href="/login" className="underline font-semibold hover:text-red-700">Login</a> atau beri umpan balik (rating) untuk mereset batasan.
+                </p>
+              </div>
+            ) : (
+              <ChatInput
+                onSend={handleSend}
+                onStop={stopGenerating}
+                isLoading={isLoading}
+              />
+            )}
           </>
+        )}
+
+        {showConfirmTrash && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-2xl">
+            <div className="bg-white rounded-xl p-5 shadow-xl w-[85%] max-w-sm text-center">
+              <h4 className="font-semibold text-slate-800 mb-2 font-display">Mulai Sesi Baru?</h4>
+              <p className="text-sm text-slate-500 mb-5 leading-relaxed">
+                Percakapan saat ini akan ditutup dan kamu akan memulai obrolan dengan topik baru. Lanjutkan?
+              </p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => setShowConfirmTrash(false)}
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={confirmClearChat}
+                  className="px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors"
+                >
+                  Ya, Mulai Baru
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </>

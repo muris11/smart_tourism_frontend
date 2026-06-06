@@ -9,6 +9,7 @@ import DestinationCard from '@/components/cards/DestinationCard'
 import CulinaryCard from '@/components/cards/CulinaryCard'
 import HangoutCard from '@/components/cards/HangoutCard'
 import { getDestinations, getCulinary, getHangouts } from '@/lib/api'
+import { regionsApi } from '@/lib/api/regions'
 import type { Destination, Culinary, Hangout } from '@/lib/api'
 
 const popularSearches = [
@@ -19,8 +20,6 @@ const popularSearches = [
   'Empal Gentong',
   'Curug Putri',
 ]
-
-const WILAYAH_OPTIONS = ['Cirebon', 'Indramayu', 'Majalengka', 'Kuningan']
 const TIPE_OPTIONS = [
   { value: 'wisata', label: 'Wisata' },
   { value: 'kuliner', label: 'Kuliner' },
@@ -63,16 +62,18 @@ export default function CariContent() {
   const [showFilters, setShowFilters] = useState(false)
   const [allItems, setAllItems] = useState<UnifiedItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [wilayahOptions, setWilayahOptions] = useState<string[]>([])
 
   const debouncedQuery = useDebounce(query, 400)
 
   const fetchAll = useCallback(async () => {
     setLoading(true)
     try {
-      const [destinations, culinary, hangouts] = await Promise.all([
+      const [destinations, culinary, hangouts, regions] = await Promise.all([
         getDestinations(),
         getCulinary(),
         getHangouts(),
+        regionsApi.list(),
       ])
       const items: UnifiedItem[] = [
         ...destinations.map(toItem),
@@ -80,6 +81,9 @@ export default function CariContent() {
         ...hangouts.map(toHangoutItem),
       ]
       setAllItems(items)
+      setWilayahOptions(regions.map(r => r.name))
+    } catch (error) {
+        console.error("Failed fetching data", error)
     } finally {
       setLoading(false)
     }
@@ -231,7 +235,7 @@ export default function CariContent() {
               >
                 Semua Wilayah
               </button>
-              {WILAYAH_OPTIONS.map((w) => (
+              {wilayahOptions.map((w) => (
                 <button
                   key={w}
                   onClick={() => setWilayah(w)}
@@ -275,7 +279,7 @@ export default function CariContent() {
                     <label className="mb-3 block text-xs font-semibold uppercase tracking-wider text-citra-muted">Wilayah</label>
                     <div className="flex flex-wrap gap-2">
                       <button onClick={() => setWilayah('')} className={cn('rounded-full px-4 py-2 text-sm font-medium', !wilayah ? 'bg-citra-primary text-white' : 'bg-citra-surface-soft text-citra-body')}>Semua</button>
-                      {WILAYAH_OPTIONS.map((w) => (
+                      {wilayahOptions.map((w) => (
                         <button key={w} onClick={() => setWilayah(w)} className={cn('rounded-full px-4 py-2 text-sm font-medium', wilayah === w ? 'bg-citra-primary text-white' : 'bg-citra-surface-soft text-citra-body')}>{w}</button>
                       ))}
                     </div>

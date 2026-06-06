@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Mountain, Heart, Search, Trees, Waves, Landmark, Coffee } from 'lucide-react'
-import SentimentChart from '@/components/sections/tentang/SentimentChart'
 
 export const metadata: Metadata = { title: 'Tentang' }
 
@@ -142,12 +141,6 @@ export default function TentangPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="section-spacing bg-citra-surface-soft">
-        <div className="container-page">
-          <SentimentChart />
         </div>
       </section>
 

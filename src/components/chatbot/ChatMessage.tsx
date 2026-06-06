@@ -1,7 +1,9 @@
 'use client'
 
-import { User, Headphones, Clock, MapPin, Utensils, Coffee, Compass } from 'lucide-react'
+import { User, Headphones, Clock, MapPin, Utensils, Coffee, Compass, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { useState } from 'react'
 import { cn } from '@/lib/utils/cn'
+import { feedbackApi } from '@/lib/api/feedback'
 import { ChatMessage as ChatMessageType } from '@/types'
 import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
@@ -9,11 +11,31 @@ import { id } from 'date-fns/locale'
 interface ChatMessageProps {
   message: ChatMessageType
   isLast?: boolean
+  onFeedback?: () => void
 }
 
-export default function ChatMessage({ message }: ChatMessageProps) {
+export default function ChatMessage({ message, onFeedback }: ChatMessageProps) {
+  const [feedbackStatus, setFeedbackStatus] = useState<number | null>(null)
+
   if (!message || !message.role) {
     return null
+  }
+
+  const handleFeedback = async (rating: number) => {
+    if (feedbackStatus !== null) return // Already rated
+    
+    setFeedbackStatus(rating)
+    try {
+      await feedbackApi.submit({
+        feature: 'chatbot',
+        rating,
+        context: { message: message.content }
+      })
+      onFeedback?.()
+    } catch (e) {
+      console.error('Failed to submit feedback', e)
+      setFeedbackStatus(null) // Reset on fail
+    }
   }
 
   const isUser = message.role === 'user'
@@ -119,14 +141,42 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         )}
 
         {message.timestamp && (
-          <p className={cn(
-            'mt-1.5 flex items-center gap-1',
-            isUser ? 'text-white/50' : 'text-slate-300',
-            'text-[10px]'
-          )}>
-            <Clock className="h-2.5 w-2.5" />
-            {format(new Date(message.timestamp), 'HH:mm', { locale: id })}
-          </p>
+          <div className="flex items-center justify-between mt-1.5 pt-1 border-t border-slate-100">
+            <p className={cn(
+              'flex items-center gap-1 text-[10px]',
+              isUser ? 'text-white/50 border-white/10' : 'text-slate-300'
+            )}>
+              <Clock className="h-2.5 w-2.5" />
+              {format(new Date(message.timestamp), 'HH:mm', { locale: id })}
+            </p>
+
+            {!isUser && (
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => handleFeedback(1)}
+                  disabled={feedbackStatus !== null}
+                  className={cn("p-1 rounded transition-colors", 
+                    feedbackStatus === 1 ? "text-green-600 bg-green-50" : "text-slate-300 hover:text-green-600 hover:bg-slate-50",
+                    feedbackStatus === -1 ? "opacity-30" : ""
+                  )}
+                  title="Jawaban membantu"
+                >
+                  <ThumbsUp className="h-3 w-3" />
+                </button>
+                <button 
+                  onClick={() => handleFeedback(-1)}
+                  disabled={feedbackStatus !== null}
+                  className={cn("p-1 rounded transition-colors", 
+                    feedbackStatus === -1 ? "text-red-600 bg-red-50" : "text-slate-300 hover:text-red-600 hover:bg-slate-50",
+                    feedbackStatus === 1 ? "opacity-30" : ""
+                  )}
+                  title="Jawaban tidak membantu"
+                >
+                  <ThumbsDown className="h-3 w-3" />
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

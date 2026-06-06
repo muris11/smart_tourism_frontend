@@ -11,19 +11,12 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import Pagination from '@/components/ui/Pagination'
 import { cn } from '@/lib/utils/cn'
 import { getHangouts, type Hangout } from '@/lib/api'
+import { regionsApi } from '@/lib/api/regions'
 
 const PAGE_SIZE = 12
 
-const REGIONS = ['Semua', 'Cirebon', 'Indramayu', 'Majalengka', 'Kuningan'] as const
-const CATEGORIES = ['Semua', 'Kafe', 'Kopi', 'Rooftop', 'Taman Baca'] as const
-
-// Map JSON category to filter categories
-function normalizeCategory(jsonCat: string): string {
-  if (jsonCat.includes('Coffee')) return 'Kopi'
-  if (jsonCat.includes('Working')) return 'Kafe'
-  if (jsonCat.includes('Outdoor')) return 'Taman Baca'
-  return jsonCat
-}
+// Regions di-load secara dinamis
+// const REGIONS = ['Semua', 'Cirebon', 'Indramayu', 'Majalengka', 'Kuningan'] as const
 
 const SORT_OPTIONS = [
   { value: 'popular', label: 'Terpopuler' },
@@ -92,35 +85,34 @@ function NongkrongPageContent() {
 
   const [hangouts, setHangouts] = useState<Hangout[]>([])
   const [region, setRegion] = useState(searchParams.get('region') || 'Semua')
-  const [category, setCategory] = useState(searchParams.get('category') || 'Semua')
   const [sort, setSort] = useState<SortValue>('popular')
   const [showMobileFilter, setShowMobileFilter] = useState(false)
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
+  const [regions, setRegions] = useState<string[]>(['Semua'])
 
   useEffect(() => {
-    getHangouts()
-      .then(setHangouts)
+    Promise.all([getHangouts(), regionsApi.list()])
+      .then(([hangData, regionData]) => {
+        setHangouts(hangData)
+        setRegions(['Semua', ...regionData.map(r => r.name)])
+      })
       .finally(() => setLoading(false))
   }, [])
 
   useEffect(() => {
     const params = new URLSearchParams()
     if (region !== 'Semua') params.set('region', region)
-    if (category !== 'Semua') params.set('category', category)
     const qs = params.toString()
     router.replace(`/nongkrong${qs ? `?${qs}` : ''}`, { scroll: false })
     setPage(1)
-  }, [region, category, router])
+  }, [region, router])
 
   const filtered = useMemo(() => {
     let result = [...hangouts]
 
     if (region !== 'Semua') {
       result = result.filter((d) => d.region === region)
-    }
-    if (category !== 'Semua') {
-      result = result.filter((d) => d.category === category)
     }
 
     switch (sort) {
@@ -136,12 +128,12 @@ function NongkrongPageContent() {
     }
 
     return result
-  }, [region, category, sort, hangouts])
+  }, [region, sort, hangouts])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginatedItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  const activeFilterCount = [region !== 'Semua' ? region : '', category !== 'Semua' ? category : ''].filter(Boolean).length
+  const activeFilterCount = [region !== 'Semua' ? region : ''].filter(Boolean).length
 
   return (
     <div className="container-page section-spacing">
@@ -153,7 +145,7 @@ function NongkrongPageContent() {
       </div>
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
-        {REGIONS.map((r) => (
+        {regions.map((r) => (
           <Chip key={r} label={r} active={region === r} onClick={() => setRegion(r)} />
         ))}
         <button
@@ -172,9 +164,18 @@ function NongkrongPageContent() {
 
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-3">
-          {CATEGORIES.map((c) => (
-            <Chip key={c} label={c} active={category === c} onClick={() => setCategory(c)} />
-          ))}
+          <p className="text-sm text-citra-muted">
+            {!loading && filtered.length > 0 && (
+              <span>
+                Menampilkan {Math.min((page - 1) * PAGE_SIZE + 1, filtered.length)}-{Math.min(page * PAGE_SIZE, filtered.length)} data dari <span className="font-semibold text-citra-primary">{filtered.length}</span> tempat
+              </span>
+            )}
+            {!loading && filtered.length === 0 && (
+              <span>
+                Menampilkan <span className="font-semibold text-citra-primary">0</span> tempat
+              </span>
+            )}
+          </p>
         </div>
         <div className="relative">
           <ArrowUpDown className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-citra-muted" />
@@ -190,15 +191,6 @@ function NongkrongPageContent() {
         </div>
       </div>
 
-      <div className="mb-6">
-        <p className="text-sm text-citra-muted">
-          {!loading && (
-            <span>
-              Menampilkan <span className="font-semibold text-citra-primary">{filtered.length}</span> tempat
-            </span>
-          )}
-        </p>
-      </div>
 
       {loading ? (
         <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
@@ -223,10 +215,10 @@ function NongkrongPageContent() {
             Tidak ada tempat ditemukan
           </h3>
           <p className="mb-6 max-w-sm text-sm text-citra-muted">
-            Coba ubah filter wilayah atau kategori untuk menemukan lebih banyak tempat nongkrong.
+            Coba ubah filter wilayah untuk menemukan lebih banyak tempat nongkrong.
           </p>
           <button
-            onClick={() => { setRegion('Semua'); setCategory('Semua') }}
+            onClick={() => setRegion('Semua')}
             className="rounded-full bg-citra-primary px-6 py-2.5 text-sm font-semibold text-citra-on-primary transition-all hover:bg-citra-primary-hover"
           >
             Reset Filter
@@ -261,16 +253,8 @@ function NongkrongPageContent() {
               <div>
                 <p className="mb-2 text-sm font-semibold text-citra-ink">Wilayah</p>
                 <div className="flex flex-wrap gap-2">
-                  {REGIONS.map((r) => (
+                  {regions.map((r) => (
                     <Chip key={r} label={r} active={region === r} onClick={() => setRegion(r)} />
-                  ))}
-                </div>
-              </div>
-              <div>
-                <p className="mb-2 text-sm font-semibold text-citra-ink">Kategori</p>
-                <div className="flex flex-wrap gap-2">
-                  {CATEGORIES.map((c) => (
-                    <Chip key={c} label={c} active={category === c} onClick={() => setCategory(c)} />
                   ))}
                 </div>
               </div>
