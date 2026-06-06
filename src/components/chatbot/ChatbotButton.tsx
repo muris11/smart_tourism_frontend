@@ -32,8 +32,8 @@ export default function ChatbotButton({ className }: ChatbotButtonProps) {
         <X className="h-6 w-6 text-white" />
       ) : (
         <div className="relative flex items-center justify-center">
-          <Bot className="h-6 w-6 text-white" />
-          <Sparkles className="absolute -right-2 -top-2 h-3 w-3 text-emerald-100 animate-pulse" />
+          <Bot className="h-7 w-7 text-white" fill="white" />
+          <Sparkles className="absolute -right-2 -top-2 h-4 w-4 text-emerald-100 animate-pulse fill-emerald-100" />
         </div>
       )}
     </button>
