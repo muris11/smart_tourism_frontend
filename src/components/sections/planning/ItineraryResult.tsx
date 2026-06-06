@@ -156,7 +156,7 @@ export default function ItineraryResult({ result }: Props) {
                 <div className="flex-1">
                   <div className="mb-1 flex items-center gap-2">
                     <h4 className="text-sm font-semibold text-slate-800">{tempat.nama}</h4>
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${tipeBadgeColor(tempat.tipe)}`}>
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${tipeBadgeColor(tempat.tipe)}`}>
                       {tempat.tipe}
                     </span>
                   </div>
