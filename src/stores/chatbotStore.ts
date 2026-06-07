@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { ChatMessage } from '@/types'
-import { chatbotApi } from '@/lib/api/chatbot'
 
 /** State untuk manajemen chatbot */
 interface ChatbotState {
@@ -29,7 +28,7 @@ interface ChatbotState {
 
 export const useChatbotStore = create<ChatbotState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       isOpen: false,
       messages: [],
       sessionToken: null,
