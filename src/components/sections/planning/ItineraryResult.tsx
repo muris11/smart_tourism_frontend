@@ -183,7 +183,7 @@ export default function ItineraryResult({ result }: Props) {
             disabled={feedbackStatus !== null}
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer ${
               feedbackStatus === 1 ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600 hover:bg-green-50 hover:text-green-600"
-            } ${feedbackStatus !== null && feedbackStatus !== 1 ? "opacity-40" : ""} disabled:cursor-default disabled:pointer-events-none`}
+            } ${feedbackStatus !== null && feedbackStatus !== 1 ? "opacity-40" : ""} disabled:cursor-not-allowed disabled:opacity-50`}
           >
             <ThumbsUp className="h-4 w-4" /> Membantu
           </button>
@@ -192,7 +192,7 @@ export default function ItineraryResult({ result }: Props) {
             disabled={feedbackStatus !== null}
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer ${
               feedbackStatus === -1 ? "bg-red-100 text-red-700" : "bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-600"
-            } ${feedbackStatus !== null && feedbackStatus !== -1 ? "opacity-40" : ""} disabled:cursor-default disabled:pointer-events-none`}
+            } ${feedbackStatus !== null && feedbackStatus !== -1 ? "opacity-40" : ""} disabled:cursor-not-allowed disabled:opacity-50`}
           >
             <ThumbsDown className="h-4 w-4" /> Kurang
           </button>

@@ -8,6 +8,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { ROUTES } from '@/lib/constants/routes'
 import { cn } from '@/lib/utils/cn'
 import UserMenu from '@/components/ui/UserMenu'
+import Logo from '@/components/ui/Logo'
 
 const navLinks = [
   { href: ROUTES.WISATA, label: 'Wisata' },
@@ -66,22 +67,10 @@ export default function Navbar() {
         )}
       >
         <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 md:px-6 lg:px-10">
-          <Link
-            href="/"
-            aria-label="CITRA - Beranda"
-            className="relative z-50 flex-shrink-0"
-          >
-            <span
-              className={cn(
-                'font-display text-xl font-bold tracking-[-0.045em] transition-colors duration-300 lg:text-[1.375rem]',
-                showScrolled
-                  ? 'text-citra-ink'
-                  : 'text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.18)]'
-              )}
-            >
-              CITRA
-            </span>
-          </Link>
+          <Logo
+            variant={showScrolled ? 'default' : 'white'}
+            className="z-50"
+          />
 
           <nav
             aria-label="Navigasi utama"
@@ -189,6 +178,10 @@ export default function Navbar() {
         style={{ paddingTop: 'calc(68px + 0.75rem)' }}
       >
         <div className="flex-1 overflow-y-auto">
+          <div className="mb-4 px-4">
+            <Logo variant="default" showText={false} />
+          </div>
+
           <nav className="flex flex-col gap-1">
             {navLinks.map((link) => {
               const isActive = isActiveLink(link.href)

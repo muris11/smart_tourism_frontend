@@ -4,17 +4,16 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Star } from 'lucide-react'
-import { cn } from '@/lib/utils/cn'
 import { Badge } from '@/components/ui/Badge'
-import { getDestinations, type Destination } from '@/lib/api'
+import { getFeaturedDestinations, type Destination } from '@/lib/api'
 
 export default function FeaturedDestinationsSection() {
   const [featured, setFeatured] = useState<Destination[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getDestinations()
-      .then((data) => setFeatured(data.filter((d) => d.featured).slice(0, 12)))
+    getFeaturedDestinations(12)
+      .then(setFeatured)
       .finally(() => setLoading(false))
   }, [])
 

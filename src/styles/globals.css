@@ -84,6 +84,36 @@
     color: var(--color-citra-primary);
   }
 
+  :where(
+    a[href],
+    button:not(:disabled),
+    [role="button"],
+    [role="link"],
+    [role="menuitem"],
+    [role="tab"],
+    summary,
+    select,
+    label[for],
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"],
+    input[type="checkbox"],
+    input[type="radio"],
+    [tabindex]:not([tabindex="-1"])
+  ) {
+    cursor: pointer;
+  }
+
+  :where(
+    button:disabled,
+    select:disabled,
+    input:disabled,
+    textarea:disabled,
+    [aria-disabled="true"]
+  ) {
+    cursor: not-allowed;
+  }
+
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;

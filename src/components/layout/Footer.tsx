@@ -12,6 +12,7 @@ import {
   ChevronDown,
 } from 'lucide-react'
 import { FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa6'
+import Logo from '@/components/ui/Logo'
 
 const linkGroups = [
   {
@@ -210,12 +211,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-8">
 
           <div className="lg:col-span-3">
-            <h2 className="text-2xl font-bold tracking-tight text-citra-on-dark">
-              CITRA
-            </h2>
-            <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-citra-muted-soft">
-              Ciayumajakuning Intelligent Tourism & Recommendation Assistant
-            </p>
+            <Logo variant="white" className="mb-4" />
             <p className={cn(
               'mt-4 text-sm leading-relaxed',
               'text-citra-muted-soft max-w-xs'
