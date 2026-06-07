@@ -9,7 +9,11 @@ import StoryBandSection from '@/components/sections/StoryBandSection'
 import PlannerCTASection from '@/components/sections/PlannerCTASection'
 import LazyInteractiveMap from '@/components/sections/LazyInteractiveMap'
 
-export const metadata: Metadata = { title: 'Beranda' }
+export const metadata: Metadata = {
+  title: {
+    absolute: 'CITRA Ciayumajakuning — Asisten Wisata Cerdas & Rencana Itinerary AI',
+  },
+}
 
 export default function HomePage() {
   return (
