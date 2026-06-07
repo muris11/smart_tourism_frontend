@@ -9,19 +9,13 @@ import { cn } from '@/lib/utils/cn'
 import { Button } from '@/components/ui/Button'
 import { getHomepage, type HeroSlide } from '@/lib/api'
 
-const fallbackSlides: HeroSlide[] = [
-  { id: 'fallback-1', region: 'Cirebon', src: '/images/hero/hero-1.jpeg', alt: 'Pemandangan Ciayumajakuning' },
-  { id: 'fallback-2', region: 'Indramayu', src: '/images/hero/hero-2.jpeg', alt: 'Destinasi wisata Ciayumajakuning' },
-  { id: 'fallback-3', region: 'Majalengka', src: '/images/hero/hero-3.jpg', alt: 'Alam Ciayumajakuning' },
-  { id: 'fallback-4', region: 'Kuningan', src: '/images/hero/hero-4.jpg', alt: 'Budaya Ciayumajakuning' },
-]
-
 export default function HeroSection() {
   const router = useRouter()
-  const [slides, setSlides] = useState<HeroSlide[]>(fallbackSlides)
+  const [slides, setSlides] = useState<HeroSlide[]>([])
   const [current, setCurrent] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const [parallaxOffset, setParallaxOffset] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
 
@@ -32,23 +26,28 @@ export default function HeroSection() {
           setSlides(data.heroSlides)
           setCurrent(0)
         }
+        setIsLoading(false)
       })
-      .catch((error) => console.error('Failed to fetch homepage data:', error))
+      .catch((error) => {
+        console.error('Failed to fetch homepage data:', error)
+        setIsLoading(false)
+      })
   }, [])
 
   const startInterval = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current)
+    if (slides.length === 0) return
     intervalRef.current = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length)
     }, 6000)
   }, [slides.length])
 
   useEffect(() => {
-    if (!isPaused) startInterval()
+    if (!isPaused && slides.length > 0) startInterval()
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
-  }, [isPaused, startInterval])
+  }, [isPaused, startInterval, slides.length])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,6 +64,12 @@ export default function HeroSection() {
     setCurrent(index)
     setIsPaused(true)
     setTimeout(() => setIsPaused(false), 8000)
+  }
+
+  if (isLoading || slides.length === 0) {
+    return (
+      <section className="relative overflow-hidden bg-citra-forest min-h-[600px] md:h-screen" />
+    )
   }
 
   return (

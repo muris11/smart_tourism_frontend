@@ -1,149 +1,190 @@
-"use client"
+'use client'
 
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
-
-const heroImages = [
-  '/images/hero/hero-1.jpeg',
-  '/images/hero/hero-2.jpeg',
-  '/images/hero/hero-3.jpg',
-  '/images/hero/hero-4.jpg',
-]
+import { useRouter } from 'next/navigation'
+import { Search, MapPin, UtensilsCrossed, Coffee } from 'lucide-react'
+import { cn } from '@/lib/utils/cn'
+import { Button } from '@/components/ui/Button'
+import { getHomepage, type HeroSlide } from '@/lib/api'
 
 export default function HeroSection() {
-  const [currentImage, setCurrentImage] = useState(0)
+  const router = useRouter()
+  const [slides, setSlides] = useState<HeroSlide[]>([])
+  const [current, setCurrent] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
+  const [parallaxOffset, setParallaxOffset] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImage((prev) =>
-        prev === heroImages.length - 1 ? 0 : prev + 1
-      )
-    }, 5000)
-    return () => clearInterval(interval)
+    getHomepage()
+      .then((data) => {
+        if (data.heroSlides.length > 0) {
+          setSlides(data.heroSlides)
+          setCurrent(0)
+        }
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        console.error('Failed to fetch homepage data:', error)
+        setIsLoading(false)
+      })
   }, [])
 
-  const nextSlide = () => {
-    setCurrentImage((prev) =>
-      prev === heroImages.length - 1 ? 0 : prev + 1
-    )
+  const startInterval = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current)
+    if (slides.length === 0) return
+    intervalRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % slides.length)
+    }, 6000)
+  }, [slides.length])
+
+  useEffect(() => {
+    if (!isPaused && slides.length > 0) startInterval()
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [isPaused, startInterval, slides.length])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (sectionRef.current) {
+        const rect = sectionRef.current.getBoundingClientRect()
+        setParallaxOffset(rect.top * 0.15)
+      }
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const goToSlide = (index: number) => {
+    setCurrent(index)
+    setIsPaused(true)
+    setTimeout(() => setIsPaused(false), 8000)
   }
 
-  const prevSlide = () => {
-    setCurrentImage((prev) =>
-      prev === 0 ? heroImages.length - 1 : prev - 1
+  if (isLoading || slides.length === 0) {
+    return (
+      <section className="relative overflow-hidden bg-citra-forest min-h-[600px] md:h-screen" />
     )
   }
 
   return (
-    <section className="relative min-h-[90vh] overflow-hidden bg-black pt-20">
+    <section
+      ref={sectionRef}
+      className="relative overflow-hidden bg-citra-forest"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      <div className="relative h-[80vh] min-h-[600px] md:h-screen">
+        {slides.map((slide, index) => (
+          <div
+            key={slide.id}
+            className={cn(
+              'absolute inset-0 transition-opacity duration-1000 ease-in-out',
+              index === current ? 'opacity-100' : 'opacity-0'
+            )}
+          >
+            <Image
+              src={slide.src}
+              alt={slide.alt}
+              fill
+              priority={index === 0}
+              className="object-cover md:object-center"
+              style={{ transform: `translateY(${parallaxOffset}px)` }}
+              sizes="100vw"
+              quality={90}
+            />
+          </div>
+        ))}
 
-      {heroImages.map((image, index) => (
-        <Image
-          key={image}
-          src={image}
-          alt={`Hero background - Pemandangan Ciayumajakuning ${index + 1}`}
-          fill
-          priority={index === 0}
-          className={`object-cover transition-opacity duration-1000 ease-in-out ${
-            index === currentImage ? 'opacity-100' : 'opacity-0'
-          }`}
-          sizes="100vw"
-          quality={90}
-        />
-      ))}
+        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-black/40" />
 
-      <div className="absolute inset-0 bg-linear-to-b from-black/60 via-black/30 to-black/70" />
+        <div className="relative z-10 flex h-full flex-col items-center justify-end pb-32 md:justify-center md:pb-0">
+          <div className="container-page w-full">
+            <div className="mx-auto max-w-3xl text-center">
+              <div className="mb-4 flex items-center justify-center gap-3">
+                <span className="block h-px w-12 bg-white/30" />
+                <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/80">
+                  C I T R A
+                </span>
+                <span className="block h-px w-12 bg-white/30" />
+              </div>
 
-      <div className="absolute inset-0 z-[15] pointer-events-none">
-        <div className="h-full w-full bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,0.06)_0%,_transparent_70%)]" />
-      </div>
+              <h1 className="mb-5 font-display text-4xl leading-tight font-bold tracking-tight text-white md:text-6xl lg:text-7xl">
+                Jelajahi Pesona
+                <br />
+                Ciayumajakuning
+              </h1>
 
-      <div className="relative z-20 flex min-h-[90vh] items-center justify-center">
-        <div className="container mx-auto px-4 text-center sm:px-6 md:px-8 lg:px-12">
-          <div className="mx-auto max-w-4xl">
+              <p className="mx-auto mb-8 max-w-xl text-sm leading-relaxed text-white/75 md:text-base lg:text-lg">
+                Temukan tempat wisata, kuliner khas, dan sudut favorit dari Cirebon, Indramayu, Majalengka, dan Kuningan — satu pintu.
+              </p>
 
-            <span className="mb-5 inline-flex rounded-full border border-white/15 bg-white/10 px-5 py-1.5 text-xs font-medium tracking-[0.15em] text-white/90 uppercase backdrop-blur-md sm:mb-6 sm:px-6 sm:py-2 sm:text-sm">
-              Explore Ciayumajakuning
-            </span>
+              <form onSubmit={(e) => {
+                e.preventDefault()
+                const val = (e.currentTarget.elements.namedItem('search') as HTMLInputElement).value
+                if (val) {
+                  router.push(`/cari?q=${encodeURIComponent(val)}`)
+                }
+              }} className="mx-auto mb-6 flex max-w-xl items-center gap-2 rounded-full border border-white/20 bg-white/12 p-1.5 pl-5 backdrop-blur-md">
+                <Search className="h-4 w-4 shrink-0 text-white/60" />
+                <input
+                  type="text"
+                  name="search"
+                  placeholder="Cari destinasi, kuliner, atau tempat nongkrong..."
+                  className="w-full bg-transparent text-sm text-white placeholder-white/50 outline-none"
+                />
+                <Button type="submit" variant="primary" size="sm" className="shrink-0 rounded-full px-5 cursor-pointer">
+                  Jelajahi
+                </Button>
+              </form>
 
-            <h1 className="mb-5 text-4xl leading-tight font-bold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl drop-shadow-lg">
-              Temukan Keindahan
-              <br />
-              <span className="bg-linear-to-r from-amber-200 to-white bg-clip-text text-transparent">
-                Alam & Budaya
-              </span>
-              <br />
-              Ciayumajakuning
-            </h1>
-
-            <p className="mx-auto mb-8 max-w-2xl text-sm leading-relaxed font-light text-white/75 sm:text-base md:text-lg lg:text-xl">
-              Jelajahi destinasi wisata terbaik, kuliner khas daerah,
-              hidden gems, dan pengalaman autentik dari Cirebon,
-              Indramayu, Majalengka, hingga Kuningan.
-            </p>
-
-            <div className="flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
-              <Link
-                href="/planning"
-                className="rounded-full bg-white px-7 py-3 text-sm font-semibold tracking-wide text-brand-deep shadow-lg transition-all duration-300 hover:scale-105 hover:bg-slate-100 sm:px-8 sm:py-3.5"
-              >
-                Buat Rencana
-              </Link>
-
-              <Link
-                href="/wisata"
-                className="rounded-full border border-white/20 bg-white/10 px-7 py-3 text-sm font-semibold tracking-wide text-white backdrop-blur-md transition-all duration-300 hover:bg-white/20 sm:px-8 sm:py-3.5"
-              >
-                Jelajahi Destinasi
-              </Link>
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <Link
+                  href="/wisata"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-white/85 backdrop-blur-sm transition-all hover:bg-white/20 hover:text-white"
+                >
+                  <MapPin className="h-3.5 w-3.5" />
+                  Wisata Alam
+                </Link>
+                <Link
+                  href="/kuliner"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-white/85 backdrop-blur-sm transition-all hover:bg-white/20 hover:text-white"
+                >
+                  <UtensilsCrossed className="h-3.5 w-3.5" />
+                  Kuliner Khas
+                </Link>
+                <Link
+                  href="/nongkrong"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium text-white/85 backdrop-blur-sm transition-all hover:bg-white/20 hover:text-white"
+                >
+                  <Coffee className="h-3.5 w-3.5" />
+                  Tempat Nongkrong
+                </Link>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <button
-        onClick={prevSlide}
-        className="absolute top-1/2 left-4 z-30 hidden -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/10 p-2.5 text-white backdrop-blur-md transition-all hover:bg-white/20 hover:scale-110 md:flex lg:left-8"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft className="h-4 w-4 lg:h-5 lg:w-5" />
-      </button>
-
-      <button
-        onClick={nextSlide}
-        className="absolute top-1/2 right-4 z-30 hidden -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/10 p-2.5 text-white backdrop-blur-md transition-all hover:bg-white/20 hover:scale-110 md:flex lg:right-8"
-        aria-label="Next slide"
-      >
-        <ChevronRight className="h-4 w-4 lg:h-5 lg:w-5" />
-      </button>
-
-      <div
-        className="absolute inset-y-0 left-0 z-20 w-1/2 cursor-pointer md:hidden"
-        onClick={prevSlide}
-        aria-label="Previous slide (tap left side)"
-      />
-
-      <div
-        className="absolute inset-y-0 right-0 z-20 w-1/2 cursor-pointer md:hidden"
-        onClick={nextSlide}
-        aria-label="Next slide (tap right side)"
-      />
-
-      <div className="absolute bottom-6 left-1/2 z-30 flex -translate-x-1/2 gap-2 sm:bottom-8 sm:gap-2.5">
-        {heroImages.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentImage(index)}
-            className={`h-1.5 rounded-full transition-all duration-500 ${
-              index === currentImage
-                ? 'w-6 bg-white sm:w-8'
-                : 'w-2 bg-white/30 hover:bg-white/50'
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
+        <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={cn(
+                'rounded-full transition-all duration-500',
+                index === current
+                  ? 'h-2 w-6 bg-white'
+                  : 'h-2 w-2 bg-white/40 hover:bg-white/70'
+              )}
+              aria-label={`Slide ${index + 1}: ${slides[index].region}`}
+            />
+          ))}
+        </div>
       </div>
     </section>
   )
