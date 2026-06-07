@@ -26,10 +26,10 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://smart-tourism-citra.web.id'),
   title: {
     template: '%s | CITRA',
-    default: 'CITRA — Asisten Wisata Cerdas Ciayumajakuning',
+    default: 'CITRA Ciayumajakuning — Asisten Wisata Cerdas & Rencana Itinerary AI',
   },
   description: 'CITRA (Ciayumajakuning Intelligent Tourism & Recommendation Assistant). Temukan rekomendasi destinasi wisata, kuliner legendaris, tempat nongkrong estetik, dan buat rencana perjalanan itinerary otomatis berbasis AI di Cirebon, Indramayu, Majalengka, dan Kuningan.',
-  keywords: ['smart tourism', 'ciayumajakuning', 'cirebon', 'indramayu', 'majalengka', 'kuningan', 'itinerary generator', 'wisata cirebon', 'kuliner cirebon', 'trip planner', 'asisten wisata ai'],
+  keywords: ['smart tourism', 'citra', 'citra ciayumajakuning', 'ciayumajakuning', 'cirebon', 'indramayu', 'majalengka', 'kuningan', 'itinerary generator', 'wisata cirebon', 'kuliner cirebon', 'trip planner', 'asisten wisata ai'],
   authors: [{ name: 'CITRA Team' }],
   creator: 'CITRA Dev',
   publisher: 'CITRA',
@@ -60,11 +60,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/icon-dark.svg', type: 'image/svg+xml', media: '(prefers-color-scheme: dark)' }
+      { url: '/images/logo/citra-logo.png', type: 'image/png' }
     ],
     apple: [
-      { url: '/apple-icon.svg', type: 'image/svg+xml' }
+      { url: '/images/logo/citra-logo.png', type: 'image/png' }
     ]
   },
 }
@@ -75,8 +74,66 @@ export const viewport: Viewport = {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    'name': 'CITRA',
+    'alternateName': 'CITRA Ciayumajakuning',
+    'url': 'https://smart-tourism-citra.web.id',
+    'description': 'Ciayumajakuning Intelligent Tourism & Recommendation Assistant. Asisten wisata cerdas berbasis AI.',
+    'potentialAction': {
+      '@type': 'SearchAction',
+      'target': {
+        '@type': 'EntryPoint',
+        'urlTemplate': 'https://smart-tourism-citra.web.id/cari?q={search_term_string}'
+      },
+      'query-input': 'required name=search_term_string'
+    }
+  }
+
+  const sitelinksSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    'itemListElement': [
+      {
+        '@type': 'SiteNavigationElement',
+        'position': 1,
+        'name': 'Destinasi Wisata',
+        'url': 'https://smart-tourism-citra.web.id/wisata'
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        'position': 2,
+        'name': 'Kuliner Khas',
+        'url': 'https://smart-tourism-citra.web.id/kuliner'
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        'position': 3,
+        'name': 'Tempat Nongkrong',
+        'url': 'https://smart-tourism-citra.web.id/nongkrong'
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        'position': 4,
+        'name': 'Rencana Perjalanan (Itinerary AI)',
+        'url': 'https://smart-tourism-citra.web.id/rencana'
+      }
+    ]
+  }
+
   return (
     <html lang="id" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(sitelinksSchema) }}
+        />
+      </head>
       <body
         className={`${bodyFont.variable} ${displayFont.variable} ${editorialFont.variable} font-body antialiased bg-citra-canvas text-citra-body`}
       >
