@@ -12,6 +12,7 @@ interface ChatbotState {
   isTyping: boolean
   guestQuestionCount: number
   guestCooldownUntil: number | null
+  isMinimized: boolean
   open: () => void
   close: () => void
   toggle: () => void
@@ -22,6 +23,8 @@ interface ChatbotState {
   incrementGuestQuestion: () => void
   resetGuestLimit: () => void
   clearChat: () => void
+  setIsMinimized: (isMinimized: boolean) => void
+  toggleMinimize: () => void
 }
 
 export const useChatbotStore = create<ChatbotState>()(
@@ -32,9 +35,9 @@ export const useChatbotStore = create<ChatbotState>()(
       sessionToken: null,
       wilayah: null,
       isTyping: false,
-
       guestQuestionCount: 0,
       guestCooldownUntil: null,
+      isMinimized: false,
 
       open: () => set({ isOpen: true }),
       close: () => set({ isOpen: false }),
@@ -43,6 +46,7 @@ export const useChatbotStore = create<ChatbotState>()(
       setSession: (token) => set({ sessionToken: token }),
       setWilayah: (w) => set({ wilayah: w }),
       setTyping: (v) => set({ isTyping: v }),
+
       incrementGuestQuestion: () => set((s) => {
         const count = s.guestQuestionCount + 1
         if (count >= 5) {
@@ -50,11 +54,23 @@ export const useChatbotStore = create<ChatbotState>()(
         }
         return { guestQuestionCount: count }
       }),
+
       resetGuestLimit: () => set({ guestQuestionCount: 0, guestCooldownUntil: null }),
+
       clearChat: () => {
-        // Just clear local state to start a new session, do not delete from backend
-        set({ messages: [], sessionToken: null, wilayah: null, guestQuestionCount: 0, guestCooldownUntil: null })
+        set({
+          messages: [],
+          sessionToken: null,
+          wilayah: null,
+          guestQuestionCount: 0,
+          guestCooldownUntil: null,
+          isMinimized: false,
+        })
       },
+
+      setIsMinimized: (isMinimized) => set({ isMinimized }),
+
+      toggleMinimize: () => set((s) => ({ isMinimized: !s.isMinimized })),
     }),
     {
       name: 'chatbot-storage',
@@ -64,6 +80,7 @@ export const useChatbotStore = create<ChatbotState>()(
         wilayah: state.wilayah,
         guestQuestionCount: state.guestQuestionCount,
         guestCooldownUntil: state.guestCooldownUntil,
+        isMinimized: state.isMinimized,
       }),
     }
   )
