@@ -66,7 +66,7 @@ export default function Navbar() {
             : 'bg-transparent'
         )}
       >
-        <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 md:px-6 lg:px-10">
+        <div className="mx-auto flex h-full w-full items-center justify-between px-4 md:px-6 lg:px-8 xl:px-12 max-w-[1920px]">
           <Logo
             variant={showScrolled ? 'default' : 'white'}
             className="z-50"
