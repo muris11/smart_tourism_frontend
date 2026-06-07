@@ -60,10 +60,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/images/logo/citra-logo.png', type: 'image/png' }
+      { url: '/icon.svg', type: 'image/svg+xml' }
     ],
     apple: [
-      { url: '/images/logo/citra-logo.png', type: 'image/png' }
+      { url: '/icon.svg', type: 'image/svg+xml' }
     ]
   },
 }
