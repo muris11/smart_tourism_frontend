@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { MapPin, Save, CheckCircle, Loader2 } from 'lucide-react'
+import { MapPin, Save, CheckCircle, Loader2, ThumbsUp, ThumbsDown, Bot } from 'lucide-react'
 import { PlanningResult } from '@/types/recommendation'
 import { useAuth } from '@/hooks/useAuth'
 import { apiClient } from '@/lib/api/client'
+import { feedbackApi } from '@/lib/api/feedback'
 
 interface Props {
   result: PlanningResult
@@ -16,6 +17,21 @@ export default function ItineraryResult({ result }: Props) {
   const [isSaving, setIsSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [feedbackStatus, setFeedbackStatus] = useState<number | null>(null)
+
+  const handleFeedback = async (rating: number) => {
+    if (feedbackStatus !== null) return
+    setFeedbackStatus(rating)
+    try {
+      await feedbackApi.submit({
+        feature: 'planning',
+        rating,
+        context: { result }
+      })
+    } catch {
+      setFeedbackStatus(null)
+    }
+  }
 
   const handleSave = async () => {
     setIsSaving(true)
@@ -111,6 +127,19 @@ export default function ItineraryResult({ result }: Props) {
         <div className="rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-600">{saveError}</div>
       )}
 
+      {result.narasi && (
+        <div className="rounded-2xl border border-blue-100 bg-blue-50/50 p-5 shadow-sm">
+          <div className="flex gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+              <Bot className="h-4 w-4" fill="currentColor" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">{result.narasi}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {(result.itinerary || []).map((day) => (
         <div key={day.hari} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h3 className="mb-4 text-lg font-bold text-slate-800">Hari {day.hari}</h3>
@@ -127,7 +156,7 @@ export default function ItineraryResult({ result }: Props) {
                 <div className="flex-1">
                   <div className="mb-1 flex items-center gap-2">
                     <h4 className="text-sm font-semibold text-slate-800">{tempat.nama}</h4>
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${tipeBadgeColor(tempat.tipe)}`}>
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${tipeBadgeColor(tempat.tipe)}`}>
                       {tempat.tipe}
                     </span>
                   </div>
@@ -145,6 +174,31 @@ export default function ItineraryResult({ result }: Props) {
           </div>
         </div>
       ))}
+
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col items-center justify-center space-y-4">
+        <p className="text-sm font-medium text-slate-700">Apakah rekomendasi itinerary ini membantu Anda?</p>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => handleFeedback(1)}
+            disabled={feedbackStatus !== null}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer ${
+              feedbackStatus === 1 ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600 hover:bg-green-50 hover:text-green-600"
+            } ${feedbackStatus !== null && feedbackStatus !== 1 ? "opacity-40" : ""} disabled:cursor-default disabled:pointer-events-none`}
+          >
+            <ThumbsUp className="h-4 w-4" /> Membantu
+          </button>
+          <button 
+            onClick={() => handleFeedback(-1)}
+            disabled={feedbackStatus !== null}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer ${
+              feedbackStatus === -1 ? "bg-red-100 text-red-700" : "bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-600"
+            } ${feedbackStatus !== null && feedbackStatus !== -1 ? "opacity-40" : ""} disabled:cursor-default disabled:pointer-events-none`}
+          >
+            <ThumbsDown className="h-4 w-4" /> Kurang
+          </button>
+        </div>
+        {feedbackStatus !== null && <p className="text-xs text-green-600 mt-2">Terima kasih atas tanggapan Anda!</p>}
+      </div>
     </div>
   )
 }

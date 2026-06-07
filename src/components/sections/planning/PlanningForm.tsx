@@ -9,7 +9,8 @@ import { recommendationApi } from '@/lib/api/recommendation'
 import { PlanningPayload, PlanningResult } from '@/types/recommendation'
 import { useAuth } from '@/hooks/useAuth'
 
-const WILAYAH_OPTIONS = ['Cirebon', 'Indramayu', 'Majalengka', 'Kuningan']
+import { regionsApi, RegionData } from '@/lib/api/regions'
+
 const KATEGORI_OPTIONS = ['Alam', 'Buatan', 'Budaya', 'Religi', 'Petualangan', 'Edukasi', 'Kuliner', 'Nongkrong']
 
 const schema = z.object({
@@ -52,7 +53,14 @@ const PlanningForm = forwardRef<PlanningFormRef, Props>(({ onResult }, ref) => {
   const { user } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [wilayahOptions, setWilayahOptions] = useState<string[]>([])
   const hasAutoSubmitted = useRef(false)
+
+  useEffect(() => {
+    regionsApi.list().then(data => {
+      setWilayahOptions(data.map(r => r.name))
+    }).catch(console.error)
+  }, [])
 
   const { register, handleSubmit, formState: { errors }, setValue, getValues } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -115,7 +123,7 @@ const PlanningForm = forwardRef<PlanningFormRef, Props>(({ onResult }, ref) => {
 
       // Set wilayah dari URL
       if (data.wilayah) {
-        const wilayahMatch = WILAYAH_OPTIONS.find(
+        const wilayahMatch = wilayahOptions.find(
           (w) => w.toLowerCase() === data.wilayah?.toLowerCase()
         )
         if (wilayahMatch) {
@@ -212,17 +220,21 @@ const PlanningForm = forwardRef<PlanningFormRef, Props>(({ onResult }, ref) => {
             Wilayah
           </label>
           <div className="flex flex-wrap gap-2">
-            {WILAYAH_OPTIONS.map((w) => (
-              <label key={w} className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm transition-colors hover:border-blue-300">
-                <input
-                  type="checkbox"
-                  value={w}
-                  {...register('wilayah')}
-                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-slate-700">{w}</span>
-              </label>
-            ))}
+            {wilayahOptions.length === 0 ? (
+                <span className="text-sm text-slate-400">Memuat wilayah...</span>
+            ) : (
+                wilayahOptions.map((w) => (
+                  <label key={w} className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm transition-colors hover:border-blue-300">
+                    <input
+                      type="checkbox"
+                      value={w}
+                      {...register('wilayah')}
+                      className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-slate-700">{w}</span>
+                  </label>
+                ))
+            )}
           </div>
           {errors.wilayah && <p className="mt-1 text-xs text-red-500">{errors.wilayah.message}</p>}
         </div>

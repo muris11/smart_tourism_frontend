@@ -1,6 +1,6 @@
 import { Wilayah } from '@/lib/constants/wilayah'
 import type { Status } from '@/lib/constants/status'
-import type { Sentimen } from '@/lib/constants/sentimen'
+import type { Sentimen } from './sentiment'
 import { Koordinat } from './koordinat'
 
 /** Item nongkrong untuk list */

@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
 import { ROUTES } from '@/lib/constants/routes'
 import { cn } from '@/lib/utils/cn'
@@ -31,9 +34,9 @@ const linkGroups = [
   {
     title: 'Legal',
     links: [
-      { label: 'Kebijakan Privasi' },
-      { label: 'Syarat & Ketentuan' },
-      { label: 'Lisensi Aset' },
+      { href: ROUTES.KEBIJAKAN_PRIVASI, label: 'Kebijakan Privasi' },
+      { href: ROUTES.SYARAT_KETENTUAN, label: 'Syarat & Ketentuan' },
+      { href: ROUTES.LISENSI_ASET, label: 'Lisensi Aset' },
     ],
   },
 ]
@@ -43,6 +46,44 @@ const socialLinks = [
   { icon: FaTiktok, label: 'TikTok' },
   { icon: FaYoutube, label: 'YouTube' },
 ]
+
+function NewsletterSubForm() {
+  const [email, setEmail] = useState('')
+  const [subscribed, setSubscribed] = useState(false)
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email) return
+    setSubscribed(true)
+    setEmail('')
+    alert('Terima kasih! Anda telah berhasil berlangganan newsletter kami.')
+  }
+
+  if (subscribed) {
+    return (
+      <div className="rounded-full bg-citra-primary/10 border border-citra-primary/30 px-5 py-2.5 text-sm text-citra-on-dark font-medium">
+        Telah berlangganan! 🎉
+      </div>
+    )
+  }
+
+  return (
+    <form onSubmit={handleSubscribe} className="flex w-full max-w-md gap-2">
+      <input
+        type="email"
+        required
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Masukkan email Anda"
+        className="min-w-0 flex-1 rounded-full border border-citra-forest-elevated bg-citra-forest-elevated px-5 py-2.5 text-sm text-citra-on-dark placeholder-citra-muted outline-none transition-colors focus:border-citra-sage focus:ring-1 focus:ring-citra-sage/30"
+      />
+      <button type="submit" className="inline-flex items-center gap-2 rounded-full bg-citra-primary px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-citra-primary-hover cursor-pointer">
+        Berlangganan
+        <Send className="h-4 w-4" />
+      </button>
+    </form>
+  )
+}
 
 function LinkGroupDesktop({ title, links }: { title: string; links: { href?: string; label: string }[] }) {
   return (
@@ -160,17 +201,7 @@ export default function Footer() {
                 Bergabung dengan newsletter CITRA untuk rekomendasi wisata terbaik.
               </p>
             </div>
-            <div className="flex w-full max-w-md gap-2">
-              <input
-                type="email"
-                placeholder="Masukkan email Anda"
-                className="min-w-0 flex-1 rounded-full border border-citra-forest-elevated bg-citra-forest-elevated px-5 py-2.5 text-sm text-citra-on-dark placeholder-citra-muted outline-none transition-colors focus:border-citra-sage focus:ring-1 focus:ring-citra-sage/30"
-              />
-              <button className="inline-flex items-center gap-2 rounded-full bg-citra-primary px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-citra-primary-hover">
-                Berlangganan
-                <Send className="h-4 w-4" />
-              </button>
-            </div>
+            <NewsletterSubForm />
           </div>
         </div>
       </div>

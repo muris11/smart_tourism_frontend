@@ -15,7 +15,7 @@ export const apiClient: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
     Accept: 'application/json',
   },
-  timeout: 60000,
+  timeout: 180000,
 })
 
 /**
@@ -41,7 +41,11 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       Cookies.remove(TOKEN_KEY)
       if (typeof window !== 'undefined') {
-        window.location.href = '/login'
+        const isLoginRequest = error.config?.url?.includes('/auth/login')
+        const isAlreadyOnLogin = window.location.pathname === '/login'
+        if (!isLoginRequest && !isAlreadyOnLogin) {
+          window.location.href = '/login'
+        }
       }
       return Promise.reject(error)
     }

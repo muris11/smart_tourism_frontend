@@ -11,11 +11,13 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import Pagination from '@/components/ui/Pagination'
 import { cn } from '@/lib/utils/cn'
 import { getDestinations, type Destination } from '@/lib/api'
+import { regionsApi } from '@/lib/api/regions'
 
 const PAGE_SIZE = 12
 
-const REGIONS = ['Semua', 'Cirebon', 'Indramayu', 'Majalengka', 'Kuningan'] as const
-const CATEGORIES = ['Semua', 'Alam', 'Budaya', 'Religi', 'Pantai'] as const
+// Regions di-load secara dinamis
+// const REGIONS = ['Semua', 'Cirebon', 'Indramayu', 'Majalengka', 'Kuningan'] as const
+const CATEGORIES = ['Semua', 'Alam', 'Budaya', 'Religi'] as const
 const SORT_OPTIONS = [
   { value: 'popular', label: 'Terpopuler' },
   { value: 'rating', label: 'Rating Tertinggi' },
@@ -79,10 +81,14 @@ function WisataPageContent() {
   const [showMobileFilter, setShowMobileFilter] = useState(false)
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
+  const [regions, setRegions] = useState<string[]>(['Semua'])
 
   useEffect(() => {
-    getDestinations()
-      .then(setDestinations)
+    Promise.all([getDestinations(), regionsApi.list()])
+      .then(([destData, regionData]) => {
+        setDestinations(destData)
+        setRegions(['Semua', ...regionData.map(r => r.name)])
+      })
       .finally(() => setLoading(false))
   }, [])
 
@@ -134,7 +140,7 @@ function WisataPageContent() {
       </div>
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
-        {REGIONS.map((r) => (
+        {regions.map((r) => (
           <Chip key={r} label={r} active={region === r} onClick={() => setRegion(r)} />
         ))}
         <div className="ml-auto hidden md:flex items-center gap-3">
@@ -158,9 +164,14 @@ function WisataPageContent() {
 
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <p className="text-sm text-citra-muted">
-          {!loading && (
+          {!loading && filtered.length > 0 && (
             <span>
-              Menampilkan <span className="font-semibold text-citra-primary">{filtered.length}</span> destinasi
+              Menampilkan {Math.min((page - 1) * PAGE_SIZE + 1, filtered.length)}-{Math.min(page * PAGE_SIZE, filtered.length)} data dari <span className="font-semibold text-citra-primary">{filtered.length}</span> destinasi
+            </span>
+          )}
+          {!loading && filtered.length === 0 && (
+            <span>
+              Menampilkan <span className="font-semibold text-citra-primary">0</span> destinasi
             </span>
           )}
         </p>
@@ -178,11 +189,6 @@ function WisataPageContent() {
         </div>
       </div>
 
-      <div className="hidden md:flex md:flex-wrap md:items-center md:gap-3 mb-6">
-        {CATEGORIES.map((c) => (
-          <Chip key={c} label={c} active={category === c} onClick={() => setCategory(c)} />
-        ))}
-      </div>
 
       {loading ? (
         <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
@@ -244,7 +250,7 @@ function WisataPageContent() {
               <div>
                 <p className="mb-2 text-sm font-semibold text-citra-ink">Wilayah</p>
                 <div className="flex flex-wrap gap-2">
-                  {REGIONS.map((r) => (
+                  {regions.map((r) => (
                     <Chip key={r} label={r} active={region === r} onClick={() => setRegion(r)} />
                   ))}
                 </div>

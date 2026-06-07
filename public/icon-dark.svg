@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Rounded rectangle background with CITRA's main warm editorial dark Forest color (#102F27) -->
+  <rect width="32" height="32" rx="8" fill="#102F27" />
+  
+  <!-- Stylized Mountain & Wave motif representing the landscape of Ciayumajakuning -->
+  <!-- Back mountain in sandy color (#DFC291) -->
+  <path d="M22 10L14 24H30L22 10Z" fill="#DFC291" opacity="0.8" />
+  
+  <!-- Front mountain in white -->
+  <path d="M12 6L2 24H22L12 6Z" fill="#FAF7F1" />
+  
+  <!-- Overlay detail representing the sun or peak reflection in Terracotta (#C86A49) -->
+  <path d="M12 6L17 15H7L12 6Z" fill="#C86A49" />
+  
+  <!-- Wave detail at the bottom in Forest Green/Sage representing sea/water -->
+  <path d="M2 24C7 22 10 26 15 24C20 22 23 26 30 24V28H2V24Z" fill="#507664" opacity="0.5" />
+</svg>

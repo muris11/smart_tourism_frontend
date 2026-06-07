@@ -25,7 +25,7 @@ interface SentimentData {
 const SENTIMENT_COLORS = {
     positif: '#10b981',
     negatif: '#ef4444',
-    netral: '#f59e0b',
+    netral: '#94a3b8',
 }
 
 const TIPE_LABEL: Record<string, string> = {
@@ -63,7 +63,7 @@ export default function SentimentSection({ wilayah, tipeTempat }: SentimentSecti
             { name: 'Positif', value: sentimentData.persentase_positif || ((sentimentData.positif / (sentimentData.total_ulasan || 1)) * 100) || 0, color: SENTIMENT_COLORS.positif },
             { name: 'Negatif', value: ((sentimentData.negatif / (sentimentData.total_ulasan || 1)) * 100) || 0, color: SENTIMENT_COLORS.negatif },
             { name: 'Netral', value: ((sentimentData.netral / (sentimentData.total_ulasan || 1)) * 100) || 0, color: SENTIMENT_COLORS.netral },
-        ]
+        ].filter(item => item.value > 0)
         : []
 
     if (isLoading) {
@@ -138,18 +138,24 @@ export default function SentimentSection({ wilayah, tipeTempat }: SentimentSecti
 
                 {/* Legend */}
                 <div className="mb-4 flex justify-center gap-4">
-                    <div className="flex items-center gap-1.5">
-                        <div className="h-2.5 w-2.5 rounded-full bg-green-500" />
-                        <span className="text-xs text-slate-600">Positif</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <div className="h-2.5 w-2.5 rounded-full bg-red-500" />
-                        <span className="text-xs text-slate-600">Negatif</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: SENTIMENT_COLORS.netral }} />
-                        <span className="text-xs text-slate-600">Netral</span>
-                    </div>
+                    {pieData.find(d => d.name === 'Positif') && (
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-2.5 w-2.5 rounded-full bg-green-500" />
+                            <span className="text-xs text-slate-600">Positif</span>
+                        </div>
+                    )}
+                    {pieData.find(d => d.name === 'Negatif') && (
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-2.5 w-2.5 rounded-full bg-red-500" />
+                            <span className="text-xs text-slate-600">Negatif</span>
+                        </div>
+                    )}
+                    {pieData.find(d => d.name === 'Netral') && (
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: SENTIMENT_COLORS.netral }} />
+                            <span className="text-xs text-slate-600">Netral</span>
+                        </div>
+                    )}
                 </div>
 
                 {/* Ringkasan angka */}

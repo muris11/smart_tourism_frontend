@@ -51,7 +51,8 @@
 
 import { Search } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
-import { WILAYAH_LIST } from '@/lib/constants/wilayah'
+import { useState, useEffect } from 'react'
+import { regionsApi } from '@/lib/api/regions'
 
 /** Interface untuk props FilterContent component */
 interface FilterContentProps {
@@ -93,6 +94,14 @@ export function FilterContent({
     showKategori = false,
     showSentimen = false,
 }: FilterContentProps) {
+    const [wilayahOptions, setWilayahOptions] = useState<string[]>([])
+
+    useEffect(() => {
+        regionsApi.list().then(data => {
+            setWilayahOptions(data.map(r => r.name))
+        }).catch(console.error)
+    }, [])
+
     /** Opsi sentimen default jika tidak disediakan */
     const sentimenOptions = options?.sentimen || ['positif', 'negatif', 'netral']
 
@@ -119,20 +128,24 @@ export function FilterContent({
                     </button>
 
                     {/* Daftar Wilayah */}
-                    {WILAYAH_LIST.map((w) => (
-                        <button
-                            key={w}
-                            onClick={() => onChange('wilayah', w)}
-                            className={cn(
-                                'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
-                                filters.wilayah === w
-                                    ? 'bg-brand-navy text-white shadow-sm'
-                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                            )}
-                        >
-                            {w}
-                        </button>
-                    ))}
+                    {wilayahOptions.length === 0 ? (
+                        <span className="text-sm text-slate-400 py-2">Memuat wilayah...</span>
+                    ) : (
+                        wilayahOptions.map((w) => (
+                            <button
+                                key={w}
+                                onClick={() => onChange('wilayah', w)}
+                                className={cn(
+                                    'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
+                                    filters.wilayah === w
+                                        ? 'bg-brand-navy text-white shadow-sm'
+                                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                )}
+                            >
+                                {w}
+                            </button>
+                        ))
+                    )}
                 </div>
             </div>
 
