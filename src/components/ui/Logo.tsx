@@ -9,13 +9,17 @@ interface LogoProps {
     href?: string
     className?: string
     showText?: boolean
+    iconSize?: number
+    textSize?: { width: number; height: number }
 }
 
 export default function Logo({
     variant = 'default',
     href = '/',
     className,
-    showText = true
+    showText = true,
+    iconSize = 32,
+    textSize = { width: 112, height: 32 }
 }: LogoProps) {
     const logoSrc = variant === 'white'
         ? '/images/logo/citra-logo-white.png'
@@ -24,7 +28,10 @@ export default function Logo({
     if (!showText) {
         return (
             <Link href={href} aria-label="CITRA" className={cn('block', className)}>
-                <div className="relative h-8 w-8">
+                <div
+                    className="relative"
+                    style={{ width: iconSize, height: iconSize }}
+                >
                     <Image
                         src={logoSrc}
                         alt="CITRA"
@@ -39,7 +46,10 @@ export default function Logo({
 
     return (
         <Link href={href} aria-label="CITRA" className={cn('block', className)}>
-            <div className="relative h-8 w-28">
+            <div
+                className="relative"
+                style={{ width: textSize.width, height: textSize.height }}
+            >
                 <Image
                     src={logoSrc}
                     alt="CITRA"
