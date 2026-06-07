@@ -1,4 +1,5 @@
 import { apiClient } from './client'
+import { makeBrowserCacheKey, withBrowserCache } from '@/lib/cache/browserStorage'
 import type { Wilayah, SentimentSummary, SentimentSummaryResponse } from '@/types'
 
 export const sentimentApi = {
@@ -24,7 +25,13 @@ export const sentimentApi = {
    * @returns List ringkasan sentimen untuk 4 wilayah (cocok untuk chart perbandingan)
    */
   summaryAll: async (): Promise<SentimentSummary[]> => {
-    const { data } = await apiClient.get<{ success: boolean; message: string; data: SentimentSummary[] }>('/sentiment/summary-all')
-    return data.data
+    return withBrowserCache(
+      makeBrowserCacheKey('sentiment:summary-all'),
+      30 * 60 * 1000,
+      async () => {
+        const { data } = await apiClient.get<{ success: boolean; message: string; data: SentimentSummary[] }>('/sentiment/summary-all')
+        return data.data
+      }
+    )
   },
 }

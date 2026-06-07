@@ -4,6 +4,8 @@ import useSWR from 'swr'
 import { nongkrongApi } from '@/lib/api/nongkrong'
 import type { NongkrongItem, NongkrongDetail, NongkrongFilter } from '@/types'
 
+const PUBLIC_DATA_DEDUPE_INTERVAL = 5 * 60 * 1000
+
 /** Hook untuk mendapatkan daftar tempat nongkrong dengan filter */
 export function useNongkrong(params?: NongkrongFilter) {
   const key = params ? ['nongkrong', JSON.stringify(params)] : ['nongkrong']
@@ -13,6 +15,8 @@ export function useNongkrong(params?: NongkrongFilter) {
     () => nongkrongApi.list(params || {}),
     {
       revalidateOnFocus: false,
+      revalidateIfStale: false,
+      dedupingInterval: PUBLIC_DATA_DEDUPE_INTERVAL,
       keepPreviousData: true,
     }
   )

@@ -241,7 +241,7 @@ function NongkrongPageContent() {
 
       {showMobileFilter && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-citra-ink/50" onClick={() => setShowMobileFilter(false)} />
+          <div className="absolute inset-0 cursor-pointer bg-citra-ink/50" onClick={() => setShowMobileFilter(false)} />
           <div className="absolute bottom-0 left-0 right-0 max-h-[80vh] overflow-y-auto rounded-t-xl bg-citra-surface p-6 shadow-modal">
             <div className="mb-5 flex items-center justify-between">
               <h3 className="text-lg font-semibold font-display text-citra-ink">Filter</h3>

@@ -5,15 +5,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
-import { getCulinary, type Culinary } from '@/lib/api'
+import { getFeaturedCulinary, type Culinary } from '@/lib/api'
 
 export default function CulinaryPreviewSection() {
   const [featuredCulinary, setFeaturedCulinary] = useState<Culinary[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getCulinary()
-      .then((data) => setFeaturedCulinary(data.filter((c) => c.featured).slice(0, 4)))
+    getFeaturedCulinary(4)
+      .then(setFeaturedCulinary)
       .finally(() => setLoading(false))
   }, [])
 

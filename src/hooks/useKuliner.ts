@@ -4,6 +4,8 @@ import useSWR from 'swr'
 import { kulinerApi } from '@/lib/api/kuliner'
 import type { KulinerItem, KulinerDetail, KulinerFilter } from '@/types'
 
+const PUBLIC_DATA_DEDUPE_INTERVAL = 5 * 60 * 1000
+
 /** Hook untuk mendapatkan daftar kuliner dengan filter */
 export function useKuliner(params?: KulinerFilter) {
   const key = params ? ['kuliner', JSON.stringify(params)] : ['kuliner']
@@ -13,6 +15,8 @@ export function useKuliner(params?: KulinerFilter) {
     () => kulinerApi.list(params || {}),
     {
       revalidateOnFocus: false,
+      revalidateIfStale: false,
+      dedupingInterval: PUBLIC_DATA_DEDUPE_INTERVAL,
       keepPreviousData: true,
     }
   )

@@ -9,16 +9,16 @@ import { cn } from '@/lib/utils/cn'
 import { Button } from '@/components/ui/Button'
 import { getHomepage, type HeroSlide } from '@/lib/api'
 
-const categoryChips = [
-  { label: 'Wisata Alam', icon: MapPin },
-  { label: 'Kuliner Khas', icon: UtensilsCrossed },
-  { label: 'Tempat Nongkrong', icon: Coffee },
+const fallbackSlides: HeroSlide[] = [
+  { id: 'fallback-1', region: 'Cirebon', src: '/images/hero/hero-1.jpeg', alt: 'Pemandangan Ciayumajakuning' },
+  { id: 'fallback-2', region: 'Indramayu', src: '/images/hero/hero-2.jpeg', alt: 'Destinasi wisata Ciayumajakuning' },
+  { id: 'fallback-3', region: 'Majalengka', src: '/images/hero/hero-3.jpg', alt: 'Alam Ciayumajakuning' },
+  { id: 'fallback-4', region: 'Kuningan', src: '/images/hero/hero-4.jpg', alt: 'Budaya Ciayumajakuning' },
 ]
 
 export default function HeroSection() {
   const router = useRouter()
-  const [slides, setSlides] = useState<HeroSlide[]>([])
-  const [loading, setLoading] = useState(true)
+  const [slides, setSlides] = useState<HeroSlide[]>(fallbackSlides)
   const [current, setCurrent] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const [parallaxOffset, setParallaxOffset] = useState(0)
@@ -27,8 +27,13 @@ export default function HeroSection() {
 
   useEffect(() => {
     getHomepage()
-      .then((data) => setSlides(data.heroSlides))
-      .finally(() => setLoading(false))
+      .then((data) => {
+        if (data.heroSlides.length > 0) {
+          setSlides(data.heroSlides)
+          setCurrent(0)
+        }
+      })
+      .catch((error) => console.error('Failed to fetch homepage data:', error))
   }, [])
 
   const startInterval = useCallback(() => {
@@ -60,14 +65,6 @@ export default function HeroSection() {
     setCurrent(index)
     setIsPaused(true)
     setTimeout(() => setIsPaused(false), 8000)
-  }
-
-  if (loading && slides.length === 0) {
-    return (
-      <section className="relative overflow-hidden bg-citra-forest">
-        <div className="h-[80vh] min-h-[600px] md:h-screen" />
-      </section>
-    )
   }
 
   return (

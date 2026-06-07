@@ -1,4 +1,5 @@
 import apiClient from './client'
+import { makeBrowserCacheKey, withBrowserCache } from '@/lib/cache/browserStorage'
 import { ApiResponse } from '@/types'
 
 export interface RegionData {
@@ -15,7 +16,13 @@ export interface RegionData {
 export const regionsApi = {
   /** Mendapatkan daftar semua wilayah aktif */
   list: async (): Promise<RegionData[]> => {
-    const response = await apiClient.get<ApiResponse<RegionData[]>>('/regions')
-    return response.data.data || []
+    return withBrowserCache(
+      makeBrowserCacheKey('regions:list'),
+      24 * 60 * 60 * 1000,
+      async () => {
+        const response = await apiClient.get<ApiResponse<RegionData[]>>('/regions')
+        return response.data.data || []
+      }
+    )
   },
 }

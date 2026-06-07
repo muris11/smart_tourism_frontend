@@ -257,7 +257,7 @@ export default function CariContent() {
 
           {showFilters && (
             <div className="fixed inset-0 z-50 lg:hidden">
-              <div className="absolute inset-0 bg-black/40" onClick={() => setShowFilters(false)} />
+              <div className="absolute inset-0 cursor-pointer bg-black/40" onClick={() => setShowFilters(false)} />
               <div className="absolute bottom-0 left-0 right-0 max-h-[70vh] rounded-t-xl bg-citra-surface p-6 shadow-modal">
                 <div className="mb-4 flex items-center justify-between">
                   <h3 className="font-display text-lg font-semibold text-citra-ink">Filter</h3>

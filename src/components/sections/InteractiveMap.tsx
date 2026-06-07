@@ -3,13 +3,14 @@
 import { useState, useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils/cn'
 import { Badge } from '@/components/ui/Badge'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { getRegions, type Region } from '@/lib/api'
 import { wisataApi } from '@/lib/api/wisata'
 import { kulinerApi } from '@/lib/api/kuliner'
 import { nongkrongApi } from '@/lib/api/nongkrong'
 import type { WisataItem, KulinerItem, NongkrongItem } from '@/types'
 import { getFirstImage } from '@/lib/utils/format'
-import { Maximize2, Minimize2, Eye, EyeOff } from 'lucide-react'
+import { Maximize2, Minimize2 } from 'lucide-react'
 
 interface InteractiveMapProps {
   className?: string
@@ -453,7 +454,17 @@ export default function InteractiveMap({ className }: InteractiveMapProps) {
           <div
             ref={mapRef}
             className="w-full h-full rounded-lg overflow-hidden border border-citra-border"
+            aria-busy={loading}
           />
+
+          {loading && (
+            <div className="absolute inset-0 z-[1001] flex items-center justify-center bg-white/70 backdrop-blur-sm">
+              <div className="flex flex-col items-center gap-3 rounded-lg bg-white px-5 py-4 shadow-card">
+                <LoadingSpinner size="md" />
+                <span className="text-xs font-semibold text-citra-muted">Memuat data peta...</span>
+              </div>
+            </div>
+          )}
 
           <div className="absolute top-3 left-3 z-[1000]">
             <Badge variant="overlay">Peta Interaktif Ciayumajakuning</Badge>

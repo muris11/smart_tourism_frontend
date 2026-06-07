@@ -4,6 +4,8 @@ import useSWR from 'swr'
 import { wisataApi } from '@/lib/api/wisata'
 import type { WisataItem, WisataDetail, WisataFilter } from '@/types'
 
+const PUBLIC_DATA_DEDUPE_INTERVAL = 5 * 60 * 1000
+
 /** Hook untuk mendapatkan daftar wisata dengan filter */
 export function useWisata(params?: WisataFilter) {
   const key = params ? ['wisata', JSON.stringify(params)] : ['wisata']
@@ -13,6 +15,8 @@ export function useWisata(params?: WisataFilter) {
     () => wisataApi.list(params || {}),
     {
       revalidateOnFocus: false,
+      revalidateIfStale: false,
+      dedupingInterval: PUBLIC_DATA_DEDUPE_INTERVAL,
       keepPreviousData: true,
     }
   )

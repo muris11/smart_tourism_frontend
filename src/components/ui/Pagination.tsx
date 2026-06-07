@@ -43,7 +43,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
-        className="flex h-10 w-10 items-center justify-center rounded-full text-citra-muted transition-all hover:bg-citra-surface-soft hover:text-citra-ink disabled:pointer-events-none disabled:opacity-30"
+        className="flex h-10 w-10 items-center justify-center rounded-full text-citra-muted transition-all hover:bg-citra-surface-soft hover:text-citra-ink disabled:cursor-not-allowed disabled:opacity-30"
         aria-label="Halaman sebelumnya"
       >
         <ChevronLeft className="h-5 w-5" />
@@ -75,7 +75,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
-        className="flex h-10 w-10 items-center justify-center rounded-full text-citra-muted transition-all hover:bg-citra-surface-soft hover:text-citra-ink disabled:pointer-events-none disabled:opacity-30"
+        className="flex h-10 w-10 items-center justify-center rounded-full text-citra-muted transition-all hover:bg-citra-surface-soft hover:text-citra-ink disabled:cursor-not-allowed disabled:opacity-30"
         aria-label="Halaman selanjutnya"
       >
         <ChevronRight className="h-5 w-5" />

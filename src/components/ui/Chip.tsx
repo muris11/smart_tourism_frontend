@@ -12,8 +12,6 @@ interface ChipProps {
 }
 
 export function Chip({ label, active, onClick, onRemove, className }: ChipProps) {
-  const isInteractive = !!onClick
-
   return (
     <button
       type="button"
@@ -24,7 +22,6 @@ export function Chip({ label, active, onClick, onRemove, className }: ChipProps)
         active
           ? 'bg-citra-primary text-white'
           : 'bg-citra-surface text-citra-body hover:bg-citra-surface-soft border border-citra-border',
-        !isInteractive && 'cursor-default',
         className
       )}
     >

@@ -2,7 +2,7 @@ import { wisataApi } from './wisata'
 import { kulinerApi } from './kuliner'
 import { nongkrongApi } from './nongkrong'
 import { regionsApi } from './regions'
-import { WILAYAH_CENTER } from '@/lib/constants/wilayah'
+import { makeBrowserCacheKey, withBrowserCache } from '@/lib/cache/browserStorage'
 import type { WisataItem, KulinerItem, NongkrongItem } from '@/types'
 
 export interface RegionImage {
@@ -183,102 +183,54 @@ function nongkrongToHangout(item: NongkrongItem): Hangout {
   }
 }
 
-// Remove hardcoded REGION_META
+const HOMEPAGE_TTL = 30 * 60 * 1000
 
-let cachedCounts: Record<string, number> | null = null
-let cachedRegionCounts: Record<string, number> | null = null
+let regionsPromise: Promise<Region[]> | null = null
+export function getRegions(): Promise<Region[]> {
+  if (!regionsPromise) {
+    regionsPromise = withBrowserCache(
+      makeBrowserCacheKey('homepage:regions'),
+      24 * 60 * 60 * 1000,
+      async () => {
+        const apiRegions = await regionsApi.list()
+        return apiRegions.map((apiRegion) => {
+          const slug = apiRegion.name.toLowerCase()
+          const center = { lat: apiRegion.latitude, lon: apiRegion.longitude }
 
-async function getWilayahCounts(): Promise<Record<string, number>> {
-  if (cachedCounts) return cachedCounts
-  try {
-    const wisata = await wisataApi.list({ per_page: 1, page: 1 })
-    const kuliner = await kulinerApi.list({ per_page: 1, page: 1 })
-    const nongkrong = await nongkrongApi.list({ per_page: 1, page: 1 })
-    cachedCounts = {
-      wisata: wisata.total || 0,
-      kuliner: kuliner.total || 0,
-      nongkrong: nongkrong.total || 0,
-    }
-    return cachedCounts
-  } catch {
-    cachedCounts = { wisata: 0, kuliner: 0, nongkrong: 0 }
-    return cachedCounts
-  }
-}
-
-async function getCountsPerRegion(regionName: string): Promise<number> {
-  const cacheKey = regionName.toLowerCase()
-  if (cachedRegionCounts && cachedRegionCounts[cacheKey] !== undefined) {
-    return cachedRegionCounts[cacheKey]
-  }
-  
-  if (!cachedRegionCounts) {
-    cachedRegionCounts = {}
-  }
-
-  try {
-    const regionFilter = regionName as any
-    const wisata = await wisataApi.list({ wilayah: regionFilter, per_page: 1, page: 1 })
-    const kuliner = await kulinerApi.list({ wilayah: regionFilter, per_page: 1, page: 1 })
-    const nongkrong = await nongkrongApi.list({ wilayah: regionFilter, per_page: 1, page: 1 })
-    
-    const total = (wisata.total || 0) + (kuliner.total || 0) + (nongkrong.total || 0)
-    cachedRegionCounts[cacheKey] = total
-    return total
-  } catch {
-    cachedRegionCounts[cacheKey] = 0
-    return 0
-  }
-}
-
-export async function getRegions(): Promise<Region[]> {
-  try {
-    const apiRegions = await regionsApi.list()
-    const regionsData = await Promise.all(
-      apiRegions.map(async (apiRegion) => {
-        const slug = apiRegion.name.toLowerCase()
-        const center = { lat: apiRegion.latitude, lon: apiRegion.longitude }
-        
-        let count = 0
-        try {
-          count = await getCountsPerRegion(apiRegion.name)
-        } catch (e) {
-          // Fallback
-        }
-
-        const destinationCount = count > 0 ? `${count} Destinasi` : '0 Destinasi'
-        
-        // Define default images based on code or name (bisa dipindah ke DB kelak jika ada image)
-        let defaultImage = 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=600'
-        let theme = 'budaya'
-        if (apiRegion.name.includes('Indramayu')) {
+          // Define default images based on code or name (bisa dipindah ke DB kelak jika ada image)
+          let defaultImage = 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=600'
+          let theme = 'budaya'
+          if (apiRegion.name.includes('Indramayu')) {
             defaultImage = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600'
             theme = 'pantai'
-        } else if (apiRegion.name.includes('Majalengka')) {
+          } else if (apiRegion.name.includes('Majalengka')) {
             defaultImage = 'https://images.unsplash.com/photo-1585409677983-0f6c41ca9c3b?w=600'
             theme = 'alam'
-        } else if (apiRegion.name.includes('Kuningan')) {
+          } else if (apiRegion.name.includes('Kuningan')) {
             defaultImage = 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600'
             theme = 'pegunungan'
-        }
+          }
 
-        return {
-          id: slug,
-          name: apiRegion.name,
-          slug,
-          description: apiRegion.description || `Destinasi wisata ${apiRegion.name}`,
-          image: { src: defaultImage, alt: apiRegion.name },
-          destinationCount,
-          imageTheme: theme,
-          coordinates: center ? { lat: center.lat, lng: center.lon } : undefined,
-        }
-      })
-    )
-    return regionsData
-  } catch (error) {
-    console.error('Error fetching regions:', error)
-    return []
+          return {
+            id: slug,
+            name: apiRegion.name,
+            slug,
+            description: apiRegion.description || `Destinasi wisata ${apiRegion.name}`,
+            image: { src: defaultImage, alt: apiRegion.name },
+            destinationCount: 'Jelajahi',
+            imageTheme: theme,
+            coordinates: center ? { lat: center.lat, lng: center.lon } : undefined,
+          }
+        })
+      }
+    ).catch((error) => {
+      console.error('Error fetching regions:', error)
+      regionsPromise = null
+      return []
+    })
   }
+
+  return regionsPromise
 }
 
 function dedupeBy<T>(arr: T[], key: (item: T) => string): T[] {
@@ -330,6 +282,26 @@ export function getDestinations(): Promise<Destination[]> {
   return destPromise
 }
 
+const featuredDestinationPromises: Record<number, Promise<Destination[]>> = {}
+export function getFeaturedDestinations(limit: number = 12): Promise<Destination[]> {
+  if (!featuredDestinationPromises[limit]) {
+    featuredDestinationPromises[limit] = withBrowserCache(
+      makeBrowserCacheKey('homepage:featured-destinations', { limit }),
+      HOMEPAGE_TTL,
+      async () => {
+        const result = await wisataApi.list({ per_page: limit, sort: 'rating' })
+        const mapped = (result.items as WisataItem[]).map(wisataToDestination)
+        const featured = mapped.filter((item) => item.featured)
+        return (featured.length ? featured : mapped).slice(0, limit)
+      }
+    ).catch(err => {
+      delete featuredDestinationPromises[limit]
+      throw err
+    })
+  }
+  return featuredDestinationPromises[limit]
+}
+
 let culinaryPromise: Promise<Culinary[]> | null = null
 export function getCulinary(): Promise<Culinary[]> {
   if (!culinaryPromise) {
@@ -345,6 +317,26 @@ export function getCulinary(): Promise<Culinary[]> {
     )).catch(err => { culinaryPromise = null; throw err })
   }
   return culinaryPromise
+}
+
+const featuredCulinaryPromises: Record<number, Promise<Culinary[]>> = {}
+export function getFeaturedCulinary(limit: number = 4): Promise<Culinary[]> {
+  if (!featuredCulinaryPromises[limit]) {
+    featuredCulinaryPromises[limit] = withBrowserCache(
+      makeBrowserCacheKey('homepage:featured-culinary', { limit }),
+      HOMEPAGE_TTL,
+      async () => {
+        const result = await kulinerApi.list({ per_page: limit, sort: 'rating' })
+        const mapped = (result.items as KulinerItem[]).map(kulinerToCulinary)
+        const featured = mapped.filter((item) => item.featured)
+        return (featured.length ? featured : mapped).slice(0, limit)
+      }
+    ).catch(err => {
+      delete featuredCulinaryPromises[limit]
+      throw err
+    })
+  }
+  return featuredCulinaryPromises[limit]
 }
 
 let hangoutPromise: Promise<Hangout[]> | null = null
@@ -367,45 +359,50 @@ export function getHangouts(): Promise<Hangout[]> {
 let homepagePromise: Promise<HomepageData> | null = null
 export function getHomepage(): Promise<HomepageData> {
   if (!homepagePromise) {
-    homepagePromise = Promise.all([
-      getDestinations(),
-      getCulinary(),
-      getHangouts(),
-      getWilayahCounts(),
-    ]).then(([destinations, culinary, hangouts, counts]) => {
-      const wisataTotal = counts.wisata ?? destinations.length
-      const kulinerTotal = counts.kuliner ?? culinary.length
-      const nongkrongTotal = counts.nongkrong ?? hangouts.length
+    homepagePromise = withBrowserCache(
+      makeBrowserCacheKey('homepage:data'),
+      HOMEPAGE_TTL,
+      async () => {
+        const [wisataRes, kulinerRes, nongkrongRes] = await Promise.all([
+          wisataApi.list({ per_page: 12, sort: 'rating' }),
+          kulinerApi.list({ per_page: 8, sort: 'rating' }),
+          nongkrongApi.list({ per_page: 8, sort: 'rating' }),
+        ])
 
-      const heroSlides: HeroSlide[] = destinations
-        .filter((d) => d.images.length > 0)
-        .slice(0, 4)
-        .map((d) => ({
-          id: d.id,
-          region: d.region,
-          src: d.images[0].src,
-          alt: d.name,
+        const destinations = (wisataRes.items as WisataItem[]).map(wisataToDestination)
+        const culinary = (kulinerRes.items as KulinerItem[]).map(kulinerToCulinary)
+        const hangouts = (nongkrongRes.items as NongkrongItem[]).map(nongkrongToHangout)
+
+        const heroSlides: HeroSlide[] = destinations
+          .filter((d) => d.images.length > 0)
+          .slice(0, 4)
+          .map((d) => ({
+            id: d.id,
+            region: d.region,
+            src: d.images[0].src,
+            alt: d.name,
+          }))
+
+        const stats: Stat[] = [
+          { label: 'Tempat wisata terdaftar', value: `${(wisataRes.total || destinations.length).toLocaleString('id-ID')}`, isPrototype: false },
+          { label: 'Restoran & tempat makan', value: `${(kulinerRes.total || culinary.length).toLocaleString('id-ID')}`, isPrototype: false },
+          { label: 'Cafe & tempat hangout', value: `${(nongkrongRes.total || hangouts.length).toLocaleString('id-ID')}`, isPrototype: false },
+        ]
+
+        const topDest = (destinations.filter((d) => d.featured).length ? destinations.filter((d) => d.featured) : destinations).slice(1, 4)
+        const topCul = (culinary.filter((c) => c.featured).length ? culinary.filter((c) => c.featured) : culinary).slice(0, 2)
+        const topHang = (hangouts.filter((h) => h.featured).length ? hangouts.filter((h) => h.featured) : hangouts).slice(0, 2)
+        const hiddenGems: HiddenGem[] = [...topDest, ...topCul, ...topHang].slice(0, 6).map((item) => ({
+          id: `gem-${item.id}`,
+          label: item.name,
+          region: item.region,
+          src: item.images[0]?.src || '/images/fallback/fallback-1.jpg',
+          alt: item.name,
         }))
 
-      const stats: Stat[] = [
-        { label: 'Tempat wisata terdaftar', value: `${wisataTotal.toLocaleString('id-ID')}`, isPrototype: false },
-        { label: 'Restoran & tempat makan', value: `${kulinerTotal.toLocaleString('id-ID')}`, isPrototype: false },
-        { label: 'Cafe & tempat hangout', value: `${nongkrongTotal.toLocaleString('id-ID')}`, isPrototype: false },
-      ]
-
-      const topDest = destinations.filter((d) => d.featured).slice(1, 4)
-      const topCul = culinary.filter((c) => c.featured).slice(0, 2)
-      const topHang = hangouts.filter((h) => h.featured).slice(0, 2)
-      const hiddenGems: HiddenGem[] = [...topDest, ...topCul, ...topHang].slice(0, 6).map((item) => ({
-        id: `gem-${item.id}`,
-        label: item.name,
-        region: item.region,
-        src: item.images[0]?.src || '/images/fallback/fallback-1.jpg',
-        alt: item.name,
-      }))
-
-      return { heroSlides, stats, hiddenGems }
-    }).catch(err => { homepagePromise = null; throw err })
+        return { heroSlides, stats, hiddenGems }
+      }
+    ).catch(err => { homepagePromise = null; throw err })
   }
   return homepagePromise
 }
