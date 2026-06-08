@@ -1,6 +1,6 @@
 'use client'
 
-import { User, Headphones, Clock, MapPin, Utensils, Coffee, Compass, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { User, BotMessageSquare, Clock, MapPin, Utensils, Coffee, Compass, ThumbsUp, ThumbsDown } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils/cn'
 import { feedbackApi } from '@/lib/api/feedback'
@@ -23,7 +23,7 @@ export default function ChatMessage({ message, onFeedback }: ChatMessageProps) {
 
   const handleFeedback = async (rating: number) => {
     if (feedbackStatus !== null) return // Already rated
-    
+
     setFeedbackStatus(rating)
     try {
       await feedbackApi.submit({
@@ -70,7 +70,7 @@ export default function ChatMessage({ message, onFeedback }: ChatMessageProps) {
         {isUser ? (
           <User className="h-3.5 w-3.5 text-white" />
         ) : (
-          <Headphones className="h-3.5 w-3.5 text-slate-500" />
+          < BotMessageSquare className="h-3.5 w-3.5 text-slate-500" />
         )}
       </div>
 
@@ -82,7 +82,7 @@ export default function ChatMessage({ message, onFeedback }: ChatMessageProps) {
       )}>
         {!isUser && (
           <div className="flex items-center gap-1.5 mb-1.5 pb-1 border-b border-slate-100/80">
-            <Headphones className="h-3 w-3 text-brand" />
+            < BotMessageSquare className="h-3 w-3 text-brand" />
             <span className="text-[11px] font-semibold text-brand">SITA</span>
           </div>
         )}
@@ -152,10 +152,10 @@ export default function ChatMessage({ message, onFeedback }: ChatMessageProps) {
 
             {!isUser && (
               <div className="flex items-center gap-2">
-                <button 
+                <button
                   onClick={() => handleFeedback(1)}
                   disabled={feedbackStatus !== null}
-                  className={cn("p-1 rounded transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50", 
+                  className={cn("p-1 rounded transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50",
                     feedbackStatus === 1 ? "text-green-600 bg-green-50" : "text-slate-300 hover:text-green-600 hover:bg-slate-50",
                     feedbackStatus !== null && feedbackStatus !== 1 ? "opacity-30" : ""
                   )}
@@ -163,10 +163,10 @@ export default function ChatMessage({ message, onFeedback }: ChatMessageProps) {
                 >
                   <ThumbsUp className="h-3 w-3" />
                 </button>
-                <button 
+                <button
                   onClick={() => handleFeedback(-1)}
                   disabled={feedbackStatus !== null}
-                  className={cn("p-1 rounded transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50", 
+                  className={cn("p-1 rounded transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50",
                     feedbackStatus === -1 ? "text-red-600 bg-red-50" : "text-slate-300 hover:text-red-600 hover:bg-slate-50",
                     feedbackStatus !== null && feedbackStatus !== -1 ? "opacity-30" : ""
                   )}

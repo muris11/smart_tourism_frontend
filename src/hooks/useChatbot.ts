@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
 import { useChatbotStore } from '@/stores/chatbotStore'
@@ -10,27 +10,57 @@ import type { ChatRequest } from '@/types'
 interface UseChatbotReturn {
   sendMessage: (message: string, location?: { lat?: number; lon?: number }) => Promise<void>
   isLoading: boolean
+  isTypingEffect: boolean
+  streamingContent: string
   error: string | null
   stopGenerating: () => void
 }
 
 /** Hook untuk mengelola chatbot (kirim pesan, loading, stop) */
 export function useChatbot(): UseChatbotReturn {
-  const router = useRouter()
   const { user } = useAuthStore()
   const { addMessage, setSession, setTyping, sessionToken } = useChatbotStore()
   const [isLoading, setIsLoading] = useState(false)
+  const [isTypingEffect, setIsTypingEffect] = useState(false)
+  const [streamingContent, setStreamingContent] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [abortController, setAbortController] = useState<AbortController | null>(null)
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  /**
-   * Kirim pesan ke chatbot
-   * @param message - Pesan dari user
-   * @param location - Koordinat lokasi user (opsional)
-   */
+  const stopTypingEffect = useCallback(() => {
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+      typingTimeoutRef.current = null
+    }
+    setIsTypingEffect(false)
+    setStreamingContent('')
+  }, [])
+
+  const startTypingEffect = useCallback((fullText: string, onComplete: () => void) => {
+    let currentIndex = 0
+    setStreamingContent('')
+    setIsTypingEffect(true)
+
+    const typeNextChar = () => {
+      if (currentIndex <= fullText.length) {
+        setStreamingContent(fullText.slice(0, currentIndex))
+        currentIndex++
+        typingTimeoutRef.current = setTimeout(typeNextChar, 20)
+      } else {
+        setIsTypingEffect(false)
+        setStreamingContent('')
+        onComplete()
+      }
+    }
+
+    typeNextChar()
+  }, [])
+
   const sendMessage = useCallback(
     async (message: string, location?: { lat?: number; lon?: number }) => {
       if (!message.trim()) return
+
+      stopTypingEffect()
 
       const userMessage = {
         role: 'user' as const,
@@ -39,7 +69,6 @@ export function useChatbot(): UseChatbotReturn {
       }
       addMessage(userMessage)
 
-      // Proses chat biasa
       setIsLoading(true)
       setError(null)
       setTyping(true)
@@ -62,14 +91,18 @@ export function useChatbot(): UseChatbotReturn {
           userId: user?.id,
         })
 
-        const assistantMessage = {
-          role: 'assistant' as const,
-          content: response.answer,
-          timestamp: new Date().toISOString(),
-          references: response.referensi,
-          wilayah: response.wilayah_terdeteksi,
-        }
-        addMessage(assistantMessage)
+        const fullAnswer = response.answer
+
+        startTypingEffect(fullAnswer, () => {
+          const assistantMessage = {
+            role: 'assistant' as const,
+            content: fullAnswer,
+            timestamp: new Date().toISOString(),
+            references: response.referensi,
+            wilayah: response.wilayah_terdeteksi,
+          }
+          addMessage(assistantMessage)
+        })
 
         if (response.session_token) {
           setSession(response.session_token)
@@ -91,21 +124,23 @@ export function useChatbot(): UseChatbotReturn {
         setAbortController(null)
       }
     },
-    [sessionToken, addMessage, setSession, setTyping, router, user]
+    [sessionToken, addMessage, setSession, setTyping, user, startTypingEffect, stopTypingEffect]
   )
 
-  /** Stop generating response (membatalkan request) */
   const stopGenerating = useCallback(() => {
     if (abortController) {
       abortController.abort()
-      setIsLoading(false)
-      setTyping(false)
     }
-  }, [abortController, setTyping])
+    stopTypingEffect()
+    setIsLoading(false)
+    setTyping(false)
+  }, [abortController, stopTypingEffect, setTyping])
 
   return {
     sendMessage,
     isLoading,
+    isTypingEffect,
+    streamingContent,
     error,
     stopGenerating,
   }
