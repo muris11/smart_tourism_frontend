@@ -104,6 +104,39 @@ export interface HomepageData {
   hiddenGems: HiddenGem[]
 }
 
+const HOME_HERO_SLIDES: HeroSlide[] = [
+  {
+    id: 'hero-1',
+    region: 'Ciayumajakuning',
+    src: '/images/hero/hero1-kompresio.webp',
+    alt: 'Pemandangan hero Ciayumajakuning',
+  },
+  {
+    id: 'hero-2',
+    region: 'Wisata Alam',
+    src: '/images/hero/hero2-kompresio.webp',
+    alt: 'Pemandangan wisata alam Ciayumajakuning',
+  },
+  {
+    id: 'hero-3',
+    region: 'Kuliner Khas',
+    src: '/images/hero/hero3-kompresio.webp',
+    alt: 'Kuliner khas Ciayumajakuning',
+  },
+  {
+    id: 'hero-4',
+    region: 'Tempat Nongkrong',
+    src: '/images/hero/hero4-kompresio.webp',
+    alt: 'Suasana tempat nongkrong Ciayumajakuning',
+  },
+  {
+    id: 'hero-5',
+    region: 'Panorama',
+    src: '/images/hero/hero5-kompresio.webp',
+    alt: 'Panorama Ciayumajakuning',
+  },
+]
+
 function formatPrice(min: number, max: number, gratis: boolean): string {
   if (gratis) return 'Gratis'
   const fmt = (n: number) => `Rp${n.toLocaleString('id-ID')}`
@@ -373,15 +406,7 @@ export function getHomepage(): Promise<HomepageData> {
         const culinary = (kulinerRes.items as KulinerItem[]).map(kulinerToCulinary)
         const hangouts = (nongkrongRes.items as NongkrongItem[]).map(nongkrongToHangout)
 
-        const heroSlides: HeroSlide[] = destinations
-          .filter((d) => d.images.length > 0)
-          .slice(0, 4)
-          .map((d) => ({
-            id: d.id,
-            region: d.region,
-            src: d.images[0].src,
-            alt: d.name,
-          }))
+        const heroSlides = HOME_HERO_SLIDES
 
         const stats: Stat[] = [
           { label: 'Tempat wisata terdaftar', value: `${(wisataRes.total || destinations.length).toLocaleString('id-ID')}`, isPrototype: false },

@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     siteName: 'CITRA',
     images: [
       {
-        url: '/images/hero/hero-1.jpeg',
+        url: '/images/hero/hero1-kompresio.webp',
         width: 1200,
         height: 630,
         alt: 'CITRA Smart Tourism Ciayumajakuning Banner',
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'CITRA — Asisten Wisata Cerdas Ciayumajakuning',
     description: 'Rencanakan liburanmu dengan asisten perjalanan AI. Temukan kuliner terlezat dan tempat nongkrong terbaik di wilayah Ciayumajakuning.',
-    images: ['/images/hero/hero-1.jpeg'],
+    images: ['/images/hero/hero1-kompresio.webp'],
   },
   icons: {
     icon: [
