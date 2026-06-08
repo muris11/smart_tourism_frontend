@@ -33,7 +33,7 @@ export default function RegionGridSection() {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="overflow-hidden rounded-lg bg-citra-surface shadow-card">
-                <div className="aspect-[4/5] skeleton-shimmer" />
+                <div className="aspect-4/5 skeleton-shimmer" />
               </div>
             ))}
           </div>
@@ -66,7 +66,7 @@ export default function RegionGridSection() {
               href={`/wisata?region=${region.slug}`}
               className="group relative overflow-hidden rounded-lg bg-citra-surface shadow-card transition-all duration-300 hover:shadow-card-hover"
             >
-              <div className="relative aspect-[4/5] overflow-hidden">
+              <div className="relative aspect-4/5 overflow-hidden">
                 <Image
                   src={region.image.src}
                   alt={region.image.alt}

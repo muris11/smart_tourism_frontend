@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { sentimentApi } from "@/lib/api/sentiment";
 import type { SentimentSummary } from "@/types";
 import { regionsApi } from "@/lib/api/regions";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, LabelList } from "recharts";
 import { MessageSquare, ThumbsUp, ThumbsDown, Award, TrendingUp, HelpCircle, Compass, Info, BarChart3, CheckCircle2, AlertCircle } from "lucide-react";
 
 interface SentimentChartProps {
@@ -206,7 +206,7 @@ export default function SentimentChart({
       <div className="grid gap-6 lg:grid-cols-12">
         {/* LEFT CARD: Interactive Chart (7 Cols) */}
         <div className="lg:col-span-7 flex flex-col justify-between rounded-2xl bg-white border border-slate-100 p-6 shadow-card transition-all hover:shadow-card-hover">
-          <div>
+          <div className="flex flex-col flex-1 min-h-0">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="font-display text-lg font-bold text-slate-900">
@@ -227,7 +227,7 @@ export default function SentimentChart({
             </div>
             
             {/* Chart Area */}
-            <div className="h-72 w-full mt-6">
+            <div className="flex-1 w-full mt-6 min-h-[288px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={comparisonData}
@@ -298,8 +298,23 @@ export default function SentimentChart({
             </div>
           </div>
 
+          {/* Insight Box */}
+          <div className="mt-6 mb-2">
+            <div className="bg-slate-50/80 border border-slate-100 rounded-xl p-4 flex gap-3 items-start">
+              <div className="bg-primary-100 text-primary-600 p-2 rounded-lg shrink-0 mt-0.5">
+                <TrendingUp className="h-4 w-4" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-slate-800">Insight Sentimen</h4>
+                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                  <span className="font-semibold text-slate-800">{mostSatisfiedRegion?.wilayah}</span> mencatat tingkat sentimen positif tertinggi (<span className="font-semibold text-emerald-600">{mostSatisfiedRegion?.positif}%</span>), menandakan kepuasan pengunjung yang sangat baik terhadap pengalaman wisata di wilayah ini.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Quick interactive tip */}
-          <div className="border-t border-slate-100 pt-4 mt-6 flex items-center justify-between text-xs text-slate-400">
+          <div className="border-t border-slate-100 pt-4 flex items-center justify-between text-xs text-slate-400">
             <span className="flex items-center gap-1.5">
               <Compass className="h-4 w-4 text-primary-500" />
               <span>Pilih bar wilayah di chart atau tab untuk memfilter data</span>
