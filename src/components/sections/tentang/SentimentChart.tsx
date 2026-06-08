@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { sentimentApi } from "@/lib/api/sentiment";
 import type { SentimentSummary } from "@/types";
 import { regionsApi } from "@/lib/api/regions";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { MessageSquare, ThumbsUp, ThumbsDown, Award, TrendingUp, HelpCircle, Compass, Info, BarChart3 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from "recharts";
+import { MessageSquare, ThumbsUp, ThumbsDown, Award, TrendingUp, HelpCircle, Compass, Info, BarChart3, CheckCircle2, AlertCircle } from "lucide-react";
 
 interface SentimentChartProps {
   wilayah?: string;
@@ -15,6 +15,30 @@ const SENTIMENT_COLORS = {
   positif: "#10b981", // Emerald 500
   negatif: "#f43f5e", // Rose 500
   netral: "#94a3b8",  // Slate 400
+};
+
+// Mock data untuk Aspect-Based Sentiment populer di setiap wilayah
+const ASPECT_KEYWORDS: Record<string, { positive: string[]; negative: string[] }> = {
+  summary: {
+    positive: ["Pemandangan Indah", "Suasana Sejuk", "Kuliner Lezat", "Keramahan Lokal"],
+    negative: ["Fasilitas Kurang", "Akses Jalan Sempit", "Parkir Terbatas"],
+  },
+  cirebon: {
+    positive: ["Sejarah Kental", "Kuliner Khas Juara", "Akses Transportasi Mudah"],
+    negative: ["Cuaca Cukup Panas", "Kemacetan Kota", "Fasilitas Publik Minim"],
+  },
+  indramayu: {
+    positive: ["Pantai Eksotis", "Olahan Seafood Segar", "Harga Tiket Murah"],
+    negative: ["Kebersihan Pantai", "Fasilitas Pendukung", "Akses Transportasi"],
+  },
+  majalengka: {
+    positive: ["Terasering Indah", "Banyak Curug Asri", "Udara Pegunungan Sejuk"],
+    negative: ["Akses Jalan Ekstrim", "Penerangan Jalan Minim", "Sinyal Seluler Lemah"],
+  },
+  kuningan: {
+    positive: ["Destinasi Air Jernih", "Udara Dingin Segar", "Pemandangan Gunung Ciremai"],
+    negative: ["Antrean Ramai Weekend", "Tempat Sampah Minim", "Biaya Tambahan Spot Foto"],
+  },
 };
 
 export default function SentimentChart({
@@ -127,6 +151,25 @@ export default function SentimentChart({
   // Cari daerah dengan tingkat kepuasan tertinggi
   const mostSatisfiedRegion = [...comparisonData].sort((a, b) => b.positif - a.positif)[0];
 
+  // Data untuk mini Donut Chart di Bento Spotlight
+  const pieData = activeRegionData
+    ? [
+        { name: "Positif", value: activeRegionData.positif, color: SENTIMENT_COLORS.positif },
+        { name: "Negatif", value: activeRegionData.negatif, color: SENTIMENT_COLORS.negatif },
+      ]
+    : [];
+
+  const handleChartClick = (state: any) => {
+    if (state && state.activeLabel) {
+      const regionName = state.activeLabel.toLowerCase();
+      if (["cirebon", "indramayu", "majalengka", "kuningan"].includes(regionName)) {
+        setActiveTab(regionName as any);
+      }
+    }
+  };
+
+  const currentKeywords = ASPECT_KEYWORDS[activeTab || "summary"];
+
   return (
     <div className="space-y-12">
       {/* 1. Header & Quick Analytics Dashboard */}
@@ -191,6 +234,7 @@ export default function SentimentChart({
                   layout="vertical"
                   margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
                   barGap={4}
+                  onClick={handleChartClick}
                 >
                   <XAxis type="number" domain={[0, 100]} unit="%" hide />
                   <YAxis
@@ -217,14 +261,38 @@ export default function SentimentChart({
                     fill={SENTIMENT_COLORS.positif}
                     radius={[0, 99, 99, 0]}
                     barSize={14}
-                  />
+                  >
+                    {comparisonData.map((entry, index) => {
+                      const isSelected = entry.wilayah.toLowerCase() === activeTab;
+                      return (
+                        <Cell 
+                          key={`cell-pos-${index}`} 
+                          fill={SENTIMENT_COLORS.positif}
+                          opacity={activeTab === "summary" || isSelected ? 1 : 0.45}
+                          className="cursor-pointer transition-all duration-300"
+                        />
+                      );
+                    })}
+                  </Bar>
                   <Bar
                     dataKey="negatif"
                     name="Negatif"
                     fill={SENTIMENT_COLORS.negatif}
                     radius={[0, 99, 99, 0]}
                     barSize={14}
-                  />
+                  >
+                    {comparisonData.map((entry, index) => {
+                      const isSelected = entry.wilayah.toLowerCase() === activeTab;
+                      return (
+                        <Cell 
+                          key={`cell-neg-${index}`} 
+                          fill={SENTIMENT_COLORS.negatif}
+                          opacity={activeTab === "summary" || isSelected ? 1 : 0.45}
+                          className="cursor-pointer transition-all duration-300"
+                        />
+                      );
+                    })}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -234,23 +302,23 @@ export default function SentimentChart({
           <div className="border-t border-slate-100 pt-4 mt-6 flex items-center justify-between text-xs text-slate-400">
             <span className="flex items-center gap-1.5">
               <Compass className="h-4 w-4 text-primary-500" />
-              <span>Pilih wilayah di samping untuk detail ulasan mendalam</span>
+              <span>Pilih bar wilayah di chart atau tab untuk memfilter data</span>
             </span>
             <span className="font-semibold text-slate-500">Ciayumajakuning</span>
           </div>
         </div>
 
         {/* RIGHT CARD: Detail Bento Spotlight (5 Cols) */}
-        <div className="lg:col-span-5 flex flex-col justify-between rounded-2xl bg-slate-900 text-white p-6 shadow-card overflow-hidden relative">
-          {/* Subtle Decorative Pattern */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="lg:col-span-5 flex flex-col justify-between rounded-2xl bg-slate-900 text-white p-6 shadow-card overflow-hidden relative border border-slate-800 transition-all hover:border-slate-700/80">
+          {/* Glowing background gradient mesh */}
+          <div className="absolute -top-12 -right-12 w-48 h-48 bg-primary-600/20 rounded-full blur-3xl pointer-events-none transition-all duration-500 group-hover:bg-primary-600/30" />
           
           <div>
             {/* Custom Tab Selector */}
             <div className="flex border-b border-slate-800 pb-3 mb-6 overflow-x-auto scrollbar-none gap-2">
               <button
                 onClick={() => setActiveTab("summary")}
-                className={`shrink-0 px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all flex items-center gap-1 ${
+                className={`shrink-0 px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 ${
                   activeTab === "summary"
                     ? "bg-primary-500 text-white shadow-sm"
                     : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
@@ -280,14 +348,37 @@ export default function SentimentChart({
             {/* Active Region Insights */}
             {activeRegionData && (
               <div className="space-y-6">
-                <div>
-                  <h4 className="text-2xl font-black font-display tracking-tight text-white flex items-center gap-2">
-                    {activeRegionData.wilayah}
-                  </h4>
-                  <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
-                    <MessageSquare className="h-3.5 w-3.5 text-slate-500" />
-                    <span>Total {activeRegionData.total_ulasan.toLocaleString()} ulasan terverifikasi</span>
-                  </p>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="text-2xl font-black font-display tracking-tight text-white">
+                      {activeRegionData.wilayah}
+                    </h4>
+                    <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
+                      <MessageSquare className="h-3.5 w-3.5 text-slate-500" />
+                      <span>{activeRegionData.total_ulasan.toLocaleString()} Ulasan Teranalisis</span>
+                    </p>
+                  </div>
+                  
+                  {/* Miniature Donut Chart inside Bento block */}
+                  <div className="h-14 w-14 shrink-0 -mt-2">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={pieData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={16}
+                          outerRadius={24}
+                          paddingAngle={2}
+                          dataKey="value"
+                        >
+                          {pieData.map((entry, index) => (
+                            <Cell key={`cell-donut-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
                 </div>
 
                 {/* Progress bar split visualizer */}
@@ -296,21 +387,46 @@ export default function SentimentChart({
                     <span className="text-emerald-400">Positif ({activeRegionData.positif}%)</span>
                     <span className="text-rose-400">Negatif ({activeRegionData.negatif}%)</span>
                   </div>
-                  <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden flex">
+                  <div className="h-2.5 w-full bg-slate-850 rounded-full overflow-hidden flex p-0.5">
                     <div
-                      className="h-full bg-emerald-500 transition-all duration-500"
+                      className="h-full bg-emerald-500 rounded-full transition-all duration-550"
                       style={{ width: `${activeRegionData.positif}%` }}
                     />
                     <div
-                      className="h-full bg-rose-500 transition-all duration-500"
+                      className="h-full bg-rose-500 rounded-full transition-all duration-550 ml-0.5"
                       style={{ width: `${activeRegionData.negatif}%` }}
                     />
                   </div>
                 </div>
 
+                {/* Aspect-Based Keywords Section */}
+                {currentKeywords && (
+                  <div className="space-y-3 bg-slate-950/40 rounded-xl p-4 border border-slate-800/60">
+                    <h5 className="text-xs font-bold text-slate-400 tracking-wider uppercase">Fokus Kata Kunci Ulasan</h5>
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap gap-1.5">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 mt-0.5 shrink-0" />
+                        {currentKeywords.positive.map((keyword, idx) => (
+                          <span key={idx} className="text-[11px] font-semibold text-emerald-300 bg-emerald-950/50 px-2 py-0.5 rounded-md border border-emerald-900/40">
+                            {keyword}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        <AlertCircle className="h-3.5 w-3.5 text-rose-400 mt-0.5 shrink-0" />
+                        {currentKeywords.negative.map((keyword, idx) => (
+                          <span key={idx} className="text-[11px] font-semibold text-rose-300 bg-rose-950/50 px-2 py-0.5 rounded-md border border-rose-900/40">
+                            {keyword}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Detail Metrics cards */}
-                <div className="grid grid-cols-2 gap-4 pt-2">
-                  <div className="bg-slate-800/40 border border-slate-800/50 rounded-xl p-3.5">
+                <div className="grid grid-cols-2 gap-4 pt-1">
+                  <div className="bg-slate-850/40 border border-slate-850/50 rounded-xl p-3.5">
                     <div className="flex items-center gap-2 text-emerald-400 text-xs font-semibold mb-1">
                       <ThumbsUp className="h-3.5 w-3.5" />
                       <span>Positif</span>
@@ -319,7 +435,7 @@ export default function SentimentChart({
                     <p className="text-[10px] text-slate-400 mt-0.5">Ulasan Baik</p>
                   </div>
 
-                  <div className="bg-slate-800/40 border border-slate-800/50 rounded-xl p-3.5">
+                  <div className="bg-slate-850/40 border border-slate-850/50 rounded-xl p-3.5">
                     <div className="flex items-center gap-2 text-rose-400 text-xs font-semibold mb-1">
                       <ThumbsDown className="h-3.5 w-3.5" />
                       <span>Negatif</span>
@@ -334,7 +450,7 @@ export default function SentimentChart({
 
           <div className="border-t border-slate-800 pt-4 mt-6 flex justify-between items-center text-xs text-slate-400">
             <span>Sumber: Google Maps Scraper</span>
-            <span className="text-primary-400 font-bold">CITRA AI</span>
+            <span className="text-primary-450 font-bold">CITRA AI</span>
           </div>
         </div>
       </div>
