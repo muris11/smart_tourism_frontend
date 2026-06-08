@@ -111,31 +111,31 @@ const HOME_HERO_SLIDES: HeroSlide[] = [
   {
     id: "hero-2",
     region: "Wisata Alam",
-    src: "/images/hero/hero2-kompresio.webp",
+    src: "/images/hero/hero2.webp",
     alt: "Pemandangan wisata alam Ciayumajakuning",
   },
   {
     id: "hero-1",
     region: "Ciayumajakuning",
-    src: "/images/hero/hero1-kompresio.webp",
+    src: "/images/hero/hero1.webp",
     alt: "Pemandangan hero Ciayumajakuning",
   },
   {
     id: "hero-3",
     region: "Kuliner Khas",
-    src: "/images/hero/hero3-kompresio.webp",
+    src: "/images/hero/hero3.webp",
     alt: "Kuliner khas Ciayumajakuning",
   },
   {
     id: "hero-4",
     region: "Tempat Nongkrong",
-    src: "/images/hero/hero4-kompresio.webp",
+    src: "/images/hero/hero4.webp",
     alt: "Suasana tempat nongkrong Ciayumajakuning",
   },
   {
     id: "hero-5",
     region: "Panorama",
-    src: "/images/hero/hero5-kompresio.webp",
+    src: "/images/hero/hero5.webp",
     alt: "Panorama Ciayumajakuning",
   },
 ];

@@ -50,7 +50,12 @@ const HERO_SLIDES: HeroSlide[] = [
 
 export default function HeroSection() {
   const router = useRouter();
-  const [slides, setSlides] = useState<HeroSlide[]>(HERO_SLIDES);
+  const [slides, setSlides] = useState<HeroSlide[]>([]);
+
+  useEffect(() => {
+    // Gunakan data dari constant lokal jika fetch API lambat/opsional
+    setSlides(HERO_SLIDES);
+  }, []);
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [parallaxOffset, setParallaxOffset] = useState(0);

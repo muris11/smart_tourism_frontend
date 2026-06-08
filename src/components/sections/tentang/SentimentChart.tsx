@@ -426,22 +426,26 @@ export default function SentimentChart({
 
                 {/* Detail Metrics cards */}
                 <div className="grid grid-cols-2 gap-4 pt-1">
-                  <div className="bg-slate-850/40 border border-slate-850/50 rounded-xl p-3.5">
-                    <div className="flex items-center gap-2 text-emerald-400 text-xs font-semibold mb-1">
-                      <ThumbsUp className="h-3.5 w-3.5" />
+                  <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4 transition-all duration-300 hover:bg-slate-800/80 hover:border-emerald-500/30">
+                    <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold mb-1">
+                      <ThumbsUp className="h-4 w-4" />
                       <span>Positif</span>
                     </div>
-                    <p className="text-lg font-black text-white">{activeRegionData.rawPositif.toLocaleString()}</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Ulasan Baik</p>
+                    <p className="text-2xl font-extrabold font-display tracking-tight text-white mt-1">
+                      {activeRegionData.rawPositif?.toLocaleString()}
+                    </p>
+                    <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold">Ulasan Baik</p>
                   </div>
 
-                  <div className="bg-slate-850/40 border border-slate-850/50 rounded-xl p-3.5">
-                    <div className="flex items-center gap-2 text-rose-400 text-xs font-semibold mb-1">
-                      <ThumbsDown className="h-3.5 w-3.5" />
+                  <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4 transition-all duration-300 hover:bg-slate-800/80 hover:border-rose-500/30">
+                    <div className="flex items-center gap-2 text-rose-400 text-xs font-bold mb-1">
+                      <ThumbsDown className="h-4 w-4" />
                       <span>Negatif</span>
                     </div>
-                    <p className="text-lg font-black text-white">{activeRegionData.rawNegatif.toLocaleString()}</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Ulasan Kritik</p>
+                    <p className="text-2xl font-extrabold font-display tracking-tight text-white mt-1">
+                      {activeRegionData.rawNegatif?.toLocaleString()}
+                    </p>
+                    <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold">Ulasan Kritik</p>
                   </div>
                 </div>
               </div>
