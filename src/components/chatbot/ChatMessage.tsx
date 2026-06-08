@@ -23,7 +23,7 @@ export default function ChatMessage({ message, onFeedback }: ChatMessageProps) {
 
   const handleFeedback = async (rating: number) => {
     if (feedbackStatus !== null) return // Already rated
-    
+
     setFeedbackStatus(rating)
     try {
       await feedbackApi.submit({
@@ -152,10 +152,10 @@ export default function ChatMessage({ message, onFeedback }: ChatMessageProps) {
 
             {!isUser && (
               <div className="flex items-center gap-2">
-                <button 
+                <button
                   onClick={() => handleFeedback(1)}
                   disabled={feedbackStatus !== null}
-                  className={cn("p-1 rounded transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50", 
+                  className={cn("p-1 rounded transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50",
                     feedbackStatus === 1 ? "text-green-600 bg-green-50" : "text-slate-300 hover:text-green-600 hover:bg-slate-50",
                     feedbackStatus !== null && feedbackStatus !== 1 ? "opacity-30" : ""
                   )}
@@ -163,10 +163,10 @@ export default function ChatMessage({ message, onFeedback }: ChatMessageProps) {
                 >
                   <ThumbsUp className="h-3 w-3" />
                 </button>
-                <button 
+                <button
                   onClick={() => handleFeedback(-1)}
                   disabled={feedbackStatus !== null}
-                  className={cn("p-1 rounded transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50", 
+                  className={cn("p-1 rounded transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50",
                     feedbackStatus === -1 ? "text-red-600 bg-red-50" : "text-slate-300 hover:text-red-600 hover:bg-slate-50",
                     feedbackStatus !== null && feedbackStatus !== -1 ? "opacity-30" : ""
                   )}
