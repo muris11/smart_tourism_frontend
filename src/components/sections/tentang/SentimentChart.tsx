@@ -5,7 +5,7 @@ import { sentimentApi } from "@/lib/api/sentiment";
 import type { SentimentSummary } from "@/types";
 import { regionsApi } from "@/lib/api/regions";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { MessageSquare, ThumbsUp, ThumbsDown, Award, TrendingUp, HelpCircle } from "lucide-react";
+import { MessageSquare, ThumbsUp, ThumbsDown, Award, TrendingUp, HelpCircle, Compass, Info } from "lucide-react";
 
 interface SentimentChartProps {
   wilayah?: string;
@@ -24,7 +24,6 @@ export default function SentimentChart({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [wilayahColors, setWilayahColors] = useState<Record<string, string>>({});
-  const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"cirebon" | "indramayu" | "majalengka" | "kuningan" | null>("majalengka");
 
   useEffect(() => {
@@ -128,13 +127,13 @@ export default function SentimentChart({
         <div className="max-w-2xl space-y-3">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-600">
             <TrendingUp className="h-3.5 w-3.5" />
-            <span>AI Sentiment Analysis v1.2</span>
+            <span>Analisis Sentimen Publik</span>
           </div>
           <h2 className="font-display text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl lg:text-5xl">
             Apa Kata Mereka?
           </h2>
           <p className="text-base text-slate-600 leading-relaxed">
-            Menganalisis opini publik secara real-time. Berdasarkan <span className="font-bold text-slate-900 underline decoration-primary-500 decoration-2">{totalUlasan.toLocaleString()} ulasan</span> dari Google Maps di kawasan Ciayumajakuning.
+            Menyajikan analisis respon publik secara real-time berdasarkan akumulasi <span className="font-bold text-slate-900 underline decoration-primary-500 decoration-2">{totalUlasan.toLocaleString()} ulasan</span> Google Maps dari wisatawan di Ciayumajakuning.
           </p>
         </div>
 
@@ -145,7 +144,7 @@ export default function SentimentChart({
               <Award className="h-5.5 w-5.5" />
             </div>
             <div>
-              <p className="text-xs font-medium text-slate-500">Destinasi Terfavorit</p>
+              <p className="text-xs font-medium text-slate-500">Kepuasan Tertinggi</p>
               <h4 className="text-base font-bold text-slate-900">{mostSatisfiedRegion.wilayah}</h4>
               <p className="text-xs font-semibold text-emerald-600">{mostSatisfiedRegion.positif}% Ulasan Positif</p>
             </div>
@@ -226,7 +225,10 @@ export default function SentimentChart({
 
           {/* Quick interactive tip */}
           <div className="border-t border-slate-100 pt-4 mt-6 flex items-center justify-between text-xs text-slate-400">
-            <span>💡 Klik wilayah di samping untuk detail ulasan mendalam</span>
+            <span className="flex items-center gap-1.5">
+              <Compass className="h-4 w-4 text-primary-500" />
+              <span>Pilih wilayah di samping untuk detail ulasan mendalam</span>
+            </span>
             <span className="font-semibold text-slate-500">Ciayumajakuning</span>
           </div>
         </div>
@@ -320,9 +322,10 @@ export default function SentimentChart({
       </div>
 
       {/* 3. Footer Note & Disclaimer */}
-      <div className="text-center bg-slate-50 border border-slate-200/60 rounded-xl p-4 max-w-3xl mx-auto">
-        <p className="text-xs text-slate-500 leading-relaxed">
-          *Analisis sentimen diproses secara otomatis oleh model Natural Language Processing (NLP) CITRA AI. Ulasan dikumpulkan secara agregat untuk memberikan gambaran umum tingkat kepuasan publik terhadap ekosistem pariwisata wilayah Ciayumajakuning.
+      <div className="flex items-start gap-3 bg-slate-50 border border-slate-200/60 rounded-2xl p-5 max-w-4xl mx-auto shadow-sm">
+        <Info className="h-5 w-5 text-slate-400 shrink-0 mt-0.5" />
+        <p className="text-xs text-slate-600 leading-relaxed">
+          Statistik ini disarikan secara dinamis menggunakan model analisis sentimen berbasis pemrosesan bahasa alami (NLP) terhadap kumpulan ulasan publik. Data ditujukan untuk memberikan perspektif objektif mengenai persepsi kenyamanan dan kepuasan pengunjung di destinasi terkait.
         </p>
       </div>
     </div>
