@@ -172,17 +172,14 @@ export default function Navbar() {
 
       <div
         className={cn(
-          'fixed inset-y-0 right-0 z-40 flex w-full flex-col bg-citra-canvas px-5 pb-6 shadow-2xl transition-transform duration-500 ease-out sm:max-w-sm lg:hidden',
-          mobileOpen ? 'translate-x-0' : 'translate-x-full'
+          'fixed left-0 right-0 top-0 z-40 flex flex-col bg-citra-canvas px-5 pb-8 pt-[74px] shadow-nav transition-all duration-500 ease-in-out lg:hidden border-b border-citra-border',
+          mobileOpen 
+            ? 'opacity-100 translate-y-0 max-h-[85vh] overflow-y-auto' 
+            : 'opacity-0 -translate-y-full pointer-events-none max-h-0'
         )}
-        style={{ paddingTop: 'calc(68px + 0.75rem)' }}
       >
-        <div className="flex-1 overflow-y-auto">
-          <div className="mb-4 px-4">
-            <Logo variant="default" showText={false} />
-          </div>
-
-          <nav className="flex flex-col gap-1">
+        <div className="flex flex-col">
+          <nav className="flex flex-col gap-0.5">
             {navLinks.map((link) => {
               const isActive = isActiveLink(link.href)
               return (
@@ -206,14 +203,14 @@ export default function Navbar() {
 
           <div className="my-4 h-px bg-citra-border" />
 
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-0.5">
             {drawerExtraLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={handleMenuClose}
                 className={cn(
-                  'flex min-h-[52px] items-center rounded-xl px-4 text-base font-medium text-citra-muted transition-all',
+                  'flex min-h-[48px] items-center rounded-xl px-4 text-base font-medium text-citra-muted transition-all',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-citra-focus focus-visible:ring-inset',
                   'hover:bg-citra-surface-soft hover:text-citra-ink'
                 )}
@@ -223,7 +220,7 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div className="mt-auto pt-4">
+          <div className="pt-4 mt-2 border-t border-citra-border">
             <UserMenu variant="mobile" onMobileClose={handleMenuClose} />
           </div>
         </div>
