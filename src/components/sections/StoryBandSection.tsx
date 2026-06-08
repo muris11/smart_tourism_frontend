@@ -7,37 +7,63 @@ import { ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import { getHomepage, type Stat } from '@/lib/api'
 
+const STORY_IMAGES = [
+  '/images/hero/hero1.webp',
+  '/images/hero/hero2.webp',
+  '/images/hero/hero3.webp',
+  '/images/hero/hero4.webp',
+  '/images/hero/hero5.webp',
+]
+
 export default function StoryBandSection() {
   const [stats, setStats] = useState<Stat[]>([])
-  const [storyImage, setStoryImage] = useState<string | null>(null)
+  const [current, setCurrent] = useState(0)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     getHomepage()
       .then((data) => {
         setStats(data.stats)
-        if (data.heroSlides.length > 0) {
-          setStoryImage(data.heroSlides[0].src)
-        }
       })
       .finally(() => setLoading(false))
+  }, [])
+
+  // Auto-slide effect untuk gambar background
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % STORY_IMAGES.length)
+    }, 5000)
+    return () => clearInterval(timer)
   }, [])
 
   return (
     <section className="relative overflow-hidden bg-citra-forest">
       <div className="container-page">
         <div className="flex flex-col-reverse lg:flex-row">
-          <div className="relative h-[300px] w-full lg:w-1/2 lg:h-[500px]">
-            <Image
-              src={storyImage || '/images/fallback/fallback-1.jpg'}
-              alt="Pemandangan Ciayumajakuning"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-            <div className="absolute inset-0 bg-linear-to-r from-citra-forest/60 to-transparent" />
+          {/* Kontainer Gambar Slide */}
+          <div className="relative h-[350px] w-full lg:w-1/2 lg:h-[550px] overflow-hidden">
+            {STORY_IMAGES.map((src, index) => (
+              <div
+                key={src}
+                className={cn(
+                  "absolute inset-0 transition-opacity duration-1000 ease-in-out",
+                  index === current ? "opacity-100" : "opacity-0"
+                )}
+              >
+                <Image
+                  src={src}
+                  alt={`Pemandangan Ciayumajakuning ${index + 1}`}
+                  fill
+                  priority={index === 0}
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </div>
+            ))}
+            <div className="absolute inset-0 bg-linear-to-r from-citra-forest/60 via-citra-forest/20 to-transparent" />
           </div>
 
+          {/* Kontainer Deskripsi */}
           <div className="flex items-center px-6 py-14 md:px-10 md:py-18 lg:w-1/2 lg:px-14 lg:py-24">
             <div className="max-w-lg">
               <span className="mb-3 block text-xs font-bold uppercase tracking-[0.16em] text-white/60">
