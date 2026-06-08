@@ -7,7 +7,7 @@ import { useChatbotStore } from '@/stores/chatbotStore'
 import { useAuthStore } from '@/stores/authStore'
 import ChatMessage from './ChatMessage'
 import ChatInput from './ChatInput'
-import { X, MapPin, Headphones, Trash2, ChevronDown, Compass, Utensils, Coffee, Calendar } from 'lucide-react'
+import { X, MapPin, Trash2, ChevronDown, Compass, Utensils, Coffee, Calendar, BotMessageSquare, ChevronUp } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
 interface ChatbotDrawerProps {
@@ -85,19 +85,22 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
 
   return (
     <>
-      {/* Overlay untuk mobile */}
-      <div
-        className="fixed inset-0 z-40 cursor-pointer bg-black/40 backdrop-blur-sm lg:hidden"
-        onClick={close}
-      />
+      {/* Overlay untuk mobile - hanya muncul saat tidak diminimalkan */}
+      {!isMinimized && (
+        <div
+          className="fixed inset-0 z-40 cursor-pointer bg-black/40 backdrop-blur-sm lg:hidden"
+          onClick={close}
+        />
+      )}
 
       {/* Drawer Chatbot */}
       <div
         className={cn(
           'fixed z-50 flex flex-col bg-white shadow-2xl transition-all duration-300',
-          'bottom-4 left-4 right-4 rounded-2xl border border-slate-200',
-          'lg:bottom-6 lg:right-6 lg:left-auto lg:h-[560px] lg:w-[380px] lg:rounded-2xl',
-          isMinimized ? 'h-14' : 'h-[85vh]',
+          isMinimized
+            ? 'bottom-4 left-4 right-4 lg:bottom-6 lg:right-6 lg:left-auto rounded-2xl border border-slate-200'
+            : 'bottom-4 left-4 right-4 rounded-2xl border border-slate-200 lg:bottom-6 lg:right-6 lg:left-auto lg:w-[380px] lg:rounded-2xl',
+          isMinimized ? 'h-14' : 'h-[85vh] lg:h-[560px]',
           className
         )}
       >
@@ -105,7 +108,7 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
         <div className="flex items-center justify-between bg-linear-to-r from-[#0d7a6a] to-[#0a6458] px-4 py-3 rounded-t-2xl">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15">
-              <Headphones className="h-4 w-4 text-white" />
+              <BotMessageSquare className="h-4 w-4 text-white" />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-white">SITA</h3>
@@ -114,22 +117,34 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
           </div>
 
           <div className="flex items-center gap-0.5">
-            <button onClick={() => setIsMinimized(!isMinimized)} className="rounded-lg p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white cursor-pointer">
-              <ChevronDown className={cn('h-4 w-4 transition-transform', isMinimized && 'rotate-180')} />
+            <button
+              onClick={() => setIsMinimized(!isMinimized)}
+              className="rounded-lg p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+              aria-label={isMinimized ? "Expand" : "Minimize"}
+            >
+              {isMinimized ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
             </button>
-            <button onClick={handleEnableLocation} disabled={locationLoading} className={cn('rounded-lg p-1.5 transition-colors cursor-pointer', showLocation && lat ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white', locationLoading && 'opacity-50 cursor-not-allowed')}>
-              <MapPin className="h-4 w-4" />
-            </button>
-            <button onClick={() => setShowConfirmTrash(true)} className="rounded-lg p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white cursor-pointer">
-              <Trash2 className="h-4 w-4" />
-            </button>
+            {!isMinimized && (
+              <>
+                <button onClick={handleEnableLocation} disabled={locationLoading} className={cn('rounded-lg p-1.5 transition-colors cursor-pointer', showLocation && lat ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white', locationLoading && 'opacity-50 cursor-not-allowed')}>
+                  <MapPin className="h-4 w-4" />
+                </button>
+                <button onClick={() => setShowConfirmTrash(true)} className="rounded-lg p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white cursor-pointer">
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </>
+            )}
             <button onClick={close} className="rounded-lg p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white cursor-pointer">
               <X className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        {/* BODY DRAWER */}
+        {/* BODY DRAWER - hanya tampil saat tidak diminimalkan */}
         {!isMinimized && (
           <>
             {/* Lokasi Bar */}
@@ -151,7 +166,7 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
                 // Tampilan awal (empty state)
                 <div className="flex h-full flex-col items-center justify-center text-center px-4">
                   <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-[#0d7a6a] to-[#0a6458] shadow-md">
-                    <Headphones className="h-7 w-7 text-white" />
+                    <BotMessageSquare className="h-7 w-7 text-white" />
                   </div>
                   <h4 className="mb-2 text-base font-semibold text-brand-deep font-display">Halo! Ada yang bisa dibantu?</h4>
                   <p className="max-w-xs text-sm leading-relaxed text-slate-500 mb-6">Tanyakan tentang wisata, kuliner, atau tempat nongkrong di Ciayumajakuning.</p>
@@ -180,7 +195,7 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
                   {isTypingEffect && streamingContent && (
                     <div className="flex gap-3">
                       <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10">
-                        <Headphones className="h-3.5 w-3.5 text-brand" />
+                        <BotMessageSquare className="h-3.5 w-3.5 text-brand" />
                       </div>
                       <div className="rounded-xl rounded-tl-none bg-slate-100 px-4 py-3 max-w-[85%] overflow-hidden">
                         <div
@@ -196,7 +211,7 @@ export default function ChatbotDrawer({ className }: ChatbotDrawerProps) {
                   {isTyping && !isTypingEffect && (
                     <div className="flex gap-3">
                       <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10">
-                        <Headphones className="h-3.5 w-3.5 text-brand" />
+                        <BotMessageSquare className="h-3.5 w-3.5 text-brand" />
                       </div>
                       <div className="rounded-xl rounded-tl-none bg-slate-100 px-4 py-3">
                         <div className="flex gap-1">
