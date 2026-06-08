@@ -23,6 +23,9 @@ export async function generateMetadata({ params }: Omit<Props, 'children'>): Pro
   return {
     title,
     description,
+    alternates: {
+      canonical: `/wisata/${slug}`,
+    },
     keywords: [
       destination.name.toLowerCase(),
       `wisata ${destination.name.toLowerCase()}`,

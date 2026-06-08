@@ -23,6 +23,9 @@ export async function generateMetadata({ params }: Omit<Props, 'children'>): Pro
   return {
     title,
     description,
+    alternates: {
+      canonical: `/kuliner/${slug}`,
+    },
     keywords: [
       culinary.name.toLowerCase(),
       `kuliner ${culinary.name.toLowerCase()}`,

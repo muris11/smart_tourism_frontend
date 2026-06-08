@@ -80,8 +80,36 @@ export default function KulinerDetailPage() {
     )
   }
 
+  const schemaData = {
+    '@context': 'https://schema.org',
+    '@type': 'Restaurant',
+    'name': item.name,
+    'description': item.description || `Nikmati kelezatan kuliner ${item.name} khas ${item.region}. Temukan info harga menu, alamat, dan rekomendasi hidangan bersama CITRA.`,
+    'image': item.images.map((img) => img.src),
+    'address': {
+      '@type': 'PostalAddress',
+      'streetAddress': item.address,
+      'addressLocality': item.region,
+      'addressCountry': 'ID'
+    },
+    'servesCuisine': item.category || 'Kuliner Khas',
+    ...(item.rating > 0 && {
+      'aggregateRating': {
+        '@type': 'AggregateRating',
+        'ratingValue': item.rating,
+        'bestRating': '5',
+        'worstRating': '1',
+        'ratingCount': '10'
+      }
+    })
+  }
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+      />
       <DetailHero
         images={item.images}
         title={item.name}

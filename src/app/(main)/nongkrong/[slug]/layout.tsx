@@ -23,6 +23,9 @@ export async function generateMetadata({ params }: Omit<Props, 'children'>): Pro
   return {
     title,
     description,
+    alternates: {
+      canonical: `/nongkrong/${slug}`,
+    },
     keywords: [
       hangout.name.toLowerCase(),
       `cafe ${hangout.name.toLowerCase()}`,

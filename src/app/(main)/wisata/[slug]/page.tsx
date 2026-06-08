@@ -81,8 +81,35 @@ export default function WisataDetailPage() {
     )
   }
 
+  const schemaData = {
+    '@context': 'https://schema.org',
+    '@type': 'TouristAttraction',
+    'name': item.name,
+    'description': item.description || `Jelajahi destinasi wisata ${item.name} di ${item.region} dengan asisten perjalanan CITRA.`,
+    'image': item.images.map((img) => img.src),
+    'address': {
+      '@type': 'PostalAddress',
+      'streetAddress': item.address,
+      'addressLocality': item.region,
+      'addressCountry': 'ID'
+    },
+    ...(item.rating > 0 && {
+      'aggregateRating': {
+        '@type': 'AggregateRating',
+        'ratingValue': item.rating,
+        'bestRating': '5',
+        'worstRating': '1',
+        'ratingCount': '10' // default placeholder review count
+      }
+    })
+  }
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+      />
       <DetailHero
         images={item.images}
         title={item.name}

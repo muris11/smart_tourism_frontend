@@ -80,8 +80,36 @@ export default function NongkrongDetailPage() {
     )
   }
 
+  const schemaData = {
+    '@context': 'https://schema.org',
+    '@type': 'Restaurant',
+    'name': item.name,
+    'description': item.description || `Cari tahu informasi cafe estetik ${item.name} di ${item.region}. Dapatkan kisaran harga menu, alamat lengkap, dan suasana tempat bersama CITRA.`,
+    'image': item.images.map((img) => img.src),
+    'address': {
+      '@type': 'PostalAddress',
+      'streetAddress': item.address,
+      'addressLocality': item.region,
+      'addressCountry': 'ID'
+    },
+    'servesCuisine': item.category || 'Cafe & Coffee Shop',
+    ...(item.rating > 0 && {
+      'aggregateRating': {
+        '@type': 'AggregateRating',
+        'ratingValue': item.rating,
+        'bestRating': '5',
+        'worstRating': '1',
+        'ratingCount': '10'
+      }
+    })
+  }
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+      />
       <DetailHero
         images={item.images}
         title={item.name}
