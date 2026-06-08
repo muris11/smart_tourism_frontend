@@ -5,7 +5,7 @@ import { sentimentApi } from "@/lib/api/sentiment";
 import type { SentimentSummary } from "@/types";
 import { regionsApi } from "@/lib/api/regions";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { MessageSquare, ThumbsUp, ThumbsDown, Award, TrendingUp, HelpCircle, Compass, Info } from "lucide-react";
+import { MessageSquare, ThumbsUp, ThumbsDown, Award, TrendingUp, HelpCircle, Compass, Info, BarChart3 } from "lucide-react";
 
 interface SentimentChartProps {
   wilayah?: string;
@@ -24,7 +24,7 @@ export default function SentimentChart({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [wilayahColors, setWilayahColors] = useState<Record<string, string>>({});
-  const [activeTab, setActiveTab] = useState<"cirebon" | "indramayu" | "majalengka" | "kuningan" | null>("majalengka");
+  const [activeTab, setActiveTab] = useState<"cirebon" | "indramayu" | "majalengka" | "kuningan" | "summary" | null>("summary");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,12 +42,6 @@ export default function SentimentChart({
           colors[r.name] = r.color_hex || '#0d7a6a';
         });
         setWilayahColors(colors);
-
-        // Cari wilayah dengan total ulasan atau persentase positif tertinggi sebagai default active tab
-        if (allSummary.length > 0) {
-          const sorted = [...allSummary].sort((a, b) => b.total_ulasan - a.total_ulasan);
-          setActiveTab(sorted[0].wilayah.toLowerCase() as any);
-        }
       } catch (err) {
         console.error("Failed to fetch sentiment data:", err);
         setError("Gagal memuat data sentimen");
@@ -113,9 +107,22 @@ export default function SentimentChart({
   });
 
   const totalUlasan = allData.reduce((sum, item) => sum + item.total_ulasan, 0);
-  const activeRegionData = comparisonData.find(
-    (d) => d.wilayah.toLowerCase() === activeTab
-  );
+  const totalRawPositif = allData.reduce((sum, item) => sum + item.positif, 0);
+  const totalRawNegatif = allData.reduce((sum, item) => sum + item.negatif, 0);
+  const aggregatePositif = Number(((totalRawPositif / totalUlasan) * 100).toFixed(1));
+  const aggregateNegatif = Number(((totalRawNegatif / totalUlasan) * 100).toFixed(1));
+
+  // Determine active dataset
+  const activeRegionData = activeTab === "summary"
+    ? {
+        wilayah: "Seluruh Wilayah",
+        total_ulasan: totalUlasan,
+        positif: aggregatePositif,
+        negatif: aggregateNegatif,
+        rawPositif: totalRawPositif,
+        rawNegatif: totalRawNegatif,
+      }
+    : comparisonData.find((d) => d.wilayah.toLowerCase() === activeTab);
 
   // Cari daerah dengan tingkat kepuasan tertinggi
   const mostSatisfiedRegion = [...comparisonData].sort((a, b) => b.positif - a.positif)[0];
@@ -241,6 +248,17 @@ export default function SentimentChart({
           <div>
             {/* Custom Tab Selector */}
             <div className="flex border-b border-slate-800 pb-3 mb-6 overflow-x-auto scrollbar-none gap-2">
+              <button
+                onClick={() => setActiveTab("summary")}
+                className={`shrink-0 px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all flex items-center gap-1 ${
+                  activeTab === "summary"
+                    ? "bg-primary-500 text-white shadow-sm"
+                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+                }`}
+              >
+                <BarChart3 className="h-3.5 w-3.5" />
+                Gabungan
+              </button>
               {allData.map((item) => {
                 const isSelected = item.wilayah.toLowerCase() === activeTab;
                 return (
@@ -263,7 +281,7 @@ export default function SentimentChart({
             {activeRegionData && (
               <div className="space-y-6">
                 <div>
-                  <h4 className="text-2xl font-black font-display tracking-tight text-white">
+                  <h4 className="text-2xl font-black font-display tracking-tight text-white flex items-center gap-2">
                     {activeRegionData.wilayah}
                   </h4>
                   <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
