@@ -27,7 +27,7 @@ export default function StoryBandSection() {
     <section className="relative overflow-hidden bg-citra-forest">
       <div className="container-page">
         <div className="flex flex-col-reverse lg:flex-row">
-          <div className="relative min-h-[300px] lg:w-1/2 lg:min-h-[500px]">
+          <div className="relative h-[300px] w-full lg:w-1/2 lg:h-[500px]">
             <Image
               src={storyImage || '/images/fallback/fallback-1.jpg'}
               alt="Pemandangan Ciayumajakuning"
