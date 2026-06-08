@@ -1,75 +1,98 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { Search, MapPin, UtensilsCrossed, Coffee } from 'lucide-react'
-import { cn } from '@/lib/utils/cn'
-import { Button } from '@/components/ui/Button'
-import { getHomepage, type HeroSlide } from '@/lib/api'
+import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils/cn";
+import { Coffee, MapPin, Search, UtensilsCrossed } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+type HeroSlide = {
+  id: string;
+  region: string;
+  src: string;
+  alt: string;
+};
+
+const HERO_SLIDES: HeroSlide[] = [
+  {
+    id: "hero-1",
+    region: "Ciayumajakuning",
+    src: "/images/hero/hero1-kompresio.webp",
+    alt: "Pemandangan hero Ciayumajakuning",
+  },
+  {
+    id: "hero-2",
+    region: "Wisata Alam",
+    src: "/images/hero/hero2-kompresio.webp",
+    alt: "Pemandangan wisata alam Ciayumajakuning",
+  },
+  {
+    id: "hero-3",
+    region: "Panorama",
+    src: "/images/hero/hero3-kompresio.webp",
+    alt: "Panorama Ciayumajakuning",
+  },
+  {
+    id: "hero-4",
+    region: "Kuliner Khas",
+    src: "/images/hero/hero4-kompresio.webp",
+    alt: "Kuliner khas Ciayumajakuning",
+  },
+  {
+    id: "hero-5",
+    region: "Tempat Nongkrong",
+    src: "/images/hero/hero5-kompresio.webp",
+    alt: "Suasana tempat nongkrong Ciayumajakuning",
+  },
+];
 
 export default function HeroSection() {
-  const router = useRouter()
-  const [slides, setSlides] = useState<HeroSlide[]>([])
-  const [current, setCurrent] = useState(0)
-  const [isPaused, setIsPaused] = useState(false)
-  const [parallaxOffset, setParallaxOffset] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const sectionRef = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    getHomepage()
-      .then((data) => {
-        if (data.heroSlides.length > 0) {
-          setSlides(data.heroSlides)
-          setCurrent(0)
-        }
-        setIsLoading(false)
-      })
-      .catch((error) => {
-        console.error('Failed to fetch homepage data:', error)
-        setIsLoading(false)
-      })
-  }, [])
+  const router = useRouter();
+  const [slides, setSlides] = useState<HeroSlide[]>(HERO_SLIDES);
+  const [current, setCurrent] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [parallaxOffset, setParallaxOffset] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
   const startInterval = useCallback(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current)
-    if (slides.length === 0) return
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (slides.length === 0) return;
     intervalRef.current = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % slides.length)
-    }, 6000)
-  }, [slides.length])
+      setCurrent((prev) => (prev + 1) % slides.length);
+    }, 6000);
+  }, [slides.length]);
 
   useEffect(() => {
-    if (!isPaused && slides.length > 0) startInterval()
+    if (!isPaused && slides.length > 0) startInterval();
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
-  }, [isPaused, startInterval, slides.length])
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isPaused, startInterval, slides.length]);
 
   useEffect(() => {
     const handleScroll = () => {
       if (sectionRef.current) {
-        const rect = sectionRef.current.getBoundingClientRect()
-        setParallaxOffset(rect.top * 0.15)
+        const rect = sectionRef.current.getBoundingClientRect();
+        setParallaxOffset(rect.top * 0.15);
       }
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const goToSlide = (index: number) => {
-    setCurrent(index)
-    setIsPaused(true)
-    setTimeout(() => setIsPaused(false), 8000)
-  }
+    setCurrent(index);
+    setIsPaused(true);
+    setTimeout(() => setIsPaused(false), 8000);
+  };
 
-  if (isLoading || slides.length === 0) {
+  if (slides.length === 0) {
     return (
-      <section className="relative overflow-hidden bg-citra-forest min-h-[600px] md:h-screen" />
-    )
+      <section className="relative overflow-hidden bg-citra-forest min-h-150 md:h-screen" />
+    );
   }
 
   return (
@@ -79,13 +102,13 @@ export default function HeroSection() {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="relative h-[80vh] min-h-[600px] md:h-screen">
+      <div className="relative h-[80vh] min-h-150 md:h-screen">
         {slides.map((slide, index) => (
           <div
             key={slide.id}
             className={cn(
-              'absolute inset-0 transition-opacity duration-1000 ease-in-out',
-              index === current ? 'opacity-100' : 'opacity-0'
+              "absolute inset-0 transition-opacity duration-1000 ease-in-out",
+              index === current ? "opacity-100" : "opacity-0",
             )}
           >
             <Image
@@ -121,16 +144,24 @@ export default function HeroSection() {
               </h1>
 
               <p className="mx-auto mb-8 max-w-xl text-sm leading-relaxed text-white/75 md:text-base lg:text-lg">
-                Temukan tempat wisata, kuliner khas, dan sudut favorit dari Cirebon, Indramayu, Majalengka, dan Kuningan — satu pintu.
+                Temukan tempat wisata, kuliner khas, dan sudut favorit dari
+                Cirebon, Indramayu, Majalengka, dan Kuningan — satu pintu.
               </p>
 
-              <form onSubmit={(e) => {
-                e.preventDefault()
-                const val = (e.currentTarget.elements.namedItem('search') as HTMLInputElement).value
-                if (val) {
-                  router.push(`/cari?q=${encodeURIComponent(val)}`)
-                }
-              }} className="mx-auto mb-6 flex max-w-xl items-center gap-2 rounded-full border border-white/20 bg-white/12 p-1.5 pl-5 backdrop-blur-md">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const val = (
+                    e.currentTarget.elements.namedItem(
+                      "search",
+                    ) as HTMLInputElement
+                  ).value;
+                  if (val) {
+                    router.push(`/cari?q=${encodeURIComponent(val)}`);
+                  }
+                }}
+                className="mx-auto mb-6 flex max-w-xl items-center gap-2 rounded-full border border-white/20 bg-white/12 p-1.5 pl-5 backdrop-blur-md"
+              >
                 <Search className="h-4 w-4 shrink-0 text-white/60" />
                 <input
                   type="text"
@@ -138,7 +169,12 @@ export default function HeroSection() {
                   placeholder="Cari destinasi, kuliner, atau tempat nongkrong..."
                   className="w-full bg-transparent text-sm text-white placeholder-white/50 outline-none"
                 />
-                <Button type="submit" variant="primary" size="sm" className="shrink-0 rounded-full px-5 cursor-pointer">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="sm"
+                  className="shrink-0 rounded-full px-5 cursor-pointer"
+                >
                   Jelajahi
                 </Button>
               </form>
@@ -176,10 +212,10 @@ export default function HeroSection() {
               key={index}
               onClick={() => goToSlide(index)}
               className={cn(
-                'rounded-full transition-all duration-500',
+                "rounded-full transition-all duration-500",
                 index === current
-                  ? 'h-2 w-6 bg-white'
-                  : 'h-2 w-2 bg-white/40 hover:bg-white/70'
+                  ? "h-2 w-6 bg-white"
+                  : "h-2 w-2 bg-white/40 hover:bg-white/70",
               )}
               aria-label={`Slide ${index + 1}: ${slides[index].region}`}
             />
@@ -187,5 +223,5 @@ export default function HeroSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
