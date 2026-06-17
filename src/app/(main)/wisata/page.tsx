@@ -9,14 +9,11 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { Chip } from '@/components/ui/Chip'
 import { Skeleton } from '@/components/ui/Skeleton'
 import Pagination from '@/components/ui/Pagination'
-import { cn } from '@/lib/utils/cn'
 import { getDestinations, type Destination } from '@/lib/api'
 import { regionsApi } from '@/lib/api/regions'
 
 const PAGE_SIZE = 12
 
-// Regions di-load secara dinamis
-// const REGIONS = ['Semua', 'Cirebon', 'Indramayu', 'Majalengka', 'Kuningan'] as const
 const CATEGORIES = ['Semua', 'Alam', 'Budaya', 'Religi'] as const
 const SORT_OPTIONS = [
   { value: 'popular', label: 'Terpopuler' },
@@ -25,6 +22,12 @@ const SORT_OPTIONS = [
 ] as const
 
 type SortValue = (typeof SORT_OPTIONS)[number]['value']
+
+// 🔥 FIX: Handle string | null
+function capitalizeFirstLetter(str: string | null): string {
+  if (!str || str === 'Semua') return 'Semua'
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}
 
 function DestinationCard({ item }: { item: Destination }) {
   return (
@@ -75,7 +78,9 @@ function WisataPageContent() {
   const searchParams = useSearchParams()
 
   const [destinations, setDestinations] = useState<Destination[]>([])
-  const [region, setRegion] = useState(searchParams.get('region') || 'Semua')
+  const [region, setRegion] = useState(
+    capitalizeFirstLetter(searchParams.get('region'))
+  )
   const [category, setCategory] = useState(searchParams.get('category') || 'Semua')
   const [sort, setSort] = useState<SortValue>('popular')
   const [showMobileFilter, setShowMobileFilter] = useState(false)
@@ -83,11 +88,15 @@ function WisataPageContent() {
   const [page, setPage] = useState(1)
   const [regions, setRegions] = useState<string[]>(['Semua'])
 
+  // Load data
   useEffect(() => {
     Promise.all([getDestinations(), regionsApi.list()])
       .then(([destData, regionData]) => {
         setDestinations(destData)
         setRegions(['Semua', ...regionData.map(r => r.name)])
+      })
+      .catch(error => {
+        console.error('Error loading data:', error)
       })
       .finally(() => setLoading(false))
   }, [])
@@ -98,6 +107,7 @@ function WisataPageContent() {
     if (category !== 'Semua') params.set('category', category)
     const qs = params.toString()
     router.replace(`/wisata${qs ? `?${qs}` : ''}`, { scroll: false })
+
     setPage(1)
   }, [region, category, router])
 
@@ -105,7 +115,9 @@ function WisataPageContent() {
     let result = [...destinations]
 
     if (region !== 'Semua') {
-      result = result.filter((d) => d.region === region)
+      result = result.filter((d) =>
+        d.region.toLowerCase() === region.toLowerCase()
+      )
     }
     if (category !== 'Semua') {
       result = result.filter((d) => d.category === category)
@@ -141,7 +153,12 @@ function WisataPageContent() {
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
         {regions.map((r) => (
-          <Chip key={r} label={r} active={region === r} onClick={() => setRegion(r)} />
+          <Chip
+            key={r}
+            label={r}
+            active={region === r}
+            onClick={() => setRegion(r)}
+          />
         ))}
         <div className="ml-auto hidden md:flex items-center gap-3">
           {CATEGORIES.map((c) => (
@@ -188,7 +205,6 @@ function WisataPageContent() {
           </select>
         </div>
       </div>
-
 
       {loading ? (
         <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
