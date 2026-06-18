@@ -143,7 +143,7 @@ function WisataPageContent() {
   const activeFilterCount = [region !== 'Semua' ? region : '', category !== 'Semua' ? category : ''].filter(Boolean).length
 
   return (
-    <div className="container-page section-spacing pt-24 lg:pt-32">
+    <div className="container-page section-spacing pt-32 lg:pt-40">
       <div className="mb-8">
         <span className="eyebrow">Jelajahi</span>
         <h1 className="mt-2 text-3xl font-bold font-display text-citra-ink md:text-4xl">
@@ -297,7 +297,7 @@ export default function WisataPage() {
   usePageTitle('Wisata')
   return (
     <Suspense fallback={
-      <div className="container-page section-spacing pt-24 lg:pt-32">
+      <div className="container-page section-spacing pt-32 lg:pt-40">
         <div className="skeleton-shimmer mb-8 h-8 w-64 rounded-lg" />
         <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
