@@ -143,7 +143,7 @@ function WisataPageContent() {
   const activeFilterCount = [region !== 'Semua' ? region : '', category !== 'Semua' ? category : ''].filter(Boolean).length
 
   return (
-    <div className="container-page section-spacing pt-32 lg:pt-40">
+    <div className="container-page pt-32 pb-14 lg:pt-40 lg:pb-24">
       <div className="mb-8">
         <span className="eyebrow">Jelajahi</span>
         <h1 className="mt-2 text-3xl font-bold font-display text-citra-ink md:text-4xl">
