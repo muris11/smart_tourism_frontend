@@ -297,7 +297,7 @@ export default function WisataPage() {
   usePageTitle('Wisata')
   return (
     <Suspense fallback={
-      <div className="container-page section-spacing pt-32 lg:pt-40">
+    <div className="container-page pt-32 pb-14 lg:pt-40 lg:pb-24">
         <div className="skeleton-shimmer mb-8 h-8 w-64 rounded-lg" />
         <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (

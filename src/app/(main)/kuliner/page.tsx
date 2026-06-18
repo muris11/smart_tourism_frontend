@@ -133,7 +133,7 @@ function KulinerPageContent() {
   const activeFilterCount = [region !== 'Semua' ? region : ''].filter(Boolean).length
 
   return (
-    <div className="container-page section-spacing pt-32 lg:pt-40">
+    <div className="container-page pt-32 pb-14 lg:pt-40 lg:pb-24">
       <div className="mb-8">
         <span className="eyebrow">Cicipi</span>
         <h1 className="mt-2 text-3xl font-bold font-display text-citra-ink md:text-4xl">
@@ -272,7 +272,7 @@ export default function KulinerPage() {
   usePageTitle('Kuliner')
   return (
     <Suspense fallback={
-      <div className="container-page section-spacing pt-32 lg:pt-40">
+      <div className="container-page pt-32 pb-14 lg:pt-40 lg:pb-24">
         <div className="skeleton-shimmer mb-8 h-8 w-56 rounded-lg" />
         <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 6 }).map((_, i) => (
